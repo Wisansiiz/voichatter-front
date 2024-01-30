@@ -27,6 +27,7 @@
     "@vitejs/plugin-vue": "^5.0.3",
     "@vue-macros/volar": "^0.18.11",
     "@vue/test-utils": "^2.4.3",
+    "axios": "^1.6.7",
     "eslint": "^8.56.0",
     "eslint-plugin-format": "^0.1.0",
     "jsdom": "^24.0.0",
