@@ -9,6 +9,9 @@ import UnoCSS from 'unocss/vite'
 import VueMacros from 'unplugin-vue-macros/vite'
 import VueRouter from 'unplugin-vue-router/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
+import Layouts from 'vite-plugin-vue-layouts'
+import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
+import Pages from 'vite-plugin-pages'
 
 export default defineConfig({
   resolve: {
@@ -29,9 +32,14 @@ export default defineConfig({
         }),
       },
     }),
-
     // https://github.com/posva/unplugin-vue-router
     VueRouter(),
+
+    Layouts({
+      layoutsDirs: './src/layouts',
+      defaultLayout: 'default',
+    }),
+    Pages(),
 
     // https://github.com/antfu/unplugin-auto-import
     AutoImport({
@@ -42,6 +50,14 @@ export default defineConfig({
         {
           // add any other imports you were relying on
           'vue-router/auto': ['useLink'],
+        },
+        {
+          'naive-ui': [
+            'useDialog',
+            'useMessage',
+            'useNotification',
+            'useLoadingBar',
+          ],
         },
       ],
       dts: true,
@@ -54,6 +70,7 @@ export default defineConfig({
     // https://github.com/antfu/vite-plugin-components
     Components({
       dts: true,
+      resolvers: [NaiveUiResolver()],
     }),
 
     // https://github.com/antfu/unocss
