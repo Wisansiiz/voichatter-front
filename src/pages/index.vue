@@ -13,7 +13,7 @@ function go() {
 </script>
 
 <template>
-  <div>
+  <n-scrollbar style="margin-bottom: 50px">
     <div i-carbon-campsite inline-block text-4xl />
     <p>
       <a rel="noreferrer" href="https://github.com/antfu/vitesse-lite" target="_blank">
@@ -42,5 +42,22 @@ function go() {
         Go
       </button>
     </div>
-  </div>
+
+    <div>
+      <RouterLink to="/" i-carbon-home icon-btn />
+
+      <button icon-btn @click="toggleDark()">
+        <div i-carbon-sun dark:i-carbon-moon />
+      </button>
+
+      <a
+        i-carbon-logo-github icon-btn
+        rel="noreferrer"
+        href="https://github.com/antfu/vitesse-lite"
+        target="_blank"
+        title="GitHub"
+      />
+      <RouterLink to="/ws" i-carbon-add-comment icon-btn />
+    </div>
+  </n-scrollbar>
 </template>
