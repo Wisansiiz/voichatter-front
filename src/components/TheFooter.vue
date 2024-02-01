@@ -1,22 +1,21 @@
-<script setup lang="ts">
+<script lang="ts">
 </script>
 
 <template>
-  <nav mt-6 inline-flex gap-2 text-xl>
-    <RouterLink to="/" i-carbon-home icon-btn />
-
-    <button icon-btn @click="toggleDark()">
-      <div i-carbon-sun dark:i-carbon-moon />
-    </button>
-
-    <a
-      i-carbon-logo-github icon-btn
-      rel="noreferrer"
-      href="https://github.com/antfu/vitesse-lite"
-      target="_blank"
-      title="GitHub"
-    />
-
-    <RouterLink to="/ws" i-carbon-add-comment icon-btn />
-  </nav>
+  <n-flex>
+    <n-layout-footer
+      bordered
+      position="absolute"
+      style="height: 64px;padding: 5px"
+    >
+      <n-flex justify="center">
+        <TheInput />
+        <div style="height: 54px; line-height: 54px">
+          <n-button type="primary" ghost>
+            发送
+          </n-button>
+        </div>
+      </n-flex>
+    </n-layout-footer>
+  </n-flex>
 </template>
