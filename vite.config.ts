@@ -35,10 +35,7 @@ export default defineConfig({
     // https://github.com/posva/unplugin-vue-router
     VueRouter(),
 
-    Layouts({
-      layoutsDirs: './src/layouts',
-      defaultLayout: 'default',
-    }),
+    Layouts(),
     Pages(),
 
     // https://github.com/antfu/unplugin-auto-import
