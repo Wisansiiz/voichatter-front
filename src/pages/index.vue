@@ -16,7 +16,7 @@ function go() {
   <n-scrollbar style="margin-bottom: 50px">
     <div i-carbon-campsite inline-block text-4xl />
     <p>
-      <a rel="noreferrer" href="https://github.com/antfu/vitesse-lite" target="_blank">
+      <a rel="noreferrer" href="" target="_blank">
         Vitesse Lite
       </a>
     </p>
@@ -53,7 +53,7 @@ function go() {
       <a
         i-carbon-logo-github icon-btn
         rel="noreferrer"
-        href="https://github.com/antfu/vitesse-lite"
+        href=""
         target="_blank"
         title="GitHub"
       />
