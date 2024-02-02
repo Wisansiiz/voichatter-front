@@ -34,6 +34,9 @@ devDependencies:
   '@unocss/reset':
     specifier: ^0.58.3
     version: 0.58.3
+  '@vicons/carbon':
+    specifier: ^0.12.0
+    version: 0.12.0
   '@vicons/ionicons5':
     specifier: ^0.12.0
     version: 0.12.0
@@ -1846,6 +1849,10 @@ packages:
       vite: 5.0.12(@types/node@20.11.5)
     transitivePeerDependencies:
       - rollup
+    dev: true
+
+  /@vicons/carbon@0.12.0:
+    resolution: {integrity: sha512-kCOgr/ZOhZzoiFLJ8pwxMa2TMxrkCUOA22qExPabus35F4+USqzcsxaPoYtqRd9ROOYiHrSqwapak/ywF0D9bg==}
     dev: true
 
   /@vicons/ionicons5@0.12.0:
