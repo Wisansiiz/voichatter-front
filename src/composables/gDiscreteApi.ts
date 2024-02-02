@@ -3,8 +3,19 @@ import { createDiscreteApi } from 'naive-ui'
 const { message, notification, dialog, loadingBar } = createDiscreteApi(
   ['message', 'dialog', 'notification', 'loadingBar'],
 )
-export function gMessage(str: string) {
-  message.info(str)
+export const gMessage = {
+  // info: (str: string) => {
+  //   message.info(str)
+  // },
+  success: (str: string) => {
+    message.success(str)
+  },
+  // warning: (str: string) => {
+  //   message.warning(str)
+  // },
+  error: (str: string) => {
+    message.error(str)
+  },
 }
 export function gNotification(str: string) {
   notification.create({ title: str })
