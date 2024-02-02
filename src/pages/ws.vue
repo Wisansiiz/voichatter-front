@@ -1,57 +1,41 @@
-<script>
-import { ref } from 'vue'
+<script setup>
 import axios from 'axios'
 
-export default {
-  setup() {
-    const roomID = ref('')
-    const messageText = ref('')
-    const messages = ref([])
-    const isChatBoxVisible = ref(false)
-    let ws
-    const active = ref(false)
+const channelID = ref('')
+const messageText = ref('')
+const messages = ref([])
+const isChatBoxVisible = ref(false)
+let ws
+const active = ref(false)
 
-    const joinRoom = () => {
-      if (roomID.value.trim() !== '') {
-        ws = new WebSocket(`ws://localhost:9000/api/ws?roomID=${roomID.value.trim()}`)
-        messages.value = []
-        ws.onmessage = (event) => {
-          const message = JSON.parse(event.data)
-          messages.value.push(message)
-        }
-        isChatBoxVisible.value = true
-        active.value = true
-      }
+function joinRoom() {
+  if (channelID.value.trim() !== '') {
+    ws = new WebSocket(`ws://localhost:9000/api/ws?channelID=${channelID.value.trim()}`)
+    messages.value = []
+    ws.onmessage = (event) => {
+      const message = JSON.parse(event.data)
+      messages.value.push(message)
     }
-    const queryHistoryMessages = async () => {
-      try {
-        const response = await axios.get(`http://localhost:9000/api/history?roomID=${roomID.value.trim()}`)
-        messages.value = response.data.data.map((event) => {
-          return JSON.parse(event.text)
-        })
-      }
-      catch (error) {
-        console.error('Error fetching history messages:', error)
-      }
-    }
-    const sendMessage = () => {
-      if (messageText.value.trim() !== '') {
-        ws.send(JSON.stringify({ data: messageText.value.trim() }))
-        messageText.value = ''
-      }
-    }
-
-    return {
-      roomID,
-      messageText,
-      messages,
-      isChatBoxVisible,
-      joinRoom,
-      sendMessage,
-      queryHistoryMessages,
-      active,
-    }
-  },
+    isChatBoxVisible.value = true
+    active.value = true
+  }
+}
+async function queryHistoryMessages() {
+  try {
+    const response = await axios.get(`http://localhost:9000/api/history?channelID=${channelID.value.trim()}`)
+    messages.value = response.data.data.map((event) => {
+      return JSON.parse(event.content)
+    })
+  }
+  catch (error) {
+    console.error('Error fetching history messages:', error)
+  }
+}
+function sendMessage() {
+  if (messageText.value.trim() !== '') {
+    ws.send(JSON.stringify({ data: messageText.value.trim() }))
+    messageText.value = ''
+  }
 }
 </script>
 
@@ -68,7 +52,7 @@ export default {
         </n-scrollbar>
       </n-flex>
       <n-input
-        v-model:value="roomID"
+        v-model:value="channelID"
         type="text"
         placeholder="Enter room ID"
         :disabled="active"
