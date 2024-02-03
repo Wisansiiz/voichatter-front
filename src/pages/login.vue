@@ -4,7 +4,7 @@ import { login } from '~/stores/authorized'
 
 const router = useRouter()
 const formRef = ref(null)
-// const rPasswordFormItemRef = ref(null)
+let remember = false
 const modelRef = ref({
   username: null,
   password: null,
@@ -32,17 +32,13 @@ const rules = {
     },
   ],
 }
-// function handlePasswordInput() {
-//   if (modelRef.value.reenteredPassword)
-//     rPasswordFormItemRef.value?.validate({ trigger: 'password-input' })
-// }
 function userLogin() {
   formRef.value?.validate((errors) => {
     if (!errors) {
       login(
         model.value.username,
         model.value.password,
-        false,
+        remember,
         () => {
           router.push('/')
         },
@@ -55,6 +51,9 @@ function userLogin() {
       gMessage.warning('请完整填写注册表单内容！')
     }
   })
+}
+function changeRemember() {
+  remember = !remember
 }
 </script>
 
@@ -83,7 +82,6 @@ function userLogin() {
             maxlength="24"
             @keydown.enter.prevent
           >
-            <!-- @input="handlePasswordInput" -->
             <template #prefix>
               <n-icon>
                 <Password />
@@ -92,6 +90,9 @@ function userLogin() {
           </n-input>
         </n-form-item>
       </n-form>
+      <n-checkbox @click="changeRemember">
+        记住我
+      </n-checkbox>
       <div style="margin-top: 40px">
         <n-button
           style="width: 270px"
