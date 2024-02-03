@@ -1,12 +1,20 @@
 <template>
-  <main
-    px-4 py-10
-    text="center blue-700 dark:gray-200"
-  >
+  <div class="contain">
     <RouterView />
-    <TheFooter />
     <div mx-auto mt-5 text-center text-sm opacity-50>
       [Home Layout]
     </div>
-  </main>
+  </div>
 </template>
+
+<style scoped>
+.contain {
+  height: 100%;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+</style>
