@@ -10,9 +10,9 @@ export const gMessage = {
   success: (str: string) => {
     message.success(str)
   },
-  // warning: (str: string) => {
-  //   message.warning(str)
-  // },
+  warning: (str: string) => {
+    message.warning(str)
+  },
   error: (str: string) => {
     message.error(str)
   },
