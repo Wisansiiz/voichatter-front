@@ -9,6 +9,7 @@ declare module 'vue' {
   export interface GlobalComponents {
     NAnchor: typeof import('naive-ui')['NAnchor']
     NAnchorLink: typeof import('naive-ui')['NAnchorLink']
+    NAutoComplete: typeof import('naive-ui')['NAutoComplete']
     NButton: typeof import('naive-ui')['NButton']
     NCheckbox: typeof import('naive-ui')['NCheckbox']
     NCol: typeof import('naive-ui')['NCol']

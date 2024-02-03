@@ -9,7 +9,7 @@ function accessHeader() {
 }
 
 function defaultError() {
-  gMessage.error('发生了一些错误，请联系管理员')
+  gMessage.error('账号/邮箱或密码不正确')
 }
 
 function defaultFailure(message: any) {
@@ -24,7 +24,7 @@ function takeAccessToken() {
   return authObj.token
 }
 
-function storeAccessToken(remember: any, token: any) {
+function storeAccessToken(remember: boolean, token: any) {
   const authObj = {
     token,
   }
@@ -58,7 +58,7 @@ function internalGet(url: any, headers: any, success: any, failure: any, error =
   }).catch(() => error())
 }
 
-function login(username: any, password: any, remember: any, success: any, failure = defaultFailure) {
+function login(username: any, password: any, remember: boolean, success: any, failure = defaultFailure) {
   internalPost('http://localhost:9000/api/login', {
     username,
     password,
