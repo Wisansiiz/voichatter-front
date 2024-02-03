@@ -1,4 +1,6 @@
 <script setup lang="ts" generic="T extends any, O extends any">
+import { unauthorized } from '~/stores/authorized'
+
 defineOptions({
   name: 'IndexPage',
 })
@@ -9,6 +11,10 @@ const router = useRouter()
 function go() {
   if (name.value)
     router.push(`/hi/${encodeURIComponent(name.value)}`)
+}
+if (unauthorized()) {
+  router.push('/login')
+  gMessage.warning('请先登录')
 }
 </script>
 
