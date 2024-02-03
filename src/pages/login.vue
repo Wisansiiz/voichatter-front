@@ -1,22 +1,15 @@
 <script setup>
 import { Password, User } from '@vicons/carbon'
+import { login } from '~/stores/authorized'
 
 const router = useRouter()
 const formRef = ref(null)
-const rPasswordFormItemRef = ref(null)
+// const rPasswordFormItemRef = ref(null)
 const modelRef = ref({
   username: null,
   password: null,
-  reenteredPassword: null,
 })
 const model = modelRef
-function validatePasswordStartWith(rule, value) {
-  return !!modelRef.value.password && modelRef.value.password.startsWith(value) && modelRef.value.password.length >= value.length
-}
-function validatePasswordSame(rule, value) {
-  return value === modelRef.value.password
-}
-
 const rules = {
   username: [
     {
@@ -38,35 +31,29 @@ const rules = {
       message: '请输入密码',
     },
   ],
-  reenteredPassword: [
-    {
-      required: true,
-      message: '请再次输入密码',
-      trigger: ['input', 'blur'],
-    },
-    {
-      validator: validatePasswordStartWith,
-      message: '两次密码输入不一致',
-      trigger: 'input',
-    },
-    {
-      validator: validatePasswordSame,
-      message: '两次密码输入不一致',
-      trigger: ['blur', 'password-input'],
-    },
-  ],
 }
-function handlePasswordInput() {
-  if (modelRef.value.reenteredPassword)
-    rPasswordFormItemRef.value?.validate({ trigger: 'password-input' })
-}
-function handleValidateButtonClick(e) {
-  e.preventDefault()
+// function handlePasswordInput() {
+//   if (modelRef.value.reenteredPassword)
+//     rPasswordFormItemRef.value?.validate({ trigger: 'password-input' })
+// }
+function userLogin() {
   formRef.value?.validate((errors) => {
-    if (!errors)
-      gMessage.success('验证成功')
-    else
-      gMessage.error('验证失败')
+    if (!errors) {
+      login(
+        model.value.username,
+        model.value.password,
+        false,
+        () => {
+          router.push('/')
+        },
+        () => {
+          gMessage.error('用户名或密码错误')
+        },
+      )
+    }
+    else {
+      gMessage.warning('请完整填写注册表单内容！')
+    }
   })
 }
 </script>
@@ -94,28 +81,9 @@ function handleValidateButtonClick(e) {
             type="password"
             show-password-on="mousedown"
             maxlength="24"
-            @input="handlePasswordInput"
             @keydown.enter.prevent
           >
-            <template #prefix>
-              <n-icon>
-                <Password />
-              </n-icon>
-            </template>
-          </n-input>
-        </n-form-item>
-        <n-form-item
-          ref="rPasswordFormItemRef"
-          first
-          path="reenteredPassword"
-          label="重复密码"
-        >
-          <n-input
-            v-model:value="model.reenteredPassword"
-            :disabled="!model.password"
-            type="password"
-            @keydown.enter.prevent
-          >
+            <!-- @input="handlePasswordInput" -->
             <template #prefix>
               <n-icon>
                 <Password />
@@ -129,7 +97,7 @@ function handleValidateButtonClick(e) {
           style="width: 270px"
           type="success"
           attr-type="submit"
-          @click="handleValidateButtonClick"
+          @click="userLogin"
         >
           立即登录
         </n-button>
@@ -152,3 +120,8 @@ function handleValidateButtonClick(e) {
 
 <style scoped>
 </style>
+
+<route lang="yaml">
+meta:
+  layout: home
+</route>
