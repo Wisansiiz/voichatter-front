@@ -1,21 +1,23 @@
-<script setup lang="ts" generic="T extends any, O extends any">
-import { unauthorized } from '~/stores/authorized'
+<script setup>
+import { isOnline } from '~/composables/authorized.js'
 
 defineOptions({
   name: 'IndexPage',
 })
-
 const name = ref('')
-
 const router = useRouter()
 function go() {
   if (name.value)
     router.push(`/hi/${encodeURIComponent(name.value)}`)
 }
-if (unauthorized()) {
-  router.push('/login')
-  gMessage.warning('请先登录')
-}
+onMounted(() => {
+  isOnline((data) => {
+    if (data)
+      router.push('/')
+    else
+      router.push('/login')
+  })
+})
 </script>
 
 <template>

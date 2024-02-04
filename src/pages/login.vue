@@ -1,13 +1,15 @@
 <script setup>
 import { Password, User } from '@vicons/carbon'
-import { login } from '~/stores/authorized'
+import { isOnline, login } from '~/composables/authorized.js'
+import { useAuthStore } from '~/composables/auth.js'
 
 const router = useRouter()
 const formRef = ref(null)
-let remember = false
+const isLoading = ref(false)
 const modelRef = ref({
   username: null,
   password: null,
+  remember: false,
 })
 const model = modelRef
 const rules = {
@@ -32,28 +34,21 @@ const rules = {
     },
   ],
 }
+const authStore = useAuthStore()
 function userLogin() {
-  formRef.value?.validate((errors) => {
-    if (!errors) {
-      login(
-        model.value.username,
-        model.value.password,
-        remember,
-        () => {
-          router.push('/')
-        },
-        () => {
-          gMessage.error('用户名或密码错误')
-        },
-      )
-    }
-    else {
-      gMessage.warning('请完整填写注册表单内容！')
-    }
+  isLoading.value = true
+  login(model.value).then((data) => {
+    authStore.token = data.token
   })
-}
-function changeRemember() {
-  remember = !remember
+    .finally(() =>
+      isLoading.value = false,
+    )
+  isOnline((data) => {
+    if (data)
+      router.push('/')
+    else
+      router.push('/login')
+  })
 }
 </script>
 
@@ -90,7 +85,7 @@ function changeRemember() {
           </n-input>
         </n-form-item>
       </n-form>
-      <n-checkbox @click="changeRemember">
+      <n-checkbox v-model:checked="model.remember">
         记住我
       </n-checkbox>
       <div style="margin-top: 40px">
@@ -98,6 +93,7 @@ function changeRemember() {
           style="width: 270px"
           type="success"
           attr-type="submit"
+          :loading="isLoading"
           @click="userLogin"
         >
           立即登录
