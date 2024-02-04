@@ -36,3 +36,14 @@ export function gLoadingBar(router: any) {
     loadingBar.error()
   })
 }
+export const gLoadingBarDone = {
+  start: () => {
+    loadingBar.start()
+  },
+  finish: () => {
+    loadingBar.finish()
+  },
+  error: () => {
+    loadingBar.error()
+  },
+}
