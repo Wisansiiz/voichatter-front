@@ -10,12 +10,9 @@ function go() {
   if (name.value)
     router.push(`/hi/${encodeURIComponent(name.value)}`)
 }
-onMounted(() => {
+onMounted (() => {
   isOnline((data) => {
-    if (data)
-      router.push('/')
-    else
-      router.push('/login')
+    data ? router.push('/') : router.push('/login')
   })
 })
 </script>
@@ -55,7 +52,7 @@ onMounted(() => {
       <RouterLink to="/" i-carbon-home icon-btn />
 
       <button icon-btn @click="toggleDark()">
-        <div i-carbon-sun dark:i-carbon-moon />
+        <div i-carbon-sun />
       </button>
 
       <a
@@ -67,5 +64,8 @@ onMounted(() => {
       />
       <RouterLink to="/ws" i-carbon-add-comment icon-btn />
     </div>
+    <n-button @click="logout().then(() => router.push('/login'))">
+      退出登录
+    </n-button>
   </n-scrollbar>
 </template>
