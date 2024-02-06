@@ -54,11 +54,12 @@ async function userLogin() {
     isLoading.value = false
   })
 }
-// onUpdated (() => {
-//   isOnline((data) => {
-//     data ? router.push('/') : router.push('/login')
-//   })
-// })
+onMounted (() => {
+  isOnline((res) => {
+    if (res)
+      router.push('/')
+  })
+})
 </script>
 
 <template>

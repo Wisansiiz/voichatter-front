@@ -1,6 +1,4 @@
 <script setup>
-import { isOnline } from '~/composables/authorized.js'
-
 defineOptions({
   name: 'IndexPage',
 })
@@ -11,8 +9,11 @@ function go() {
     router.push(`/hi/${encodeURIComponent(name.value)}`)
 }
 onMounted (() => {
-  isOnline((data) => {
-    data ? router.push('/') : router.push('/login')
+  isOnline((res) => {
+    if (!res) {
+      gMessage.warning('登录已失效，请重新登录')
+      router.push('/login')
+    }
   })
 })
 </script>
