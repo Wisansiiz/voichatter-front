@@ -1,7 +1,6 @@
 <script setup>
 import { Password, User } from '@vicons/carbon'
-import { isOnline, login } from '~/composables/authorized.js'
-import { useAuthStore } from '~/composables/auth.js'
+import { login } from '~/composables/authorized.js'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -9,8 +8,8 @@ const isLoading = ref(false)
 const modelRef = ref({
   username: null,
   password: null,
-  remember: false,
 })
+const remember = ref(false)
 const model = modelRef
 const rules = {
   username: [
@@ -21,7 +20,6 @@ const rules = {
           return new Error('需要用户名')
         else if (!/^[a-zA-Z0-9_-]{4,16}$/.test(value))
           return new Error('用户名不和规范')
-
         return true
       },
       trigger: ['input', 'blur'],
@@ -34,22 +32,33 @@ const rules = {
     },
   ],
 }
-const authStore = useAuthStore()
-function userLogin() {
+const localStore = useAuthLocalStore()
+const sessionStore = useAuthSessionStore()
+
+async function userLogin() {
   isLoading.value = true
-  login(model.value).then((data) => {
-    authStore.token = data.token
-  })
-    .finally(() =>
-      isLoading.value = false,
-    )
-  isOnline((data) => {
-    if (data)
-      router.push('/')
+  login(model.value).then(async (result) => {
+    if (!/^20[0-9]$/.test(result.code))
+      return
+    if (remember.value)
+      localStore.token = result.data.token
     else
-      router.push('/login')
+      sessionStore.token = result.data.token
+    if (localStore.token || sessionStore.token) {
+      gMessage.success('登录成功')
+      await router.push('/')
+    }
+  }).catch((error) => {
+    gMessage.error(`登录过程中发生错误：${error.response.data.msg}`)
+  }).finally(() => {
+    isLoading.value = false
   })
 }
+// onUpdated (() => {
+//   isOnline((data) => {
+//     data ? router.push('/') : router.push('/login')
+//   })
+// })
 </script>
 
 <template>
@@ -85,7 +94,7 @@ function userLogin() {
           </n-input>
         </n-form-item>
       </n-form>
-      <n-checkbox v-model:checked="model.remember">
+      <n-checkbox v-model:checked="remember">
         记住我
       </n-checkbox>
       <div style="margin-top: 40px">
@@ -108,7 +117,7 @@ function userLogin() {
           type="warning"
           @click="router.push('/register')"
         >
-          注册账号
+          去注册
         </n-button>
       </div>
     </div>
