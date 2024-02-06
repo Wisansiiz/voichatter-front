@@ -36,6 +36,7 @@
     "lint-staged": "^15.2.0",
     "naive-ui": "^2.37.3",
     "pinia": "^2.1.7",
+    "pinia-plugin-persistedstate": "^3.2.1",
     "pnpm": "^8.14.3",
     "simple-git-hooks": "^2.9.0",
     "taze": "^0.13.1",
