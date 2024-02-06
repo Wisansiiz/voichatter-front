@@ -1,6 +1,4 @@
 <script setup>
-import axios from 'axios'
-
 const messageText = ref('')
 const messages = ref([])
 const isChatBoxVisible = ref(false)
@@ -15,15 +13,12 @@ onMounted(() => {
   isChatBoxVisible.value = true
 })
 async function queryHistoryMessages() {
-  try {
-    const response = await axios.get(`http://localhost:9000/api/history?channelID=123`)
-    messages.value = response.data.data.map((event) => {
-      return JSON.parse(event.content)
-    })
-  }
-  catch (error) {
-    console.error('Error fetching history messages:', error)
-  }
+  const response = await service.get(`${baseURL}/history?channelID=123`)
+  messages.value = response.data.map((res) => {
+    return JSON.parse(res.content)
+  })
+  if (!response.data.length)
+    gMessage.warning('该频道没有更多信息了')
 }
 function sendMessage() {
   if (messageText.value.trim() !== '') {
