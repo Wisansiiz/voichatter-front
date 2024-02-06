@@ -1,68 +1,6 @@
 <script setup>
-//
-// // function validateEmail() {
-// //   coldTime.value = 60
-// //   get(`/api/auth/ask-code?email=${form.email}&type=register`, () => {
-// //     ElMessage.success(`验证码已发送到邮箱: ${form.email}，请注意查收`)
-// //     const handle = setInterval(() => {
-// //       coldTime.value--
-// //       if (coldTime.value === 0)
-// //         clearInterval(handle)
-// //     }, 1000)
-// //   }, undefined, (message) => {
-// //     ElMessage.warning(message)
-// //     coldTime.value = 0
-// //   })
-// // }
-//
-// const form = reactive({
-//   username: '',
-//   password: '',
-//   password_repeat: '',
-//   email: '',
-//   code: '',
-// })
-
-// function validateUsername(rule, value, callback) {
-//   if (value === '')
-//     callback(new Error('请输入用户名'))
-//   else if (!/^[a-zA-Z0-9\u4E00-\u9FA5]+$/.test(value))
-//     callback(new Error('用户名不能包含特殊字符，只能是中文/英文'))
-//
-//   else
-//     callback()
-// }
-//
-// function validatePassword(rule, value, callback) {
-//   if (value === '')
-//     callback(new Error('请再次输入密码'))
-//   else if (value !== form.password)
-//     callback(new Error('两次输入的密码不一致'))
-//   else
-//     callback()
-// }
-// const rules = {
-//   username: [
-//     { validator: validateUsername, trigger: ['blur', 'change'] },
-//     { min: 2, max: 8, message: '用户名的长度必须在2-8个字符之间', trigger: ['blur', 'change'] },
-//   ],
-//   password: [
-//     { required: true, message: '请输入密码', trigger: 'blur' },
-//     { min: 6, max: 16, message: '密码的长度必须在6-16个字符之间', trigger: ['blur', 'change'] },
-//   ],
-//   password_repeat: [
-//     { validator: validatePassword, trigger: ['blur', 'change'] },
-//   ],
-//   email: [
-//     { required: true, message: '请输入邮件地址', trigger: 'blur' },
-//     { type: 'email', message: '请输入合法的电子邮件地址', trigger: ['blur', 'change'] },
-//   ],
-//   code: [
-//     { required: true, message: '请输入获取的验证码', trigger: 'blur' },
-//   ],
-// }
 import { Email, Password, User } from '@vicons/carbon'
-import { register } from '~/stores/authorized'
+import { register } from '~/composables/authorized.js'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -149,16 +87,15 @@ const autoCompleteOptions = computed(() => {
 function userRegister() {
   formRef.value?.validate((errors) => {
     if (!errors) {
-      register(
-        model.value.username,
-        model.value.password,
-        model.value.email,
-        // code: form.code,
-        () => {
-          gMessage.success('注册成功，欢迎加入我们')
-          router.push('/')
-        },
-      )
+      register(model.value).then((res) => {
+        if (/^2[0-9][0-9]$/.test(res.code)) {
+          gMessage.success('注册成功！')
+          router.push('/login')
+        }
+        else {
+          gMessage.error('注册失败！')
+        }
+      })
     }
     else {
       gMessage.warning('请完整填写注册表单内容！')
