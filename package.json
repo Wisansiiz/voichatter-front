@@ -4,7 +4,7 @@
   "packageManager": "pnpm@8.15.1",
   "scripts": {
     "build": "vite build",
-    "dev": "vite --port 10000",
+    "dev": "vite --port 3333 --open",
     "lint": "eslint .",
     "typecheck": "vue-tsc --noEmit",
     "preview": "vite preview",
@@ -33,6 +33,7 @@
     "axios": "^1.6.7",
     "eslint": "^8.56.0",
     "eslint-plugin-format": "^0.1.0",
+    "http-server": "^14.1.1",
     "jsdom": "^24.0.0",
     "lint-staged": "^15.2.0",
     "naive-ui": "^2.37.3",

@@ -4,9 +4,9 @@ const { message, notification, dialog, loadingBar } = createDiscreteApi(
   ['message', 'dialog', 'notification', 'loadingBar'],
 )
 export const gMessage = {
-  // info: (str: string) => {
-  //   message.info(str)
-  // },
+  info: (str: string) => {
+    message.info(str)
+  },
   success: (str: string) => {
     message.success(str)
   },
