@@ -9,7 +9,7 @@ declare global {
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const authorized: typeof import('./src/composables/authorized.js')['default']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
-  const baseURL: typeof import('./src/composables/interceptor.js')['baseURL']
+  const baseURL: typeof import('~/utils/request.js')['baseURL']
   const computed: typeof import('vue')['computed']
   const computedAsync: typeof import('@vueuse/core')['computedAsync']
   const computedEager: typeof import('@vueuse/core')['computedEager']
@@ -47,7 +47,7 @@ declare global {
   const ignorableWatch: typeof import('@vueuse/core')['ignorableWatch']
   const inject: typeof import('vue')['inject']
   const injectLocal: typeof import('@vueuse/core')['injectLocal']
-  const interceptor: typeof import('./src/composables/interceptor.js')['default']
+  const interceptor: typeof import('~/utils/request.js')['default']
   const isDark: typeof import('./src/composables/dark')['isDark']
   const isDefined: typeof import('@vueuse/core')['isDefined']
   const isOnline: typeof import('./src/composables/authorized.js')['isOnline']
@@ -99,7 +99,7 @@ declare global {
   const resolveComponent: typeof import('vue')['resolveComponent']
   const resolveRef: typeof import('@vueuse/core')['resolveRef']
   const resolveUnref: typeof import('@vueuse/core')['resolveUnref']
-  const service: typeof import('./src/composables/interceptor.js')['service']
+  const service: typeof import('~/utils/request.js')['service']
   const shallowReactive: typeof import('vue')['shallowReactive']
   const shallowReadonly: typeof import('vue')['shallowReadonly']
   const shallowRef: typeof import('vue')['shallowRef']
@@ -140,9 +140,9 @@ declare global {
   const useAsyncQueue: typeof import('@vueuse/core')['useAsyncQueue']
   const useAsyncState: typeof import('@vueuse/core')['useAsyncState']
   const useAttrs: typeof import('vue')['useAttrs']
-  const useAuthLocalStore: typeof import('./src/composables/auth.js')['useAuthLocalStore']
-  const useAuthSessionStore: typeof import('./src/composables/auth.js')['useAuthSessionStore']
-  const useAuthStore: typeof import('./src/composables/auth.js')['useAuthStore']
+  const useAuthLocalStore: typeof import('~/stores/token.js')['useAuthLocalStore']
+  const useAuthSessionStore: typeof import('~/stores/token.js')['useAuthSessionStore']
+  const useAuthStore: typeof import('~/stores/token.js')['useAuthStore']
   const useBase64: typeof import('@vueuse/core')['useBase64']
   const useBattery: typeof import('@vueuse/core')['useBattery']
   const useBluetooth: typeof import('@vueuse/core')['useBluetooth']
@@ -321,7 +321,6 @@ declare module 'vue' {
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly asyncComputed: UnwrapRef<typeof import('@vueuse/core')['asyncComputed']>
     readonly autoResetRef: UnwrapRef<typeof import('@vueuse/core')['autoResetRef']>
-    readonly baseURL: UnwrapRef<typeof import('./src/composables/interceptor.js')['baseURL']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly computedAsync: UnwrapRef<typeof import('@vueuse/core')['computedAsync']>
     readonly computedEager: UnwrapRef<typeof import('@vueuse/core')['computedEager']>
@@ -410,7 +409,6 @@ declare module 'vue' {
     readonly resolveComponent: UnwrapRef<typeof import('vue')['resolveComponent']>
     readonly resolveRef: UnwrapRef<typeof import('@vueuse/core')['resolveRef']>
     readonly resolveUnref: UnwrapRef<typeof import('@vueuse/core')['resolveUnref']>
-    readonly service: UnwrapRef<typeof import('./src/composables/interceptor.js')['service']>
     readonly shallowReactive: UnwrapRef<typeof import('vue')['shallowReactive']>
     readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
@@ -451,8 +449,6 @@ declare module 'vue' {
     readonly useAsyncQueue: UnwrapRef<typeof import('@vueuse/core')['useAsyncQueue']>
     readonly useAsyncState: UnwrapRef<typeof import('@vueuse/core')['useAsyncState']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
-    readonly useAuthLocalStore: UnwrapRef<typeof import('./src/composables/auth.js')['useAuthLocalStore']>
-    readonly useAuthSessionStore: UnwrapRef<typeof import('./src/composables/auth.js')['useAuthSessionStore']>
     readonly useBase64: UnwrapRef<typeof import('@vueuse/core')['useBase64']>
     readonly useBattery: UnwrapRef<typeof import('@vueuse/core')['useBattery']>
     readonly useBluetooth: UnwrapRef<typeof import('@vueuse/core')['useBluetooth']>
@@ -624,7 +620,6 @@ declare module '@vue/runtime-core' {
     readonly EffectScope: UnwrapRef<typeof import('vue')['EffectScope']>
     readonly asyncComputed: UnwrapRef<typeof import('@vueuse/core')['asyncComputed']>
     readonly autoResetRef: UnwrapRef<typeof import('@vueuse/core')['autoResetRef']>
-    readonly baseURL: UnwrapRef<typeof import('./src/composables/interceptor.js')['baseURL']>
     readonly computed: UnwrapRef<typeof import('vue')['computed']>
     readonly computedAsync: UnwrapRef<typeof import('@vueuse/core')['computedAsync']>
     readonly computedEager: UnwrapRef<typeof import('@vueuse/core')['computedEager']>
@@ -713,7 +708,6 @@ declare module '@vue/runtime-core' {
     readonly resolveComponent: UnwrapRef<typeof import('vue')['resolveComponent']>
     readonly resolveRef: UnwrapRef<typeof import('@vueuse/core')['resolveRef']>
     readonly resolveUnref: UnwrapRef<typeof import('@vueuse/core')['resolveUnref']>
-    readonly service: UnwrapRef<typeof import('./src/composables/interceptor.js')['service']>
     readonly shallowReactive: UnwrapRef<typeof import('vue')['shallowReactive']>
     readonly shallowReadonly: UnwrapRef<typeof import('vue')['shallowReadonly']>
     readonly shallowRef: UnwrapRef<typeof import('vue')['shallowRef']>
@@ -754,8 +748,6 @@ declare module '@vue/runtime-core' {
     readonly useAsyncQueue: UnwrapRef<typeof import('@vueuse/core')['useAsyncQueue']>
     readonly useAsyncState: UnwrapRef<typeof import('@vueuse/core')['useAsyncState']>
     readonly useAttrs: UnwrapRef<typeof import('vue')['useAttrs']>
-    readonly useAuthLocalStore: UnwrapRef<typeof import('./src/composables/auth.js')['useAuthLocalStore']>
-    readonly useAuthSessionStore: UnwrapRef<typeof import('./src/composables/auth.js')['useAuthSessionStore']>
     readonly useBase64: UnwrapRef<typeof import('@vueuse/core')['useBase64']>
     readonly useBattery: UnwrapRef<typeof import('@vueuse/core')['useBattery']>
     readonly useBluetooth: UnwrapRef<typeof import('@vueuse/core')['useBluetooth']>
