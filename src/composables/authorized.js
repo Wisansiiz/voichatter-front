@@ -1,4 +1,5 @@
-import { baseURL, service } from '~/composables/interceptor.js'
+import { baseURL, service } from '~/utils/request.js'
+import { useAuthLocalStore, useAuthSessionStore } from '~/stores/token.js'
 
 const localStore = useAuthLocalStore()
 const sessionStore = useAuthSessionStore()
@@ -21,13 +22,9 @@ export async function login({ username, password }) {
 }
 
 export async function logout() {
-  await service.post('/logout').then((res) => {
-    if (res.code === 200) {
-      gMessage.success(res.msg)
-      return
-    }
+  await service.post('/logout').then((data) => {
     localStore.token = null
     sessionStore.token = null
-    gMessage.success(res.msg)
+    gMessage.success(data.msg)
   })
 }
