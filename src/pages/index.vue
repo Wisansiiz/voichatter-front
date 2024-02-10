@@ -1,13 +1,8 @@
 <script setup>
-import { baseURL, service } from '~/utils/request.js'
-
 defineOptions({
   name: 'IndexPage',
 })
 const router = useRouter()
-onMounted (() => {
-  service.post(`${baseURL}/auth`)
-})
 </script>
 
 <template>
