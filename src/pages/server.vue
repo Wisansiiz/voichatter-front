@@ -1,4 +1,6 @@
 <script setup>
+import { baseURL, service } from '~/utils/request.js'
+
 const messageText = ref('')
 const messages = ref([])
 const isChatBoxVisible = ref(false)
