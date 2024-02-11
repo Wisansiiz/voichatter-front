@@ -20,8 +20,6 @@ service.interceptors.response.use(
       return result.data
     }
     else {
-      sessionStore.token = null
-      localStore.token = null
       window.location.href = '/login'
       gMessage.error('登录失效，请重新登录')
     }

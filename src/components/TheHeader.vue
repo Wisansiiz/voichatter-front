@@ -20,7 +20,7 @@ function renderCustomHeader() {
           h(
             NText,
             { depth: 3 },
-            { default: () => '毫无疑问，你是办公室里最亮的星' },
+            { default: () => '个性签名?' },
           ),
         ]),
       ]),
