@@ -1,0 +1,163 @@
+<script setup>
+import { ref } from 'vue'
+
+const route = useRoute()
+const currentUserId = route.query.id
+const localVideo = ref()
+const remoteVideo = ref()
+let localStream = null
+let socket = null
+const targetId = ref(null)
+let pc = null
+async function handleStart() {
+  localStream = await navigator.mediaDevices.getUserMedia({ audio: {
+    echoCancellation: true, // 音频开启回音消除
+    noiseSuppression: true, // 开启降噪
+    autoGainControl: true, // 开启自动增益功能
+  } })
+  localVideo.value.srcObject = localStream
+}
+function initWebsocket() {
+  socket = new WebSocket(`ws://localhost:9000/yy?id=${currentUserId}`)
+  socket.onopen = (e) => {
+    console.log('open_success')
+  }
+
+  socket.onmessage = (e) => {
+    const message = e.data
+    const { code, data } = JSON.parse(message)
+    console.log(code, data)
+    if (code === 'connect_success') {
+      console.log('connect success')
+    }
+    else if (code === 'offer') {
+      // 接收offer
+      getOffer(data)
+    }
+    else if (code === 'answer') {
+      // 接收answer
+      getAnswer(data)
+    }
+    else if (code === 'icecandidate') {
+      const { fromId, candidate } = data
+      pc.addIceCandidate(candidate)
+    }
+  }
+
+  socket.onerror = (e) => {
+    console.error(e.data)
+  }
+}
+
+initWebsocket()
+
+// ====== 发送方 ======= //
+function handleCall() {
+  pc = new RTCPeerConnection({})
+  localStream.getTracks().forEach(track => pc.addTrack(track, localStream))
+  pc.addEventListener('track', (e) => {
+    remoteVideo.value.srcObject = e.streams[0]
+  })
+  pc.addEventListener('icecandidate', (e) => {
+    if (e.candidate) {
+      // 内网穿透
+      const message = {
+        code: 'icecandidate',
+        data: {
+          targetId: targetId.value,
+          candidate: e.candidate,
+        },
+      }
+      socket.send(JSON.stringify(message))
+    }
+  })
+  sendOffer()
+}
+
+async function sendOffer() {
+  const description = await pc.createOffer()
+  await pc.setLocalDescription(description)
+  const message = {
+    code: 'offer',
+    data: {
+      targetId: targetId.value,
+      offer: description,
+    },
+  }
+  socket.send(JSON.stringify(message))
+}
+
+function getAnswer({ fromId, answer }) {
+  pc.setRemoteDescription(answer)
+}
+
+// ====== 接收方 ======= //
+function getOffer({ fromId, offer }) {
+  pc = new RTCPeerConnection({})
+  localStream.getTracks().forEach(track => pc.addTrack(track, localStream))
+  pc.addEventListener('track', (e) => {
+    remoteVideo.value.srcObject = e.streams[0]
+  })
+  pc.addEventListener('icecandidate', (e) => {
+    if (e.candidate) {
+      // 内网穿透
+      const message = {
+        code: 'icecandidate',
+        data: {
+          targetId: fromId,
+          candidate: e.candidate,
+        },
+      }
+      socket.send(JSON.stringify(message))
+    }
+  })
+  pc.setRemoteDescription(offer)
+  sendAnswer(fromId)
+}
+
+async function sendAnswer(targetId) {
+  const description = await pc.createAnswer()
+  await pc.setLocalDescription(description)
+  const message = {
+    code: 'answer',
+    data: {
+      targetId,
+      answer: description,
+    },
+  }
+  socket.send(JSON.stringify(message))
+}
+</script>
+
+<template>
+  <div class="container">
+    <div>
+      <audio ref="localVideo" autoplay />
+      <audio ref="remoteVideo" autoplay />
+    </div>
+    <div>
+      <button @click="handleStart">
+        start
+      </button>
+    </div>
+    <div>
+      <input v-model="targetId" type="text">
+      <button @click="handleCall">
+        call
+      </button>
+    </div>
+  </div>
+</template>
+
+<style scoped>
+video {
+  width: 500px;
+  height: 400px;
+  border: 1px dashed black;
+}
+</style>
+
+<route lang="yaml">
+meta:
+  layout: home
+</route>
