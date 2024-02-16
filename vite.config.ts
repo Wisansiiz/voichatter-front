@@ -1,4 +1,5 @@
 import path from 'node:path'
+import * as fs from 'node:fs'
 import { defineConfig } from 'vite'
 import Vue from '@vitejs/plugin-vue'
 import Components from 'unplugin-vue-components/vite'
@@ -15,6 +16,15 @@ export default defineConfig({
     alias: {
       '~/': `${path.resolve(__dirname, 'src')}/`,
     },
+  },
+  server: {
+    host: '0.0.0.0',
+    port: 3333,
+    https: {
+      key: fs.readFileSync('src/cert/server-key.pem'),
+      cert: fs.readFileSync('src/cert/server.pem'),
+    },
+    proxy: {},
   },
   plugins: [
     Vue(),
