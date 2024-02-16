@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue'
 
-const route = useRoute()
-const currentUserId = route.query.id
+const r = useRoute()
+const currentUserId = r.query.id
 const localVideo = ref()
 const remoteVideo = ref()
 let localStream = null
@@ -18,19 +18,15 @@ async function handleStart() {
   localVideo.value.srcObject = localStream
 }
 function initWebsocket() {
-  socket = new WebSocket(`ws://localhost:9000/yy?id=${currentUserId}`)
-  socket.onopen = (e) => {
-    console.log('open_success')
+  socket = new WebSocket(`wss://192.168.31.198:9000/yy?id=${currentUserId}`)
+  socket.onopen = () => {
+    gMessage.info('open_success')
   }
 
   socket.onmessage = (e) => {
     const message = e.data
     const { code, data } = JSON.parse(message)
-    console.log(code, data)
-    if (code === 'connect_success') {
-      console.log('connect success')
-    }
-    else if (code === 'offer') {
+    if (code === 'offer') {
       // 接收offer
       getOffer(data)
     }
@@ -39,13 +35,13 @@ function initWebsocket() {
       getAnswer(data)
     }
     else if (code === 'icecandidate') {
-      const { fromId, candidate } = data
+      const { candidate } = data
       pc.addIceCandidate(candidate)
     }
   }
 
   socket.onerror = (e) => {
-    console.error(e.data)
+    console.error(e)
   }
 }
 
@@ -60,7 +56,6 @@ function handleCall() {
   })
   pc.addEventListener('icecandidate', (e) => {
     if (e.candidate) {
-      // 内网穿透
       const message = {
         code: 'icecandidate',
         data: {
@@ -87,7 +82,7 @@ async function sendOffer() {
   socket.send(JSON.stringify(message))
 }
 
-function getAnswer({ fromId, answer }) {
+function getAnswer({ answer }) {
   pc.setRemoteDescription(answer)
 }
 
@@ -127,13 +122,17 @@ async function sendAnswer(targetId) {
   }
   socket.send(JSON.stringify(message))
 }
+
+function handleHangup() {
+  socket.close(1000)
+}
 </script>
 
 <template>
   <div class="container">
     <div>
-      <audio ref="localVideo" autoplay />
-      <audio ref="remoteVideo" autoplay />
+      <video ref="localVideo" autoplay />
+      <video ref="remoteVideo" autoplay />
     </div>
     <div>
       <button @click="handleStart">
@@ -145,6 +144,9 @@ async function sendAnswer(targetId) {
       <button @click="handleCall">
         call
       </button>
+      <n-button @click="handleHangup">
+        挂断
+      </n-button>
     </div>
   </div>
 </template>
