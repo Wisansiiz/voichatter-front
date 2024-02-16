@@ -1,0 +1,215 @@
+<script setup>
+import { ref } from 'vue'
+
+const r = useRoute()
+const currentUserId = r.query.id.toString()
+const videoContainer = ref()
+let socket = null
+const pcMap = new Map()
+let localStream = null
+const localVideo = ref()
+const channelId = r.query.channelId.toString()
+
+function initWebsocket() {
+  socket = new WebSocket(`wss://192.168.31.198:9000/yy?id=${currentUserId}&channelId=${channelId}`)
+  socket.onopen = () => {
+  }
+
+  socket.onmessage = (e) => {
+    const message = e.data
+    const { code, data } = JSON.parse(message)
+    if (code === 'offer') {
+      // 接收offer
+      getOffer(data)
+    }
+    else if (code === 'answer') {
+      // 接收answer
+      getAnswer(data)
+    }
+    else if (code === 'icecandidate') {
+      const { fromId, candidate } = data
+      const pc = pcMap.get(fromId)
+      pc.addIceCandidate(candidate)
+    }
+    else if (code === 'join_group') {
+      const { fromId } = data
+      sendOffer(fromId)
+    }
+    else if (code === 'leave_group') {
+      const { fromId } = data
+      pcMap.delete(fromId)
+      const video = document.getElementById(fromId)
+      video.remove()
+    }
+  }
+
+  socket.onerror = (e) => {
+    console.error(e)
+  }
+}
+
+async function handleJoin() {
+  initWebsocket()
+  localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: {
+    echoCancellation: true,
+    noiseSuppression: true,
+  } })
+  localVideo.value.srcObject = localStream
+  const message = {
+    code: 'join_group',
+  }
+  socket.send(JSON.stringify(message))
+}
+
+async function sendOffer(targetId) {
+  const pc = new RTCPeerConnection({})
+  pcMap.set(targetId, pc)
+  localStream.getTracks().forEach(track => pc.addTrack(track, localStream))
+  const video = document.createElement('video')
+  video.id = targetId
+  video.autoplay = true
+  videoContainer.value.appendChild(video)
+  pc.addEventListener('track', (e) => {
+    // 更新远程的视频
+    video.srcObject = e.streams[0]
+  })
+
+  pc.addEventListener('icecandidate', (e) => {
+    if (e.candidate) {
+      const message = {
+        code: 'icecandidate',
+        data: {
+          targetId,
+          candidate: e.candidate,
+        },
+      }
+      socket.send(JSON.stringify(message))
+    }
+  })
+  const description = await pc.createOffer()
+  await pc.setLocalDescription(description)
+  const message = {
+    code: 'offer',
+    data: {
+      targetId,
+      offer: description,
+    },
+  }
+  socket.send(JSON.stringify(message))
+}
+
+// 接收offer
+async function getOffer({ fromId: targetId, offer }) {
+  const pc = new RTCPeerConnection({})
+  pcMap.set(targetId, pc)
+  localStream.getTracks().forEach(track => pc.addTrack(track, localStream))
+  const video = document.createElement('video')
+  video.id = targetId
+  video.autoplay = true
+  videoContainer.value.appendChild(video)
+  pc.addEventListener('track', (e) => {
+    // 更新远程的视频
+    video.srcObject = e.streams[0]
+  })
+
+  pc.addEventListener('icecandidate', (e) => {
+    if (e.candidate) {
+      const message = {
+        code: 'icecandidate',
+        data: {
+          targetId,
+          candidate: e.candidate,
+        },
+      }
+      socket.send(JSON.stringify(message))
+    }
+  })
+  await pc.setRemoteDescription(offer)
+  const description = await pc.createAnswer()
+  await pc.setLocalDescription(description)
+  const message = {
+    code: 'answer',
+    data: {
+      targetId,
+      answer: description,
+    },
+  }
+  socket.send(JSON.stringify(message))
+}
+
+async function getAnswer({ fromId, answer }) {
+  const pc = pcMap.get(fromId)
+  await pc.setRemoteDescription(answer)
+}
+
+// 挂断通话并通知服务器用户离开频道
+async function hangUp() {
+  // // 发送离开频道的消息给服务器
+  const message = {
+    code: 'leave_group',
+  }
+  socket.send(JSON.stringify(message))
+  // 关闭所有与当前用户相关的RTCPeerConnections
+  for (const [key, pc] of pcMap.entries()) {
+    // if (pc && key.toString() !== currentUserId) {
+    pc.close()
+    pcMap.delete(key)
+    const video = document.getElementById(key)
+    videoContainer.value.removeChild(video)
+    // }
+  }
+  // 停止所有本地媒体流
+  if (localStream)
+    localStream.getTracks().forEach(track => track.stop())
+  // 此处不关闭WebSocket连接，以免影响其他用户
+}
+// 挂断通话并从页面移除视频元素
+// async function hangUp() {
+//   // 关闭与当前用户相关的RTCPeerConnections
+//   for (const [key, pc] of pcMap.entries()) {
+//     if (pc && key === currentUserId) {
+//       pc.close()
+//       pcMap.delete(key)
+//       // 移除页面上的视频元素
+//       const videoElement = document.getElementById(key)
+//       if (videoElement) {
+//         videoElement.srcObject = null
+//         videoContainer.value.removeChild(videoElement)
+//       }
+//     }
+//   }
+//   // 停止所有本地媒体流
+//   if (localStream)
+//     localStream.getTracks().forEach(track => track.stop())
+//   // 更改完善的挂断功能，现在将同时移除视频元素
+// }
+</script>
+
+<template>
+  <div class="container">
+    <div ref="videoContainer">
+      <video ref="localVideo" autoplay />
+    </div>
+    <div>
+      <button @click="handleJoin">
+        join
+      </button>
+      <n-button @click="hangUp">
+        挂断
+      </n-button>
+    </div>
+  </div>
+</template>
+
+<style>
+video {
+  width: 300px;
+  height: 200px;
+  border: 1px dashed black;
+}
+</style>
+
+<route lang="yaml">
+meta:
+  layout: home
+</route>
