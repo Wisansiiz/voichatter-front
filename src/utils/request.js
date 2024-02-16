@@ -3,7 +3,7 @@ import { useAuthLocalStore, useAuthSessionStore } from '~/stores/token.js'
 
 const localStore = useAuthLocalStore()
 const sessionStore = useAuthSessionStore()
-const baseURL = 'http://localhost:9000/api'
+const baseURL = 'https://192.168.31.198:9000/api'
 const service = axios.create({ baseURL, timeout: 10000 })
 service.interceptors.request.use((config) => {
   if (sessionStore.token)
