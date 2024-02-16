@@ -54,7 +54,7 @@ function handleServerList() {
             RouterLink,
             {
               to: {
-                path: '/server',
+                path: `/server?id=${data[i].server_id}`,
               },
             },
             { default: () => data[i].server_name },
