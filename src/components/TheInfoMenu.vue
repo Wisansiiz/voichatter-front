@@ -1,6 +1,6 @@
 <script setup>
 const menuOptions = []
-const collapsed = ref(true)
+const collapsed = ref(false)
 </script>
 
 <template>
