@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useAuthLocalStore, useAuthSessionStore } from '~/stores/token.js'
+import { router } from '~/router'
 
 const localStore = useAuthLocalStore()
 const sessionStore = useAuthSessionStore()
@@ -20,8 +21,8 @@ service.interceptors.response.use(
       return result.data
     }
     else {
-      window.location.href = '/login'
-      gMessage.error('登录失效，请重新登录')
+      if (router.currentRoute.value.path !== '/login')
+        await router.push('/login')
     }
   },
   (err) => {
