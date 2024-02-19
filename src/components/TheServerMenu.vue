@@ -11,26 +11,34 @@ const collapsed = ref(true)
 const showModal = ref(false)
 const showModal2 = ref(false)
 const formRef = ref<FormInst | null>(null)
-const model = ref({ server_name: null, server_theme: null })
+const model = ref({ server_name: null, server_type: null })
 const rules = {
   server_name: {
     required: true,
     trigger: ['blur', 'input'],
     message: '请输入 名字',
   },
-  server_theme: {
+  server_type: {
     required: true,
     trigger: ['blur', 'change'],
-    message: '请选择 主题',
+    message: '请选择 类型',
   },
 }
-const generalOptions = ['朋友', '家人', '同学', '网络朋友'].map(
+const generalOptions = ['public', 'private'].map(
   v => ({
     label: v,
     value: v,
   }),
 )
-
+function createImageVNode(url: string) {
+  return h('img', {
+    src: url,
+    alt: '描述',
+    style: {
+      width: '35px', // 设置图片宽度
+    },
+  })
+}
 function handleShowModal2() {
   showModal2.value = true
 }
@@ -54,7 +62,8 @@ function handleServerList() {
             RouterLink,
             {
               to: {
-                path: `/server?id=${data[i].server_id}`,
+                path: '/server',
+                query: { id: `${data[i].server_id}` },
               },
             },
             { default: () => data[i].server_name },
@@ -63,6 +72,21 @@ function handleServerList() {
         icon: renderIcon(BookIcon),
       })
     }
+    menuOptions.push({
+      label: () =>
+        h(
+          RouterLink,
+          {
+            to: {
+              path: '/server',
+              query: { id: '123' }, // 动态段参数
+            },
+          },
+          { default: () => '测试' },
+        ),
+      key: 'test',
+      icon: renderIcon(createImageVNode('https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100')),
+    })
     menuOptions.push({
       label: () =>
         h(
@@ -89,7 +113,7 @@ function handleCreateServer() {
     if (!errors) {
       service.post('/create-server', model.value).then((res: any) => {
         handleServerList()
-        gMessage.success(res.msg)
+        gMessage.success(res.message)
       })
     }
     else {
@@ -111,7 +135,7 @@ function handleCreateServer() {
     <n-menu
       :collapsed="true"
       :collapsed-width="64"
-      :collapsed-icon-size="22"
+      :collapsed-icon-size="35"
       :options="menuOptions"
     />
   </n-layout-sider>
@@ -160,9 +184,9 @@ function handleCreateServer() {
           placeholder="什么名字呢"
         />
       </n-form-item>
-      <n-form-item :span="12" label="选择一个主题吧，它是关于什么的？" path="server_theme">
+      <n-form-item :span="12" label="选择一个服务器类型" path="server_theme">
         <n-select
-          v-model:value="model.server_theme"
+          v-model:value="model.server_type"
           placeholder="什么主题呢"
           :options="generalOptions"
         />
