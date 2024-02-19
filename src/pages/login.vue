@@ -1,7 +1,7 @@
-<script setup>
+<script setup lang="ts">
 import { Password, User } from '@vicons/carbon'
-import { login } from '~/composables/authorized.js'
 import { useAuthLocalStore, useAuthSessionStore } from '~/stores/token.js'
+import { service } from '~/utils/request.js'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -16,7 +16,7 @@ const rules = {
   username: [
     {
       required: true,
-      validator(rule, value) {
+      validator(_rule: any, value: any) {
         if (!value)
           return new Error('需要用户名')
         else if (!/^[a-zA-Z0-9_-]{4,16}$/.test(value))
@@ -38,20 +38,32 @@ const sessionStore = useAuthSessionStore()
 
 async function userLogin() {
   isLoading.value = true
-  login(model.value)
+  service.post('/login', (model.value))
     .then(async (data) => {
       if (remember.value)
         localStore.token = data.data.token
       else sessionStore.token = data.data.token
-      if (localStore.token || sessionStore.token) {
-        gMessage.success('登录成功')
-        await router.push('/')
-      }
+      setTimeout(() => {
+        if (localStore.token || sessionStore.token) {
+          router.push('/')
+          gMessage.success('登录成功')
+        }
+      }, 1000)
     })
     .finally(() => {
-      isLoading.value = false
+      setTimeout(() => {
+        isLoading.value = false
+      }, 1000)
     })
 }
+onMounted(() => {
+  service.get('/auth').then((data: any) => {
+    if (data) {
+      router.push('/')
+      gMessage.success(data.messages)
+    }
+  })
+})
 </script>
 
 <template>
