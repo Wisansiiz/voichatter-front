@@ -1,56 +1,39 @@
 <script setup>
 import { Home, Search, Store, User } from '@vicons/carbon'
-import { NAvatar, NIcon, NText } from 'naive-ui'
+import { NIcon } from 'naive-ui'
+import {
+  Pencil as EditIcon,
+  LogOutOutline as LogoutIcon,
+  PersonCircleOutline as UserIcon,
+} from '@vicons/ionicons5'
 
-function renderCustomHeader() {
-  return h(
-    'div',
-    {
-      style: 'display: flex; align-items: center; padding: 8px 12px;',
-    },
-    [
-      h(NAvatar, {
-        round: true,
-        style: 'margin-right: 12px;',
-        src: 'https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100',
-      }),
-      h('div', null, [
-        h('div', null, [h(NText, { depth: 2 }, { default: () => '打工仔' })]),
-        h('div', { style: 'font-size: 12px;' }, [
-          h(
-            NText,
-            { depth: 3 },
-            { default: () => '个性签名?' },
-          ),
-        ]),
-      ]),
-    ],
-  )
+function renderIcon(icon) {
+  return () => {
+    return h(NIcon, null, {
+      default: () => h(icon),
+    })
+  }
 }
 const options = [
   {
-    key: 'header',
-    type: 'render',
-    render: renderCustomHeader,
+    label: '用户资料',
+    key: 'profile',
+    icon: renderIcon(UserIcon),
   },
   {
-    key: 'header-divider',
-    type: 'divider',
+    label: '编辑用户资料',
+    key: 'editProfile',
+    icon: renderIcon(EditIcon),
   },
   {
-    label: '处理群消息 342 条',
-    key: 'stmt1',
-  },
-  {
-    label: '被 @ 58 次',
-    key: 'stmt2',
-  },
-  {
-    label: '加入群 17 个',
-    key: 'stmt3',
+    label: '退出登录',
+    key: 'logout',
+    icon: renderIcon(LogoutIcon),
   },
 ]
 function handleSelect(key) {
+  if (key === 'logout')
+    logout()
   gMessage.info(String(key))
 }
 </script>
