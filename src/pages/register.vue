@@ -1,6 +1,6 @@
 <script setup>
 import { Email, Password, User } from '@vicons/carbon'
-import { register } from '~/composables/authorized.js'
+import { register } from '~/composables/authorized.ts'
 
 const router = useRouter()
 const formRef = ref(null)
