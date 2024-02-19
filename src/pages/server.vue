@@ -6,7 +6,7 @@ const messages = ref([])
 const isChatBoxVisible = ref(false)
 let ws
 onMounted(() => {
-  ws = new WebSocket(`ws://localhost:9000/api/ws?channelID=123`)
+  ws = new WebSocket(`wss://192.168.31.198:9000/api/ws?channelID=123`)
   messages.value = []
   ws.onmessage = (event) => {
     const message = JSON.parse(event.data)
@@ -28,10 +28,12 @@ function sendMessage() {
     messageText.value = ''
   }
 }
+const route = useRoute()
 </script>
 
 <template>
   <n-flex>
+    <n-h1>{{ route.query.id }}</n-h1>
     <n-scrollbar style="margin-bottom: 50px">
       <n-flex v-show="isChatBoxVisible" justify="center">
         <n-scrollbar style="max-width: 300px">
