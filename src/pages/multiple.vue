@@ -151,38 +151,15 @@ async function hangUp() {
   socket.send(JSON.stringify(message))
   // 关闭所有与当前用户相关的RTCPeerConnections
   for (const [key, pc] of pcMap.entries()) {
-    // if (pc && key.toString() !== currentUserId) {
     pc.close()
     pcMap.delete(key)
     const video = document.getElementById(key)
     videoContainer.value.removeChild(video)
-    // }
   }
   // 停止所有本地媒体流
   if (localStream)
     localStream.getTracks().forEach(track => track.stop())
-  // 此处不关闭WebSocket连接，以免影响其他用户
 }
-// 挂断通话并从页面移除视频元素
-// async function hangUp() {
-//   // 关闭与当前用户相关的RTCPeerConnections
-//   for (const [key, pc] of pcMap.entries()) {
-//     if (pc && key === currentUserId) {
-//       pc.close()
-//       pcMap.delete(key)
-//       // 移除页面上的视频元素
-//       const videoElement = document.getElementById(key)
-//       if (videoElement) {
-//         videoElement.srcObject = null
-//         videoContainer.value.removeChild(videoElement)
-//       }
-//     }
-//   }
-//   // 停止所有本地媒体流
-//   if (localStream)
-//     localStream.getTracks().forEach(track => track.stop())
-//   // 更改完善的挂断功能，现在将同时移除视频元素
-// }
 </script>
 
 <template>
@@ -191,9 +168,9 @@ async function hangUp() {
       <video ref="localVideo" autoplay />
     </div>
     <div>
-      <button @click="handleJoin">
+      <n-button @click="handleJoin">
         join
-      </button>
+      </n-button>
       <n-button @click="hangUp">
         挂断
       </n-button>
