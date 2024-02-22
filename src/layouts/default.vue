@@ -1,21 +1,17 @@
 <script setup>
-import TheServerMenu from '~/components/TheServerMenu.vue'
-import TheInfoMenu from '~/components/TheInfoMenu.vue'
-import TheChannelList from '~/components/TheChannelList.vue'
+// 创建一个响应式引用
+const serverName = ref('')
+function getServerName(data) {
+  serverName.value = data
+}
 </script>
 
 <template>
   <n-layout position="absolute">
     <TheHeader />
     <n-layout has-sider position="absolute" style="top: 50px">
-      <TheServerMenu />
-      <TheChannelList />
-      <n-layout has-sider sider-placement="right">
-        <n-layout content-style="padding: 24px;" :native-scrollbar="false">
-          <RouterView />
-        </n-layout>
-        <TheInfoMenu />
-      </n-layout>
+      <TheServerMenu @server-name="getServerName" />
+      <RouterView :server-name="serverName" />
     </n-layout>
   </n-layout>
 </template>
