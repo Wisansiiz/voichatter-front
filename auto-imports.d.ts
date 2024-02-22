@@ -339,11 +339,8 @@ declare module 'vue' {
     readonly eagerComputed: UnwrapRef<typeof import('@vueuse/core')['eagerComputed']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
-    readonly gDialog: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gDialog']>
     readonly gLoadingBar: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gLoadingBar']>
-    readonly gLoadingBarDone: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gLoadingBarDone']>
     readonly gMessage: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gMessage']>
-    readonly gNotification: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gNotification']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
@@ -636,11 +633,8 @@ declare module '@vue/runtime-core' {
     readonly eagerComputed: UnwrapRef<typeof import('@vueuse/core')['eagerComputed']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
-    readonly gDialog: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gDialog']>
     readonly gLoadingBar: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gLoadingBar']>
-    readonly gLoadingBarDone: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gLoadingBarDone']>
     readonly gMessage: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gMessage']>
-    readonly gNotification: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gNotification']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
