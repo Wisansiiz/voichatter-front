@@ -1,6 +1,6 @@
 import { createDiscreteApi } from 'naive-ui'
 
-const { message, notification, dialog, loadingBar } = createDiscreteApi(
+const { message, loadingBar } = createDiscreteApi(
   ['message', 'dialog', 'notification', 'loadingBar'],
 )
 export const gMessage = {
@@ -17,12 +17,7 @@ export const gMessage = {
     message.error(str)
   },
 }
-export function gNotification(str: string) {
-  notification.create({ title: str })
-}
-export function gDialog(str: string) {
-  dialog.info({ title: str })
-}
+
 export function gLoadingBar(router: any) {
   router.beforeEach(() => {
     loadingBar.start()
@@ -35,15 +30,4 @@ export function gLoadingBar(router: any) {
   router.onError(() => {
     loadingBar.error()
   })
-}
-export const gLoadingBarDone = {
-  start: () => {
-    loadingBar.start()
-  },
-  finish: () => {
-    loadingBar.finish()
-  },
-  error: () => {
-    loadingBar.error()
-  },
 }
