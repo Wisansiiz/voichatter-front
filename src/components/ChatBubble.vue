@@ -34,13 +34,13 @@ export default {
     </div>
     <div class="chat-header">
       {{ username }}
-      <time class="text-xs opacity-50">{{ time }}</time>
     </div>
     <div class="chat-bubble" :class="{ sent: !isSent, received: isSent }">
       {{ message }}
     </div>
     <div class="chat-footer opacity-50">
-      已发送
+      {{ time }}
+      <!--      <time class="text-xs opacity-50"></time> -->
     </div>
   </div>
 </template>
