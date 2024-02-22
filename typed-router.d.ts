@@ -41,13 +41,15 @@ declare module 'vue-router/auto/routes' {
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
     '/[...all]': RouteRecordInfo<'/[...all]', '/:all(.*)', { all: ParamValue<true> }, { all: ParamValue<false> }>,
+    '/[server_name]': RouteRecordInfo<'/[server_name]', '/:server_name', { server_name: ParamValue<true> }, { server_name: ParamValue<false> }>,
+    '/[server_name]/[name]': RouteRecordInfo<'/[server_name]/[name]', '/:server_name/:name', { server_name: ParamValue<true>, name: ParamValue<true> }, { server_name: ParamValue<false>, name: ParamValue<false> }>,
+    '/[server_name]/[name]/multiple': RouteRecordInfo<'/[server_name]/[name]/multiple', '/:server_name/:name/multiple', { server_name: ParamValue<true>, name: ParamValue<true> }, { server_name: ParamValue<false>, name: ParamValue<false> }>,
+    '/[server_name]/[name]/single': RouteRecordInfo<'/[server_name]/[name]/single', '/:server_name/:name/single', { server_name: ParamValue<true>, name: ParamValue<true> }, { server_name: ParamValue<false>, name: ParamValue<false> }>,
+    '/[server_name]/[name]/test': RouteRecordInfo<'/[server_name]/[name]/test', '/:server_name/:name/test', { server_name: ParamValue<true>, name: ParamValue<true> }, { server_name: ParamValue<false>, name: ParamValue<false> }>,
+    '/[server_name]/[name]/ws': RouteRecordInfo<'/[server_name]/[name]/ws', '/:server_name/:name/ws', { server_name: ParamValue<true>, name: ParamValue<true> }, { server_name: ParamValue<false>, name: ParamValue<false> }>,
     '/hi/[name]': RouteRecordInfo<'/hi/[name]', '/hi/:name', { name: ParamValue<true> }, { name: ParamValue<false> }>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
-    '/multiple': RouteRecordInfo<'/multiple', '/multiple', Record<never, never>, Record<never, never>>,
     '/register': RouteRecordInfo<'/register', '/register', Record<never, never>, Record<never, never>>,
-    '/server': RouteRecordInfo<'/server', '/server', Record<never, never>, Record<never, never>>,
-    '/single': RouteRecordInfo<'/single', '/single', Record<never, never>, Record<never, never>>,
-    '/ws': RouteRecordInfo<'/ws', '/ws', Record<never, never>, Record<never, never>>,
   }
 }
 
