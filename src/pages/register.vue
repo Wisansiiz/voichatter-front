@@ -12,10 +12,10 @@ const modelRef = ref({
   reenteredPassword: null,
 })
 const model = modelRef
-function validatePasswordStartWith(rule, value) {
+function validatePasswordStartWith(_rule, value) {
   return !!modelRef.value.password && modelRef.value.password.startsWith(value) && modelRef.value.password.length >= value.length
 }
-function validatePasswordSame(rule, value) {
+function validatePasswordSame(_rule, value) {
   return value === modelRef.value.password
 }
 
@@ -23,7 +23,7 @@ const rules = {
   username: [
     {
       required: true,
-      validator(rule, value) {
+      validator(_rule, value) {
         if (!value)
           return new Error('需要用户名')
         else if (!/^[a-zA-Z0-9_-]{4,16}$/.test(value))
@@ -37,7 +37,7 @@ const rules = {
   email: [
     {
       required: true,
-      validator(rule, value) {
+      validator(_rule, value) {
         if (!value)
           return new Error('需要邮箱')
         else if (!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(value))
