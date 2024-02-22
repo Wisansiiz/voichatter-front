@@ -6,6 +6,7 @@ import { RouterLink } from 'vue-router'
 import { Add, BookOutline as BookIcon } from '@vicons/ionicons5'
 import { service } from '~/utils/request.js'
 
+const emit = defineEmits(['serverName'])
 const menuOptions: any[] = reactive([])
 const collapsed = ref(true)
 const showModal = ref(false)
@@ -62,8 +63,10 @@ function handleServerList() {
             RouterLink,
             {
               to: {
-                path: '/server',
-                query: { id: `${data[i].server_id}` },
+                path: `/${encodeURIComponent(data[i].server_id)}`,
+              },
+              onClick: () => {
+                sendServerName(data[i].server_name)
               },
             },
             { default: () => data[i].server_name },
@@ -78,28 +81,13 @@ function handleServerList() {
           RouterLink,
           {
             to: {
-              path: '/server',
-              query: { id: '123' }, // 动态段参数
+              path: '/125',
             },
           },
           { default: () => '测试' },
         ),
       key: 'test',
       icon: renderIcon(createImageVNode('https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100')),
-    })
-    menuOptions.push({
-      label: () =>
-        h(
-          'a',
-          {
-            onClick: () => {
-              showModal.value = true
-            },
-          },
-          { default: () => '添加服务器' },
-        ),
-      key: 'add-server',
-      icon: renderIcon(Add),
     })
   })
 }
@@ -112,14 +100,23 @@ function handleCreateServer() {
   formRef.value?.validate((errors) => {
     if (!errors) {
       service.post('/create-server', model.value).then((res: any) => {
+        menuOptions.length = 0
         handleServerList()
-        gMessage.success(res.message)
+        gMessage.success(res.messages)
+        showModal2.value = false
+        showModal.value = false
       })
     }
     else {
       gMessage.error('验证失败')
     }
   })
+}
+// 创建一个响应式引用
+const serverName = ref('')
+function sendServerName(data: string) {
+  serverName.value = data
+  emit('serverName', serverName.value)
 }
 </script>
 
@@ -138,6 +135,17 @@ function handleCreateServer() {
       :collapsed-icon-size="35"
       :options="menuOptions"
     />
+    <n-button
+      quaternary
+      style="width: 48px; height: 42px; left: 8px"
+      @click="showModal = true"
+    >
+      <template #icon>
+        <NIcon size="35">
+          <Add />
+        </NIcon>
+      </template>
+    </n-button>
   </n-layout-sider>
   <n-modal
     v-model:show="showModal"
@@ -156,7 +164,10 @@ function handleCreateServer() {
       加入服务器
     </n-button>
     <br>
-    <n-button style="margin-top: 30px; width: 100%" @click="handleShowModal2">
+    <n-button
+      style="margin-top: 30px; width: 100%"
+      @click="handleShowModal2"
+    >
       创建服务器
     </n-button>
   </n-modal>
