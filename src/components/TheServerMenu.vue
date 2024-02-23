@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { Ref } from 'vue'
 import { h } from 'vue'
 import type { FormInst } from 'naive-ui'
 import { NIcon } from 'naive-ui'
@@ -11,6 +12,7 @@ const menuOptions: any[] = reactive([])
 const collapsed = ref(true)
 const showModal = ref(false)
 const showModal2 = ref(false)
+const showJoinServer = ref(false)
 const formRef = ref<FormInst | null>(null)
 const model = ref({ server_name: null, server_type: null })
 const rules = {
@@ -118,6 +120,29 @@ function sendServerName(data: string) {
   serverName.value = data
   emit('serverName', serverName.value)
 }
+const joinModel = ref({ server_id: null })
+const joinRules = {
+  server_id: {
+    required: true,
+    trigger: ['blur', 'input'],
+    message: '请输入 id',
+  },
+}
+async function handleJoinServer() {
+  formRef.value?.validate(async (errors) => {
+    if (!errors) {
+      const res: any = await service.post('/join-server', { server_id: Number(joinModel.value.server_id) })
+      menuOptions.length = 0
+      handleServerList()
+      gMessage.success(res.messages)
+      showJoinServer.value = false
+      showModal.value = false
+    }
+    else {
+      gMessage.error('验证失败')
+    }
+  })
+}
 </script>
 
 <template>
@@ -160,7 +185,10 @@ function sendServerName(data: string) {
       footer: 'soft',
     }"
   >
-    <n-button style="width: 100%">
+    <n-button
+      style="width: 100%"
+      @click="showJoinServer = true"
+    >
       加入服务器
     </n-button>
     <br>
@@ -208,6 +236,38 @@ function sendServerName(data: string) {
       @click="handleCreateServer"
     >
       创建服务器
+    </n-button>
+  </n-modal>
+  <n-modal
+    v-model:show="showJoinServer"
+    class="custom-card"
+    preset="card"
+    :style="{ maxWidth: '600px' }"
+    title="创建怎样的服务器？"
+    size="huge"
+    :bordered="false"
+    :segmented="{
+      content: 'soft',
+      footer: 'soft',
+    }"
+  >
+    <n-form
+      ref="formRef"
+      :model="joinModel"
+      :rules="joinRules"
+    >
+      <n-form-item label="添加的服务器id" path="server_id">
+        <n-input
+          v-model:value="joinModel.server_id"
+          placeholder="请输入服务器id"
+        />
+      </n-form-item>
+    </n-form>
+    <n-button
+      style="margin-top: 30px; width: 100%"
+      @click="handleJoinServer"
+    >
+      加入服务器
     </n-button>
   </n-modal>
 </template>
