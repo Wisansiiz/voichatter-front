@@ -1,13 +1,14 @@
-<script setup>
+<script setup lang="ts">
 import { Home, Search, Store, User } from '@vicons/carbon'
-import { NIcon } from 'naive-ui'
+import { type GlobalTheme, NIcon, darkTheme } from 'naive-ui'
 import {
   Pencil as EditIcon,
   LogOutOutline as LogoutIcon,
   PersonCircleOutline as UserIcon,
 } from '@vicons/ionicons5'
 
-function renderIcon(icon) {
+const emit = defineEmits(['theme'])
+function renderIcon(icon: any) {
   return () => {
     return h(NIcon, null, {
       default: () => h(icon),
@@ -31,11 +32,15 @@ const options = [
     icon: renderIcon(LogoutIcon),
   },
 ]
-function handleSelect(key) {
+function handleSelect(key: any) {
   if (key === 'logout')
     logout()
   gMessage.info(String(key))
 }
+const theme = ref<GlobalTheme | null>(null)
+watch(theme, () => {
+  emit('theme', theme.value)
+})
 </script>
 
 <template>
@@ -66,6 +71,14 @@ function handleSelect(key) {
             </RouterLink>
           </n-dropdown>
         </n-breadcrumb-item>
+        <n-flex>
+          <n-button @click="theme = darkTheme">
+            深色
+          </n-button>
+          <n-button @click="theme = null">
+            浅色
+          </n-button>
+        </n-flex>
       </n-flex>
     </n-breadcrumb>
   </n-layout-header>
