@@ -1,14 +1,19 @@
 <script setup>
 import { ref } from 'vue'
+import { service } from '~/utils/request.js'
 
-const r = useRoute()
-const currentUserId = r.query.id
 const localVideo = ref()
 const remoteVideo = ref()
 let localStream = null
 let socket = null
 const targetId = ref(null)
 let pc = null
+onMounted(async () => {
+  const currentUserId = ref(null)
+  const res = await service.get('/auth')
+  currentUserId.value = res.data
+  initWebsocket(currentUserId)
+})
 async function handleStart() {
   localStream = await navigator.mediaDevices.getUserMedia({ audio: {
     echoCancellation: true, // 音频开启回音消除
@@ -17,8 +22,8 @@ async function handleStart() {
   } })
   localVideo.value.srcObject = localStream
 }
-function initWebsocket() {
-  socket = new WebSocket(`wss://192.168.31.198:9000/yy?id=${currentUserId}`)
+function initWebsocket(currentUserId) {
+  socket = new WebSocket(`wss://192.168.31.198:9000/api/yy?id=${currentUserId.value}`)
   socket.onopen = () => {
     gMessage.info('open_success')
   }
@@ -44,8 +49,6 @@ function initWebsocket() {
     console.error(e)
   }
 }
-
-initWebsocket()
 
 // ====== 发送方 ======= //
 function handleCall() {

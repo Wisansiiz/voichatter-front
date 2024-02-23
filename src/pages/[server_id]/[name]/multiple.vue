@@ -1,17 +1,23 @@
 <script setup>
 import { ref } from 'vue'
+import { service } from '~/utils/request.js'
 
 const r = useRoute()
-const currentUserId = r.query.id.toString()
+let currentUserId = null
 const videoContainer = ref()
 let socket = null
 const pcMap = new Map()
 let localStream = null
 const localVideo = ref()
-const channelId = r.query.channelId.toString()
+const params = useRoute('/[server_id]/[name]').params
+const channelId = params.server_id + params.name
 
+onMounted(async () => {
+  const res = await service.get('/auth')
+  currentUserId = res.data
+})
 function initWebsocket() {
-  socket = new WebSocket(`wss://192.168.31.198:9000/yy?id=${currentUserId}&channelId=${channelId}`)
+  socket = new WebSocket(`wss://192.168.31.198:9000/api/yy?id=${currentUserId}&channelId=${channelId}`)
   socket.onopen = () => {
   }
 

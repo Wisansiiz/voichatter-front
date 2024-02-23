@@ -3,7 +3,8 @@ const props = defineProps<{
   serverName: string
 }>()
 const route = useRoute()
-const servername = ref('默认值')
+const servername = ref('')
+servername.value = props.serverName
 watch(route, () => {
   servername.value = props.serverName
 })
