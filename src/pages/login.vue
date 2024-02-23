@@ -39,7 +39,7 @@ const sessionStore = useAuthSessionStore()
 async function userLogin() {
   isLoading.value = true
   service.post('/login', (model.value))
-    .then(async (data) => {
+    .then(async (data: any) => {
       if (remember.value)
         localStore.token = data.data.token
       else sessionStore.token = data.data.token
@@ -47,6 +47,9 @@ async function userLogin() {
         if (localStore.token || sessionStore.token) {
           router.push('/')
           gMessage.success('登录成功')
+        }
+        else {
+          gMessage.error(data.messages)
         }
       }, 1000)
     })
