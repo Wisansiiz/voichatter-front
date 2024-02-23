@@ -20,10 +20,15 @@ service.interceptors.response.use(
     if (result.data.code === 200) {
       return result.data
     }
-    else {
+    else if (result.data.code === 302) {
+      router.back()
+    }
+    else if (result.data.code !== 200) {
       if (router.currentRoute.value.path !== '/login')
         await router.push('/login')
     }
+    // router.back()
+    return Promise.reject(result.data)
   },
   (err) => {
     return Promise.reject(err)
