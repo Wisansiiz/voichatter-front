@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { Ref } from 'vue'
 import { h } from 'vue'
 import type { FormInst } from 'naive-ui'
 import { NIcon } from 'naive-ui'
@@ -116,8 +115,8 @@ function handleCreateServer() {
 }
 // 创建一个响应式引用
 const serverName = ref('')
-function sendServerName(data: string) {
-  serverName.value = data
+function sendServerName(name: string) {
+  serverName.value = name
   emit('serverName', serverName.value)
 }
 const joinModel = ref({ server_id: null })
@@ -273,4 +272,9 @@ async function handleJoinServer() {
 </template>
 
 <style scoped>
+.active {
+  background-color: var(--n-item-color-active);
+  --n-item-text-color-active: #18a058;
+  --n-item-color-active: rgba(24, 160, 88, 0.1);
+}
 </style>
