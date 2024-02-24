@@ -1,79 +1,22 @@
 <script setup lang="ts">
 import { Menu } from '@vicons/ionicons5'
-import { createDiscreteApi } from 'naive-ui'
 import { useRouter } from 'vue-router'
 
-const props = defineProps<{
-  serverName: string
-}>()
-const { message, dialog } = createDiscreteApi(
-  ['message', 'dialog'],
-)
-
-const options = [
-  {
-    label: '邀请其他人',
-    key: 'jay gatsby',
+const props = defineProps({
+  serverName: {
+    type: String,
+    default: '',
   },
-  {
-    label: '服务器设置',
-    key: 'daisy buchanan',
+  options: {
+    type: Array,
+    default: () => [],
   },
-  {
-    label: '创建新频道',
-    key: 'red rose',
-  },
-  {
-    label: '修改服务器名称',
-    key: 'nick carraway',
-  },
-  {
-    label: () =>
-      h(
-        'a',
-        {
-          style: {
-            color: 'red',
-          },
-          onClick: () => {
-            dialog.warning({
-              title: '警告',
-              content: '确定删除该服务器吗',
-              positiveText: '确定',
-              negativeText: '不确定',
-              onPositiveClick: () => {
-                message.success('确定')
-              },
-              onNegativeClick: () => {
-                message.error('不确定')
-              },
-            })
-          },
-        },
-        { default: () => '删除服务器' },
-      ),
-    key: 'delete',
-  },
-]
-function handleSelect(key: string | number) {
-  gMessage.info(String(key))
-}
-
-// const name = ref('124')
+})
 const router = useRouter()
 const route: any = useRoute()
 function go(i: any) {
   router.push(`/${route.params.server_id}/${encodeURIComponent(i)}`)
 }
-
-// watch(route, () => {
-//   if (router.currentRoute.value.path !== '/login')
-//     go(1)
-//   // 模拟点击事件
-// })
-// onMounted(() => {
-//   go(1) // 模拟点击事件
-// })
 // 随机数
 function random(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min)
@@ -91,7 +34,6 @@ function random(min: number, max: number) {
         trigger="click"
         size="medium"
         :options="options"
-        @select="handleSelect"
       >
         <n-button style="height: 30px">
           <n-icon size="large">
