@@ -1,5 +1,10 @@
-<script setup>
-const menuOptions = []
+<script setup lang="ts">
+const props = defineProps({
+  menuOptions: {
+    type: Array,
+    default: () => [],
+  },
+})
 const collapsed = ref(false)
 </script>
 
@@ -14,10 +19,13 @@ const collapsed = ref(false)
     @collapse="collapsed = true"
     @expand="collapsed = false"
   >
+    <n-flex justify="center">
+      <n-h3>服务器成员列表</n-h3>
+    </n-flex>
     <n-menu
-      :collapsed="collapsed"
+      :collapsed="true"
       :collapsed-width="64"
-      :collapsed-icon-size="22"
+      :collapsed-icon-size="35"
       :options="menuOptions"
     />
   </n-layout-sider>
