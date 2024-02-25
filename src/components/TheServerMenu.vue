@@ -225,7 +225,7 @@ async function handleJoinServer() {
       <n-form-item :span="12" label="选择一个服务器类型" path="server_theme">
         <n-select
           v-model:value="model.server_type"
-          placeholder="什么主题呢"
+          placeholder="什么类型呢"
           :options="generalOptions"
         />
       </n-form-item>
