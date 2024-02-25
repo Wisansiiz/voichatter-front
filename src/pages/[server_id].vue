@@ -30,18 +30,7 @@ watch(() => route.params.server_id, async (value, oldValue) => {
     menuOptions.splice(0, menuOptions.length)
     const res = await service.get(`/server-members/${params.server_id}`)
     res.data.members.forEach((item: ServerMember) => {
-      menuOptions.push({
-        label: () =>
-          h(
-            RouterLink,
-            {
-              to: {},
-            },
-            { default: () => item.username },
-          ),
-        key: item.user_id,
-        icon: renderIcon(User),
-      })
+      menuOptions.push(item)
     })
   }
 })
@@ -62,86 +51,13 @@ onMounted(async () => {
   // 读取服务器成员列表
   const res = await service.get(`/server-members/${params.server_id}`)
   res.data.members.forEach((item: ServerMember) => {
-    menuOptions.push({
-      label: () =>
-        h(
-          RouterLink,
-          {
-            to: {
-            },
-          },
-          { default: () => item.username },
-        ),
-      key: item.user_id,
-      icon: renderIcon(User),
-    })
+    menuOptions.push(item)
   })
 })
-
-const { message, dialog } = createDiscreteApi(
-  ['message', 'dialog'],
-)
-
-const options = [
-  {
-    label: '邀请其他人',
-    key: 'invite',
-  },
-  {
-    label: '服务器设置',
-    key: 'serverSetting',
-  },
-  {
-    label: '创建新频道',
-    key: 'createNewChannel',
-  },
-  {
-    label: '修改服务器名称',
-    key: 'modifyServerName',
-  },
-  {
-    label: () =>
-      h(
-        'a',
-        {
-          style: {
-            color: 'red',
-          },
-          onClick: () => {
-            dialog.warning({
-              title: '警告',
-              content: '确定删除该服务器吗',
-              positiveText: '确定',
-              negativeText: '不确定',
-              onPositiveClick: () => {
-                deleteServer()
-              },
-              onNegativeClick: () => {
-                message.error('不确定')
-              },
-            })
-          },
-        },
-        { default: () => '删除服务器' },
-      ),
-    key: 'delete',
-  },
-]
-
-interface Response {
-  code: number
-  data: any
-  messages: string
-}
-async function deleteServer() {
-  const res: Response = await service.delete(`/delete-server/${route.params.server_id}`)
-  gMessage.info(res.messages)
-}
 </script>
 
 <template>
   <TheChannelList
-    :options="options"
     :server-name="servername"
   />
   <n-layout has-sider sider-placement="right">
