@@ -1,21 +1,40 @@
 <script setup lang="ts">
 import { h } from 'vue'
 import type { FormInst } from 'naive-ui'
-import { NIcon } from 'naive-ui'
+import { Add } from '@vicons/ionicons5'
 import { RouterLink } from 'vue-router'
-import { Add, BookOutline as BookIcon } from '@vicons/ionicons5'
 import { service } from '~/utils/request'
 import type { response } from '~/composables/result'
-import { useProjectSetting } from '~/hooks/setting/useProjectSetting'
+import { useProjectSettingStore } from '~/store/modules/projectSetting'
+import { createImageVNode, renderIcon } from '~/utils'
+import { useUserStore } from '~/store/modules/user'
 
-const emit = defineEmits(['serverName'])
+const props = defineProps({
+  mode: {
+    // 菜单模式
+    type: String,
+    default: 'vertical',
+  },
+  collapsed: {
+    // 侧边栏菜单是否收起
+    type: Boolean,
+    default: false,
+  },
+  // 位置
+  location: {
+    type: String,
+    default: 'left',
+  },
+})
+const emit = defineEmits(['serverName', 'clickMenuItem'])
+
 const menuOptions: any[] = reactive([])
-const collapsed = ref<boolean>(true)
-const showModal = ref<boolean>(false)
-const showModal2 = ref<boolean>(false)
-const showJoinServer = ref<boolean>(false)
+const showModal = ref(false)
+const showModal2 = ref(false)
+const showJoinServer = ref(false)
 const formRef = ref<FormInst | null>(null)
 const model = ref({ serverName: null, serverType: null })
+const userStore = useUserStore()
 const rules = {
   serverName: {
     required: true,
@@ -34,27 +53,36 @@ const generalOptions = ['public', 'private'].map(
     value: v,
   }),
 )
-function createImageVNode(url: string) {
-  return h('img', {
-    src: url,
-    alt: '描述',
-    style: {
-      width: '35px', // 设置图片宽度
-    },
-  })
-}
+
 function handleShowModal2() {
   showModal2.value = true
 }
 
-function renderIcon(icon: any) {
-  return () => h(NIcon, null, { default: () => h(icon) })
+const serverName = ref('')
+function sendServerName(name: string) {
+  serverName.value = name
+  emit('serverName', serverName.value)
 }
-
 async function handleServerList() {
+  menuOptions.push({
+    label: () =>
+      h(
+        'a',
+        {
+          onClick: () => {
+            showModal.value = true
+          },
+        },
+        { default: () => '添加服务器' },
+      ),
+    key: 'add',
+    icon: renderIcon(Add),
+  })
   const res: response = await service.get('/servers')
   const data = res.data.serverList
+  const map = new Map<number, any[]>()
   for (let i = 0; i < data.length; i++) {
+    map.set(data[i].serverId, [])
     menuOptions.push({
       label: () =>
         h(
@@ -70,44 +98,42 @@ async function handleServerList() {
           { default: () => data[i].serverName },
         ),
       key: data[i].serverId,
-      icon: renderIcon(BookIcon),
+      icon: renderIcon(createImageVNode(data[i].serverImgUrl, data[i].serverName)),
     })
   }
-  // menuOptions.push({
-  //   label: () =>
-  //     h(
-  //       RouterLink,
-  //       {
-  //         to: {
-  //           path: '/125',
-  //         },
-  //       },
-  //       { default: () => '测试' },
-  //     ),
-  //   key: 'test',
-  //   icon: renderIcon(createImageVNode('https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100')),
-  // }, {
-  //   key: 'divider-1',
-  //   type: 'divider',
-  //   props: {
-  //     style: {
-  //       marginLeft: '15px',
-  //     },
-  //   },
-  // })
+  userStore.setServerList(map)
 }
-
-onMounted(() => {
-  handleServerList()
-})
-
+interface serverRep {
+  serverId: number
+  serverName: string
+  creatorUserId: number
+  createDate: string
+  serverType: string
+  serverImgUrl: string
+}
 function handleCreateServer() {
   formRef.value?.validate(async (errors) => {
     if (!errors) {
       const res: response = await service.post('/servers', model.value)
-      menuOptions.length = 0
-      await handleServerList()
-      gMessage.success(res.message)
+      const server: serverRep = res.data.server
+      menuOptions.push({
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                path: `/${encodeURIComponent(server.serverId)}`,
+              },
+              onClick: () => {
+                sendServerName(server.serverName)
+              },
+            },
+            { default: () => server.serverName },
+          ),
+        key: server.serverId,
+        icon: renderIcon(createImageVNode(server.serverImgUrl, server.serverName)),
+      })
+      gMessage.success('创建成功')
       showModal2.value = false
       showModal.value = false
     }
@@ -115,12 +141,6 @@ function handleCreateServer() {
       gMessage.error('验证失败')
     }
   })
-}
-// 创建一个响应式引用
-const serverName = ref('')
-function sendServerName(name: string) {
-  serverName.value = name
-  emit('serverName', serverName.value)
 }
 const joinModel = ref({ serverId: null })
 const joinRules = {
@@ -145,53 +165,40 @@ async function handleJoinServer() {
     }
   })
 }
-const {
-  // showFooter,
-  // navMode,
-  // navTheme,
-  headerSetting,
-  // menuSetting,
-  // multiTabsSetting,
-} = useProjectSetting()
-const fixedMenu = computed(() => {
-  const { fixed } = unref(headerSetting)
-  return fixed ? 'absolute' : 'static'
+function clickMenuItem(key: string) {
+  if (/http(s)?:/.test(key))
+    window.open(key)
+  else
+    gMessage.info(key)
+
+  // router.push(`/${key}`)
+  emit('clickMenuItem', key)
+}
+const settingStore = useProjectSettingStore()
+
+const inverted = computed(() => {
+  return ['dark', 'header-dark'].includes(settingStore.navTheme)
+})
+const route: any = useRoute()
+onMounted(() => {
+  handleServerList()
 })
 </script>
 
 <template>
-  <n-layout class="layout" :position="fixedMenu" has-sider>
-    <n-layout-sider
-      bordered
-      :position="fixedMenu"
-      collapse-mode="width"
-      :collapsed-width="64"
-      :collapsed="collapsed"
-      show-trigger="bar"
-      class="layout-sider"
-      :native-scrollbar="false"
-      @collapse="collapsed = true"
-      @expand="collapsed = false"
-    >
-      <n-menu
-        :collapsed="collapsed"
-        :collapsed-width="64"
-        :collapsed-icon-size="35"
-        :options="menuOptions"
-      />
-      <n-button
-        quaternary
-        style="width: 48px; height: 42px; left: 8px"
-        @click="showModal = true"
-      >
-        <template #icon>
-          <NIcon size="35">
-            <Add />
-          </NIcon>
-        </template>
-      </n-button>
-    </n-layout-sider>
-  </n-layout>
+  <n-menu
+    :collapsed="props.collapsed"
+    :mode="props.mode"
+    :collapsed-width="64"
+    :collapsed-icon-size="35"
+    :options="menuOptions"
+    :indent="24"
+    :inverted="inverted"
+    :value="Number(route.params.server_id)"
+    :icon-size="30"
+    @update:value="clickMenuItem"
+    @update:expanded-keys="sendServerName"
+  />
   <n-modal
     v-model:show="showModal"
     class="custom-card"
@@ -291,89 +298,3 @@ const fixedMenu = computed(() => {
     </n-button>
   </n-modal>
 </template>
-
-<style lang="less">
-.layout-side-drawer {
-  background-color: rgb(0, 20, 40);
-
-  .layout-sider {
-    min-height: 100vh;
-    box-shadow: 2px 0 8px 0 rgb(29 35 41 / 5%);
-    position: relative;
-    z-index: 13;
-    transition: all 0.2s ease-in-out;
-  }
-}
-</style>
-
-<style lang="less" scoped>
-.layout {
-  display: flex;
-  flex-direction: row;
-  flex: auto;
-
-  &-default-background {
-    background: #f5f7f9;
-  }
-
-  .layout-sider {
-    min-height: 100vh;
-    box-shadow: 2px 0 8px 0 rgb(29 35 41 / 5%);
-    position: relative;
-    z-index: 13;
-    transition: all 0.2s ease-in-out;
-  }
-
-  .layout-sider-fix {
-    position: fixed;
-    top: 0;
-    left: 0;
-  }
-
-  .ant-layout {
-    overflow: hidden;
-  }
-
-  .layout-right-fix {
-    overflow-x: hidden;
-    padding-left: 200px;
-    min-height: 100vh;
-    transition: all 0.2s ease-in-out;
-  }
-
-  .layout-content {
-    flex: auto;
-    min-height: 100vh;
-  }
-
-  .n-layout-header.n-layout-header--absolute-positioned {
-    z-index: 11;
-  }
-
-  .n-layout-footer {
-    background: none;
-  }
-}
-
-.layout-content-main {
-  margin: 0 10px 10px;
-  position: relative;
-  padding-top: 64px;
-}
-
-.layout-content-main-fix {
-  padding-top: 64px;
-}
-
-.fluid-header {
-  padding-top: 0;
-}
-
-.main-view-fix {
-  padding-top: 44px;
-}
-
-.noMultiTabs {
-  padding-top: 0;
-}
-</style>

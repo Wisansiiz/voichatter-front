@@ -2,6 +2,7 @@
 import { Password, User } from '@vicons/carbon'
 import { useAuthLocalStore, useAuthSessionStore } from '~/stores/token.js'
 import { service } from '~/utils/request.js'
+import { useUserStore } from '~/store/modules/user'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -35,7 +36,7 @@ const rules = {
 }
 const localStore = useAuthLocalStore()
 const sessionStore = useAuthSessionStore()
-
+const userStore = useUserStore()
 async function userLogin() {
   isLoading.value = true
   service.post('/login', (model.value))
@@ -43,6 +44,9 @@ async function userLogin() {
       if (remember.value)
         localStore.token = data.data.token
       else sessionStore.token = data.data.token
+      userStore.setUserInfo({ username: data.data.username })
+      userStore.setUserId(data.data.userId)
+      userStore.setAvatar(data.data.avatar)
       setTimeout(() => {
         if (localStore.token || sessionStore.token) {
           router.push('/')
@@ -56,17 +60,17 @@ async function userLogin() {
     .finally(() => {
       setTimeout(() => {
         isLoading.value = false
-      }, 1000)
+      }, 900)
     })
 }
-onMounted(() => {
-  service.get('/auth').then((data: any) => {
-    if (data) {
-      router.push('/')
-      gMessage.success(data.messages)
-    }
-  })
-})
+// onMounted(() => {
+//   service.get('/auth').then((data: any) => {
+//     if (data) {
+//       router.push('/')
+//       gMessage.success(data.messages)
+//     }
+//   })
+// })
 </script>
 
 <template>

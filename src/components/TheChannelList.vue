@@ -1,10 +1,14 @@
 <script setup lang="ts">
 import { Menu } from '@vicons/ionicons5'
-import { useRouter } from 'vue-router'
+
+// import { useRouter } from 'vue-router'
 import type { FormInst } from 'naive-ui'
 import { createDiscreteApi } from 'naive-ui'
 import { h } from 'vue'
 import { service } from '~/utils/request'
+import type { response } from '~/composables/result'
+
+// import {RouterLink} from "vue-router";
 
 const props = defineProps({
   serverName: {
@@ -18,9 +22,9 @@ function go(i: any) {
   router.push(`/${route.params.server_id}/${encodeURIComponent(i)}`)
 }
 // 随机数
-function random(min: number, max: number) {
-  return Math.floor(Math.random() * (max - min + 1) + min)
-}
+// function random(min: number, max: number) {
+//   return Math.floor(Math.random() * (max - min + 1) + min)
+// }
 const showModal = ref(false)
 const formRef = ref<FormInst | null>(null)
 const model = ref({
@@ -106,22 +110,16 @@ const options = [
     key: 'delete',
   },
 ]
-interface Response {
-  code: number
-  data: any
-  messages: string
-}
+
 async function deleteServer() {
-  const res: Response = await service.delete(
-    `/delete-server/${route.params.server_id}`,
-  )
-  gMessage.success(res.messages)
+  await service.delete(`/servers/${route.params.server_id}`)
+  gMessage.success('删除成功')
 }
 async function createChannel() {
   // console.log(model.value, route.params.server_id)
   formRef.value?.validate(async (errors) => {
     if (!errors) {
-      const res: Response = await service.post(
+      const res: response = await service.post(
         `/create-channel/${route.params.server_id}`,
         model.value,
       )
@@ -133,38 +131,87 @@ async function createChannel() {
     }
   })
 }
+const menuOptions = [
+  {
+    label: '通知',
+    key: 1,
+    children: [
+      {
+        label: '文字',
+        type: 'text',
+        key: 3,
+        children: [
+          {
+            label: '文字',
+            type: 'text',
+            key: 5,
+          },
+          {
+            label: '语音',
+            type: 'voice',
+            key: 6,
+          },
+        ],
+      },
+      {
+        label: '语音',
+        type: 'voice',
+        key: 4,
+      },
+    ],
+  },
+  {
+    label: '交流',
+    key: 2,
+  },
+]
 </script>
 
 <template>
-  <n-layout has-sider style="max-width: 240px; border-right: 1px solid #e8e8e8">
-    <n-flex justify="space-between" style="height: 30px; border: 1px solid #e8e8e8; margin: 10px">
-      <div style="width: 149px; height: 20px; margin: 5px">
-        {{ props.serverName }}
-      </div>
-      <n-dropdown
-        placement="bottom"
-        trigger="click"
-        size="medium"
-        :options="options"
-      >
-        <n-button style="height: 30px">
-          <n-icon size="large">
-            <Menu />
-          </n-icon>
-        </n-button>
-      </n-dropdown>
-
-      <n-button
-        v-for="i in random(1, 10)"
-        :key="i"
-        :class="{ yy: i % 2 === 1 }"
-        style="width: 100%"
-        @click="go(i)"
-      >
-        {{ i }}
+  <n-flex justify="space-between" style="padding: 18px">
+    <!--    <div style="line-height: 30px"> -->
+    {{ props.serverName }}
+    <!--    </div> -->
+    <n-dropdown
+      placement="bottom"
+      trigger="click"
+      size="medium"
+      :options="options"
+    >
+      <n-button style="height: 30px">
+        <n-icon size="large">
+          <Menu />
+        </n-icon>
       </n-button>
-    </n-flex>
-  </n-layout>
+    </n-dropdown>
+    <n-layout has-sider>
+      <n-layout-sider
+        :collapsed="false"
+        collapse-mode="width"
+        :collapsed-width="64"
+        :native-scrollbar="false"
+        class="layout-sider"
+      >
+        <n-menu
+          :collapsed="false"
+          :collapsed-width="64"
+          :collapsed-icon-size="35"
+          :options="menuOptions"
+          :indent="24"
+          @update:value="go"
+        />
+      </n-layout-sider>
+    </n-layout>
+    <!--    <n-button -->
+    <!--      v-for="i in random(1, 10)" -->
+    <!--      :key="i" -->
+    <!--      :class="{ yy: i % 2 === 1 }" -->
+    <!--      style="width: 100%" -->
+    <!--      @click="go(i)" -->
+    <!--    > -->
+    <!--      {{ i }} -->
+    <!--    </n-button> -->
+  </n-flex>
   <n-modal
     v-model:show="showModal"
     class="custom-card"

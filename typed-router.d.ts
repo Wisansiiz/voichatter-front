@@ -45,11 +45,13 @@ declare module 'vue-router/auto/routes' {
     '/[server_id]/[name]': RouteRecordInfo<'/[server_id]/[name]', '/:server_id/:name', { server_id: ParamValue<true>, name: ParamValue<true> }, { server_id: ParamValue<false>, name: ParamValue<false> }>,
     '/[server_id]/[name]/multiple': RouteRecordInfo<'/[server_id]/[name]/multiple', '/:server_id/:name/multiple', { server_id: ParamValue<true>, name: ParamValue<true> }, { server_id: ParamValue<false>, name: ParamValue<false> }>,
     '/[server_id]/[name]/single': RouteRecordInfo<'/[server_id]/[name]/single', '/:server_id/:name/single', { server_id: ParamValue<true>, name: ParamValue<true> }, { server_id: ParamValue<false>, name: ParamValue<false> }>,
-    '/[server_id]/[name]/test': RouteRecordInfo<'/[server_id]/[name]/test', '/:server_id/:name/test', { server_id: ParamValue<true>, name: ParamValue<true> }, { server_id: ParamValue<false>, name: ParamValue<false> }>,
     '/[server_id]/[name]/ws': RouteRecordInfo<'/[server_id]/[name]/ws', '/:server_id/:name/ws', { server_id: ParamValue<true>, name: ParamValue<true> }, { server_id: ParamValue<false>, name: ParamValue<false> }>,
     '/hi/[name]': RouteRecordInfo<'/hi/[name]', '/hi/:name', { name: ParamValue<true> }, { name: ParamValue<false> }>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/register': RouteRecordInfo<'/register', '/register', Record<never, never>, Record<never, never>>,
+    '/setting/account': RouteRecordInfo<'/setting/account', '/setting/account', Record<never, never>, Record<never, never>>,
+    '/setting/BasicSetting': RouteRecordInfo<'/setting/BasicSetting', '/setting/BasicSetting', Record<never, never>, Record<never, never>>,
+    '/setting/SafetySetting': RouteRecordInfo<'/setting/SafetySetting', '/setting/SafetySetting', Record<never, never>, Record<never, never>>,
   }
 }
 

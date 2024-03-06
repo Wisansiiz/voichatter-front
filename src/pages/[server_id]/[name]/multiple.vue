@@ -1,8 +1,9 @@
 <script setup>
 import { ref } from 'vue'
 import { service } from '~/utils/request.js'
+// import { useAuthLocalStore, useAuthSessionStore } from '@/stores/token.js'
 
-const r = useRoute()
+// const r = useRoute()
 let currentUserId = null
 const videoContainer = ref()
 let socket = null
@@ -16,9 +17,13 @@ onMounted(async () => {
   const res = await service.get('/auth')
   currentUserId = res.data
 })
+// const localStore = useAuthLocalStore()
+// const sessionStore = useAuthSessionStore()
 function initWebsocket() {
   socket = new WebSocket(`wss://192.168.31.198:9000/api/yy?id=${currentUserId}&channelId=${channelId}`)
   socket.onopen = () => {
+    // socket.send(JSON.stringify({ code: '12345', data: { token: localStore.token || sessionStore.token } }))
+    // console.log('1111')
   }
 
   socket.onmessage = (e) => {

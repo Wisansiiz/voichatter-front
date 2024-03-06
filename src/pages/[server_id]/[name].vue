@@ -1,6 +1,6 @@
 <script setup lang="ts">
 // import type { Ref, UnwrapRef } from 'vue'
-// import { service } from '~/utils/request.js'
+// import { service } from '@/utils/request.js'
 //
 // const messageText = ref('')
 // const messages: Ref<UnwrapRef<message[]>> = ref([])
@@ -75,6 +75,7 @@ watch(route, () => {
   params.value = route.params
 })
 const router = useRouter()
+import ws from './[name]/ws.vue'
 </script>
 
 <template>
@@ -82,35 +83,35 @@ const router = useRouter()
 
   <n-flex>
     <n-h1>{{ params.name }}</n-h1>
-    <n-scrollbar style="margin-bottom: 50px">
-      <n-button @click="router.push(`${params.name}/single`)">
-        发送
-      </n-button>
-      <RouterView />
-      <!--      <n-input -->
-      <!--        value="123" -->
-      <!--        type="text" -->
-      <!--        :disabled="true" -->
-      <!--      /> -->
-      <!--      <n-button @click="queryHistoryMessages"> -->
-      <!--        Search -->
-      <!--      </n-button> -->
-      <!--      <n-flex justify="center"> -->
-      <!--        <n-scrollbar style="max-width: 300px"> -->
-      <!--          <div class="chat-window"> -->
-      <!--            <ChatBubble -->
-      <!--              v-for="(msg, index) in messages" -->
-      <!--              :key="index" -->
-      <!--              :message="msg.content" -->
-      <!--              :is-sent="msg.isSent" -->
-      <!--              avatar="https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100" -->
-      <!--              :time="formatTime(msg.send_date)" -->
-      <!--              username="测试" -->
-      <!--            /> -->
-      <!--          </div> -->
-      <!--        </n-scrollbar> -->
-      <!--      </n-flex> -->
-    </n-scrollbar>
+    <!--    <n-scrollbar style="margin-bottom: 50px"> -->
+    <n-button @click="router.push(`${params.name}/ws`)">
+      发送
+    </n-button>
+    <!--    <RouterView /> -->
+    <!--      <n-input -->
+    <!--        value="123" -->
+    <!--        type="text" -->
+    <!--        :disabled="true" -->
+    <!--      /> -->
+    <!--      <n-button @click="queryHistoryMessages"> -->
+    <!--        Search -->
+    <!--      </n-button> -->
+    <!--      <n-flex justify="center"> -->
+    <!--        <n-scrollbar style="max-width: 300px"> -->
+    <!--          <div class="chat-window"> -->
+    <!--            <ChatBubble -->
+    <!--              v-for="(msg, index) in messages" -->
+    <!--              :key="index" -->
+    <!--              :message="msg.content" -->
+    <!--              :is-sent="msg.isSent" -->
+    <!--              avatar="https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100" -->
+    <!--              :time="formatTime(msg.send_date)" -->
+    <!--              username="测试" -->
+    <!--            /> -->
+    <!--          </div> -->
+    <!--        </n-scrollbar> -->
+    <!--      </n-flex> -->
+    <!--    </n-scrollbar> -->
     <!--    <n-layout-footer -->
     <!--      bordered -->
     <!--      position="absolute" -->
@@ -126,6 +127,8 @@ const router = useRouter()
     <!--      </n-flex> -->
     <!--    </n-layout-footer> -->
   </n-flex>
+
+  <ws />
 </template>
 
 <style scoped>
