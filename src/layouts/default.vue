@@ -86,9 +86,10 @@ function watchWidth() {
   checkMobileMode()
 }
 const serverName = ref('')
-function getServerName(data: string) {
-  serverName.value = data
+function getServerName(name: string) {
+  serverName.value = name
 }
+
 onMounted(() => {
   checkMobileMode()
   window.addEventListener('resize', watchWidth)
