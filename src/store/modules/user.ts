@@ -3,11 +3,6 @@ import { store } from '~/store'
 import { service } from '~/utils/request'
 import { useAuthLocalStore, useAuthSessionStore } from '~/stores/token'
 
-// import { ACCESS_TOKEN, CURRENT_USER, IS_SCREENLOCKED } from '~/store/mutation-types'
-// import { ResultEnum } from '~/enums/httpEnum'
-// import { getUserInfo as getUserInfoApi, login } from '~/api/system/user'
-// import { storage } from '~/utils/Storage'
-
 export interface UserInfoType {
   username: string
   email?: string
@@ -27,7 +22,7 @@ export const useUserStore = defineStore({
   id: 'app-user',
   state: (): IUserState => ({
     // token: storage.get(ACCESS_TOKEN, ''),
-    token: '',
+    token: localStore.token || sessionStore.token,
     userId: 0,
     welcome: '',
     avatar: '',
@@ -102,9 +97,8 @@ export const useUserStore = defineStore({
       await service.post('/logout')
       localStore.token = ''
       sessionStore.token = ''
+      this.setToken('')
       this.setUserInfo({ username: '', email: '' })
-      // storage.remove(ACCESS_TOKEN)
-      // storage.remove(CURRENT_USER)
     },
   },
   persist: {
