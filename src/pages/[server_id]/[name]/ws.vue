@@ -1,19 +1,24 @@
 <script setup>
 import { service } from '~/utils/request.js'
+import { useUserStore } from '~/store/modules/user'
 
 const channelID = ref('')
 const messageText = ref('')
 const messages = ref([])
 const isChatBoxVisible = ref(false)
-let ws
+let ws = null
 const active = ref(false)
+const userStore = useUserStore()
 
 function joinRoom() {
   if (channelID.value.trim() !== '') {
     ws = new WebSocket(`ws://localhost:9000/api/ws?channelID=${channelID.value.trim()}`)
+    ws.onopen = () => {
+      ws.send(JSON.stringify({ code: 'authorization', data: { token: userStore.getToken } }))
+    }
     messages.value = []
-    ws.onmessage = (event) => {
-      const message = JSON.parse(event.data)
+    ws.onmessage = (e) => {
+      const message = JSON.parse(e.data)
       messages.value.push(message)
     }
     isChatBoxVisible.value = true
@@ -24,14 +29,14 @@ const route = useRoute()
 async function queryHistoryMessages() {
   const response = await service.get(`/messages/${route.params.server_id}/${route.params.name}`)
   messages.value = response.data.messageList
-  console.log(messages.value)
+  // console.log(messages.value)
   // if (!messages.value)
   //   gMessage.warning('该频道没有更多信息了')
 }
 function sendMessage() {
   if (messageText.value.trim() !== '') {
-    ws.send(JSON.stringify({ data: messageText.value.trim() }))
-    messageText.value = ''
+    ws.send(JSON.stringify({ data: messageText.value }))
+    messageText.value = null
   }
 }
 </script>
@@ -70,22 +75,24 @@ function sendMessage() {
   <n-button @click="queryHistoryMessages">
     Search
   </n-button>
-<!--  <div style="height: 300px">sss</div>-->
-  <!--    </n-scrollbar> -->
-  <!--    <n-layout-footer -->
-  <!--      bordered -->
-  <!--      position="absolute" -->
-  <!--      style="height: 64px;padding: 5px" -->
-  <!--    > -->
-  <!--      <n-flex justify="center"> -->
-  <!--        <TheInput v-model:value="messageText" /> -->
-  <!--        <div style="height: 54px; line-height: 54px"> -->
-  <!--          <n-button type="primary" ghost @click="sendMessage()"> -->
-  <!--            发送 -->
-  <!--          </n-button> -->
-  <!--        </div> -->
-  <!--      </n-flex> -->
-  <!--    </n-layout-footer> -->
+  <!--  <div style="height: 300px"> -->
+  <!--    sss -->
+  <!--  </div> -->
+  <!--      </n-scrollbar> -->
+  <n-layout-footer
+    bordered
+    position="absolute"
+    style="height: 64px;padding: 5px"
+  >
+    <n-flex justify="center">
+      <TheInput v-model:value="messageText" />
+      <div style="height: 54px; line-height: 54px">
+        <n-button type="primary" ghost @click="sendMessage()">
+          发送
+        </n-button>
+      </div>
+    </n-flex>
+  </n-layout-footer>
 <!--  </n-scrollbar> -->
 </template>
 

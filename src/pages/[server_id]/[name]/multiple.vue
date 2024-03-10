@@ -1,9 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import { service } from '~/utils/request.js'
-// import { useAuthLocalStore, useAuthSessionStore } from '@/stores/token.js'
+import { useUserStore } from '~/store/modules/user'
 
-// const r = useRoute()
+// eslint-disable-next-line unused-imports/no-unused-vars
 let currentUserId = null
 const videoContainer = ref()
 let socket = null
@@ -12,24 +11,21 @@ let localStream = null
 const localVideo = ref()
 const params = useRoute('/[server_id]/[name]').params
 const channelId = params.server_id + params.name
+const userStore = useUserStore()
 
-onMounted(async () => {
-  const res = await service.get('/auth')
-  currentUserId = res.data
-})
-// const localStore = useAuthLocalStore()
-// const sessionStore = useAuthSessionStore()
 function initWebsocket() {
-  socket = new WebSocket(`wss://192.168.31.198:9000/api/yy?id=${currentUserId}&channelId=${channelId}`)
+  socket = new WebSocket(`wss://192.168.31.198:9000/api/yy?channelId=${channelId}`)
   socket.onopen = () => {
-    // socket.send(JSON.stringify({ code: '12345', data: { token: localStore.token || sessionStore.token } }))
-    // console.log('1111')
+    socket.send(JSON.stringify({ code: 'authorization', data: { token: userStore.getToken } }))
   }
 
   socket.onmessage = (e) => {
     const message = e.data
     const { code, data } = JSON.parse(message)
-    if (code === 'offer') {
+    if (code === 'authorization') {
+      currentUserId = data.userId
+    }
+    else if (code === 'offer') {
       // 接收offer
       getOffer(data)
     }
