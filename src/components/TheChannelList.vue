@@ -173,7 +173,6 @@ export default defineComponent({
           })
         }
       }
-      console.log(data2.value)
     }
     onMounted(() => {
       channels()
