@@ -4,7 +4,8 @@ import { useRoute, useRouter } from 'vue-router'
 import { NDialogProvider, useDialog, useMessage } from 'naive-ui'
 import components from './components'
 import ProjectSetting from './ProjectSetting.vue'
-import { TABS_ROUTES } from '~/store/mutation-types'
+
+// import { TABS_ROUTES } from '~/store/mutation-types'
 import { useUserStore } from '~/store/modules/user'
 
 // import { useScreenLockStore } from '~/store/modules/screenLock'
@@ -94,11 +95,11 @@ export default defineComponent({
     }
 
     // 刷新页面
-    const reloadPage = () => {
-      router.push({
-        path: `/redirect${unref(route).fullPath}`,
-      })
-    }
+    // const reloadPage = () => {
+    //   router.push({
+    //     path: `/redirect${unref(route).fullPath}`,
+    //   })
+    // }
 
     // 退出登录
     const doLogout = () => {
@@ -198,7 +199,7 @@ export default defineComponent({
       getChangeStyle,
       avatarSelect,
       // breadcrumbList,
-      reloadPage,
+      // reloadPage,
       drawerSetting,
       openSetting,
       getInverted,
@@ -245,45 +246,45 @@ export default defineComponent({
         </n-icon>
       </div>
       <!-- 刷新 -->
-      <div
-        v-if="headerSetting.isReload"
-        class="layout-header-trigger layout-header-trigger-min mr-1"
-        @click="reloadPage"
-      >
-        <n-icon size="18">
-          <ReloadOutlined />
-        </n-icon>
-      </div>
-      <!-- 面包屑 -->
-      <!--      <n-breadcrumb v-if="crumbsSetting.show"> -->
-      <!--        <template -->
-      <!--          v-for="routeItem in breadcrumbList" -->
-      <!--          :key="routeItem.name === 'Redirect' ? void 0 : routeItem.name" -->
-      <!--        > -->
-      <!--          <n-breadcrumb-item v-if="routeItem.meta.title"> -->
-      <!--            <n-dropdown -->
-      <!--              v-if="routeItem.children.length" -->
-      <!--              :options="routeItem.children" -->
-      <!--              @select="dropdownSelect" -->
-      <!--            > -->
-      <!--              <span class="link-text"> -->
-      <!--                <component -->
-      <!--                  :is="routeItem.meta.icon" -->
-      <!--                  v-if="crumbsSetting.showIcon && routeItem.meta.icon" -->
-      <!--                /> -->
-      <!--                {{ routeItem.meta.title }} -->
-      <!--              </span> -->
-      <!--            </n-dropdown> -->
-      <!--            <span v-else class="link-text"> -->
-      <!--              <component -->
-      <!--                :is="routeItem.meta.icon" -->
-      <!--                v-if="crumbsSetting.showIcon && routeItem.meta.icon" -->
-      <!--              /> -->
-      <!--              {{ routeItem.meta.title }} -->
-      <!--            </span> -->
-      <!--          </n-breadcrumb-item> -->
-      <!--        </template> -->
-      <!--      </n-breadcrumb> -->
+      <!--      <div -->
+      <!--        v-if="headerSetting.isReload" -->
+      <!--        class="layout-header-trigger layout-header-trigger-min mr-1" -->
+      <!--        @click="reloadPage" -->
+      <!--      > -->
+      <!--        <n-icon size="18"> -->
+      <!--          <ReloadOutlined /> -->
+      <!--        </n-icon> -->
+      <!--      </div> -->
+    <!-- 面包屑 -->
+    <!--      <n-breadcrumb v-if="crumbsSetting.show"> -->
+    <!--        <template -->
+    <!--          v-for="routeItem in breadcrumbList" -->
+    <!--          :key="routeItem.name === 'Redirect' ? void 0 : routeItem.name" -->
+    <!--        > -->
+    <!--          <n-breadcrumb-item v-if="routeItem.meta.title"> -->
+    <!--            <n-dropdown -->
+    <!--              v-if="routeItem.children.length" -->
+    <!--              :options="routeItem.children" -->
+    <!--              @select="dropdownSelect" -->
+    <!--            > -->
+    <!--              <span class="link-text"> -->
+    <!--                <component -->
+    <!--                  :is="routeItem.meta.icon" -->
+    <!--                  v-if="crumbsSetting.showIcon && routeItem.meta.icon" -->
+    <!--                /> -->
+    <!--                {{ routeItem.meta.title }} -->
+    <!--              </span> -->
+    <!--            </n-dropdown> -->
+    <!--            <span v-else class="link-text"> -->
+    <!--              <component -->
+    <!--                :is="routeItem.meta.icon" -->
+    <!--                v-if="crumbsSetting.showIcon && routeItem.meta.icon" -->
+    <!--              /> -->
+    <!--              {{ routeItem.meta.title }} -->
+    <!--            </span> -->
+    <!--          </n-breadcrumb-item> -->
+    <!--        </template> -->
+    <!--      </n-breadcrumb> -->
     </div>
     <div class="layout-header-right">
       <div

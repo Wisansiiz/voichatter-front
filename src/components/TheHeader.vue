@@ -6,6 +6,7 @@ import {
   LogOutOutline as LogoutIcon,
   PersonCircleOutline as UserIcon,
 } from '@vicons/ionicons5'
+import { userLogout } from '~/api/user'
 
 const emit = defineEmits(['theme'])
 function renderIcon(icon: any) {
@@ -34,7 +35,7 @@ const options = [
 ]
 function handleSelect(key: any) {
   if (key === 'logout')
-    logout()
+    userLogout()
   gMessage.info(String(key))
 }
 const theme = ref<GlobalTheme | null>(null)

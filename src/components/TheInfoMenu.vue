@@ -1,7 +1,7 @@
 <script lang="ts">
 import { defineComponent, h, nextTick, ref } from 'vue'
 import type { DataTableColumns, DropdownOption } from 'naive-ui'
-import { NButton, useMessage } from 'naive-ui'
+import { NTag, useMessage } from 'naive-ui'
 import { createImageVNode } from '~/utils'
 
 interface ServerMember {
@@ -47,28 +47,47 @@ export default defineComponent({
     const yRef = ref(0)
     const colsReactive: DataTableColumns<ServerMember> = [
       {
-        // title: 'No.',
+        title: '头像',
         key: 'avatarURL',
       },
       {
-        title: '用户列表',
+        title: '用户',
         key: 'username',
       },
+      // {
+      //   title: () =>
+      //     h(
+      //       NButton,
+      //       {
+      //         size: 'small',
+      //         on: {
+      //           // click: handleSelect,
+      //         },
+      //       },
+      //       {
+      //         default: () => h('span', { style: { color: 'green' } }, '刷新'),
+      //       },
+      //     ),
+      //   key: 'SPermissions',
+      // },
       {
-        title: () =>
-          h(
-            NButton,
-            {
-              size: 'small',
-              on: {
-                // click: handleSelect,
-              },
-            },
-            {
-              default: () => h('span', { style: { color: 'green' } }, '刷新'),
-            },
-          ),
+        title: '身份',
         key: 'SPermissions',
+        render(row) {
+          return h(
+            NTag,
+            {
+              style: {
+                marginRight: '6px',
+              },
+              type: 'info',
+              bordered: false,
+            },
+            {
+              default: () => row.SPermissions,
+            },
+          )
+        },
       },
     ]
 

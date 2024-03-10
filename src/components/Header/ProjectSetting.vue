@@ -43,13 +43,13 @@ export default defineComponent({
       return animateOptions.find(item => item.value == unref(settingStore.pageAnimateType))
     })
 
-    function openDrawer() {
-      state.isDrawer = true
-    }
-
-    function closeDrawer() {
-      state.isDrawer = false
-    }
+    // function openDrawer() {
+    //   state.isDrawer = true
+    // }
+    //
+    // function closeDrawer() {
+    //   state.isDrawer = false
+    // }
 
     function togNavTheme(theme) {
       settingStore.navTheme = theme
@@ -74,8 +74,8 @@ export default defineComponent({
       togNavMode,
       togTheme,
       darkTheme,
-      openDrawer,
-      closeDrawer,
+      // openDrawer,
+      // closeDrawer,
       animateOptions,
       directionsOptions,
     }

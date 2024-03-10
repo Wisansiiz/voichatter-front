@@ -1,65 +1,4 @@
-<script setup lang="ts">
-// import type { Ref, UnwrapRef } from 'vue'
-// import { service } from '@/utils/request.js'
-//
-// const messageText = ref('')
-// const messages: Ref<UnwrapRef<message[]>> = ref([])
-// let ws: any
-// const localStore = useAuthLocalStore()
-// const sessionStore = useAuthSessionStore()
-// const token = ref('')
-// onMounted(() => {
-//   if (sessionStore.token)
-//     token.value = sessionStore.token
-//   else if (localStore.token)
-//     token.value = localStore.token
-//   ws = new WebSocket(`wss://192.168.31.198:9000/api/ws?channelID=123`)
-//   messages.value = []
-//   ws.onmessage = (event: any) => {
-//     messages.value.push(event)
-//   }
-// })
-// async function queryHistoryMessages() {
-//   const response = await service.get(`/history?channelID=123`)
-//   messages.value = response.data
-//   if (!response.data.length)
-//     gMessage.warning('该频道没有更多信息了')
-// }
-// function sendMessage() {
-//   if (messageText.value.trim() !== '') {
-//     ws.send(messageText.value.trim())
-//     messageText.value = ''
-//   }
-// }
-// const route = useRoute()
-// const servername = ref('默认值')
-// watch(route, () => {
-// async function findServerName() {
-// const res = await service.get(`${baseURL}/get-server-name?server_id=${route.query.id}`)
-//     servername.value = res.data.server_name
-//   }
-//   findServerName()
-// })
-// onMounted(async () => {
-// const res = await service.get(`${baseURL}/get-server-name?server_id=${route.query.id}`)
-// if (!res.data.server_name)
-//   gMessage.warning('请不要修改浏览器地址')
-// else
-//   servername.value = res.data.server_name
-// })
-// function formatTime(timeString: string) {
-//   const date = new Date(timeString)
-//   const formatter = new Intl.DateTimeFormat('zh-CN', {
-//     year: 'numeric',
-//     month: 'long',
-//     day: 'numeric',
-//     hour: 'numeric',
-//     minute: 'numeric',
-//     hour12: false,
-//   })
-//   return formatter.format(date)
-// }
-
+<script lang="ts">
 // interface message {
 //   message: string
 //   isSent: boolean
@@ -68,14 +7,26 @@
 //   username: string
 //   content: any
 // }
-const route = useRoute()
-const params = ref()
-params.value = route.params
-watch(route, () => {
-  params.value = route.params
+import Ws from '~/pages/[server_id]/[name]/ws.vue'
+import Multiple from '~/pages/[server_id]/[name]/multiple.vue'
+
+export default defineComponent({
+  components: { Ws, Multiple },
+  setup() {
+    const router = useRouter()
+    const route = useRoute()
+    const params = ref()
+    params.value = route.params
+    watch(route, () => {
+      params.value = route.params
+    })
+    return {
+      params,
+      router,
+      Ws,
+    }
+  },
 })
-const router = useRouter()
-import ws from './[name]/ws.vue'
 </script>
 
 <template>
@@ -84,9 +35,9 @@ import ws from './[name]/ws.vue'
   <n-flex>
     <n-h1>{{ params.name }}</n-h1>
     <!--    <n-scrollbar style="margin-bottom: 50px"> -->
-    <n-button @click="router.push(`${params.name}/ws`)">
-      发送
-    </n-button>
+    <!--    <n-button @click="router.push(`${params.name}/ws`)"> -->
+    <!--      发送 -->
+    <!--    </n-button> -->
     <!--    <RouterView /> -->
     <!--      <n-input -->
     <!--        value="123" -->
@@ -128,7 +79,8 @@ import ws from './[name]/ws.vue'
     <!--    </n-layout-footer> -->
   </n-flex>
 
-  <ws />
+  <Ws />
+  <Multiple />
 </template>
 
 <style scoped>
