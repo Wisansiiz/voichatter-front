@@ -1,5 +1,5 @@
 export interface response {
-  code: string
+  code: number
   data?: any
   message: string
   [property: string]: any
