@@ -59,9 +59,9 @@ function handleShowModal2() {
 }
 
 const serverName = ref('')
-function sendServerName(name: string) {
+function sendServerInfo(name: string) {
   serverName.value = name
-  emit('serverName', serverName.value)
+  emit('serverName', name)
 }
 async function handleServerList() {
   menuOptions.push({
@@ -92,7 +92,7 @@ async function handleServerList() {
               path: `/${encodeURIComponent(data[i].serverId)}`,
             },
             onClick: () => {
-              sendServerName(data[i].serverName)
+              sendServerInfo(data[i].serverName)
             },
           },
           { default: () => data[i].serverName },
@@ -125,7 +125,7 @@ function handleCreateServer() {
                 path: `/${encodeURIComponent(server.serverId)}`,
               },
               onClick: () => {
-                sendServerName(server.serverName)
+                sendServerInfo(server.serverName)
               },
             },
             { default: () => server.serverName },
@@ -153,9 +153,25 @@ const joinRules = {
 async function handleJoinServer() {
   formRef.value?.validate(async (errors) => {
     if (!errors) {
-      await service.post(`/servers/${Number(joinModel.value.serverId)}`)
-      menuOptions.length = 0
-      await handleServerList()
+      const res = await service.post(`/servers/${Number(joinModel.value.serverId)}`)
+      const server = res.data.server
+      menuOptions.push({
+        label: () =>
+          h(
+            RouterLink,
+            {
+              to: {
+                path: `/${encodeURIComponent(server.serverId)}`,
+              },
+              onClick: () => {
+                sendServerInfo(server.serverName)
+              },
+            },
+            { default: () => server.serverName },
+          ),
+        key: server.serverId,
+        icon: renderIcon(createImageVNode(server.serverImgUrl, server.serverName)),
+      })
       gMessage.success('添加成功')
       showJoinServer.value = false
       showModal.value = false
@@ -197,7 +213,7 @@ onMounted(() => {
     :value="Number(route.params.server_id)"
     :icon-size="30"
     @update:value="clickMenuItem"
-    @update:expanded-keys="sendServerName"
+    @update:expanded-keys="sendServerInfo"
   />
   <n-modal
     v-model:show="showModal"

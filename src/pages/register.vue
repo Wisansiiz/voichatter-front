@@ -1,6 +1,6 @@
 <script setup>
 import { Email, Password, User } from '@vicons/carbon'
-import { register } from '~/composables/authorized.ts'
+import { userRegister } from '~/api/user'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -84,23 +84,8 @@ const autoCompleteOptions = computed(() => {
     }
   })
 })
-function userRegister() {
-  formRef.value?.validate((errors) => {
-    if (!errors) {
-      register(model.value).then((res) => {
-        if (/^2[0-9][0-9]$/.test(res.code)) {
-          gMessage.success('注册成功！')
-          router.push('/login')
-        }
-        else {
-          gMessage.error('注册失败！')
-        }
-      })
-    }
-    else {
-      gMessage.warning('请完整填写注册表单内容！')
-    }
-  })
+function register() {
+  userRegister(formRef, model)
 }
 </script>
 
@@ -175,7 +160,7 @@ function userRegister() {
           style="width: 270px"
           type="warning"
           attr-type="submit"
-          @click="userRegister"
+          @click="register"
         >
           注册账号
         </n-button>

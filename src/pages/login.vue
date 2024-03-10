@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { Password, User } from '@vicons/carbon'
-import { useAuthLocalStore, useAuthSessionStore } from '~/stores/token.js'
-import { service } from '~/utils/request.js'
-import { useUserStore } from '~/store/modules/user'
+import { userLogin } from '~/api/user'
 
 const router = useRouter()
 const formRef = ref(null)
@@ -10,8 +8,8 @@ const isLoading = ref(false)
 const modelRef = ref({
   username: null,
   password: null,
+  remember: false,
 })
-const remember = ref(false)
 const model = modelRef
 const rules = {
   username: [
@@ -34,43 +32,9 @@ const rules = {
     },
   ],
 }
-const localStore = useAuthLocalStore()
-const sessionStore = useAuthSessionStore()
-const userStore = useUserStore()
-async function userLogin() {
-  isLoading.value = true
-  service.post('/login', (model.value))
-    .then(async (data: any) => {
-      if (remember.value)
-        localStore.token = data.data.token
-      else sessionStore.token = data.data.token
-      userStore.setUserInfo({ username: data.data.username })
-      userStore.setUserId(data.data.userId)
-      userStore.setAvatar(data.data.avatar)
-      setTimeout(() => {
-        if (localStore.token || sessionStore.token) {
-          router.push('/')
-          gMessage.success('登录成功')
-        }
-        else {
-          gMessage.error(data.messages)
-        }
-      }, 1000)
-    })
-    .finally(() => {
-      setTimeout(() => {
-        isLoading.value = false
-      }, 900)
-    })
+function login() {
+  userLogin(isLoading, model)
 }
-// onMounted(() => {
-//   service.get('/auth').then((data: any) => {
-//     if (data) {
-//       router.push('/')
-//       gMessage.success(data.messages)
-//     }
-//   })
-// })
 </script>
 
 <template>
@@ -96,11 +60,17 @@ async function userLogin() {
           </n-input>
         </n-form-item>
       </n-form>
-      <n-checkbox v-model:checked="remember">
+      <n-checkbox v-model:checked="model.remember">
         记住我
       </n-checkbox>
       <div style="margin-top: 40px">
-        <n-button style="width: 270px" type="success" attr-type="submit" :loading="isLoading" @click="userLogin">
+        <n-button
+          style="width: 270px"
+          type="success"
+          attr-type="submit"
+          :loading="isLoading"
+          @click="login"
+        >
           立即登录
         </n-button>
       </div>
