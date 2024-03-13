@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { store } from '~/store'
-import { service } from '~/utils/request'
+import { service } from '~/api'
 import { useAuthLocalStore, useAuthSessionStore } from '~/stores/token'
 
 export interface UserInfoType {
@@ -13,7 +13,6 @@ export interface IUserState {
   userId: number
   welcome: string
   avatar: string
-  serverList: Map<number, any[]>
   info: UserInfoType
 }
 const localStore = useAuthLocalStore()
@@ -21,12 +20,10 @@ const sessionStore = useAuthSessionStore()
 export const useUserStore = defineStore({
   id: 'app-user',
   state: (): IUserState => ({
-    // token: storage.get(ACCESS_TOKEN, ''),
     token: localStore.token || sessionStore.token,
     userId: 0,
     welcome: '',
     avatar: '',
-    serverList: new Map<number, any[]>(),
     info: { username: '', email: '' },
   }),
   getters: {
@@ -42,9 +39,6 @@ export const useUserStore = defineStore({
     getUserInfo(): UserInfoType {
       return this.info
     },
-    getServerList(): Map<number, any[]> {
-      return this.serverList
-    },
   },
   actions: {
     setToken(token: string) {
@@ -56,41 +50,9 @@ export const useUserStore = defineStore({
     setAvatar(avatar: string) {
       this.avatar = avatar
     },
-    setServerList(serverList: any) {
-      this.serverList = serverList
-    },
     setUserInfo(info: UserInfoType) {
       this.info = info
     },
-    // 登录
-    // async login(params: any) {
-    //   const response = await login(params)
-    //   const { result, code } = response
-    //   if (code === ResultEnum.SUCCESS) {
-    //     const ex = 7 * 24 * 60 * 60
-    //     storage.set(ACCESS_TOKEN, result.token, ex)
-    //     storage.set(CURRENT_USER, result, ex)
-    //     storage.set(IS_SCREENLOCKED, false)
-    //     this.setToken(result.token)
-    //     this.setUserInfo(result)
-    //   }
-    //   return response
-    // },
-
-    // 获取用户信息
-    // async getInfo() {
-    //   const result = await getUserInfoApi()
-    //   if (result.permissions && result.permissions.length) {
-    //     const permissionsList = result.permissions
-    //     this.setPermissions(permissionsList)
-    //     this.setUserInfo(result)
-    //   }
-    //   else {
-    //     throw new Error('getInfo: permissionsList must be a non-null array !')
-    //   }
-    //   this.setAvatar(result.avatar)
-    //   return result
-    // },
 
     // 登出
     async logout() {
@@ -106,7 +68,6 @@ export const useUserStore = defineStore({
   },
 })
 
-// Need to be used outside the setup
 export function useUser() {
   return useUserStore(store)
 }
