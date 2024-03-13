@@ -11,8 +11,6 @@ export interface ProjectSettingState {
   menuSetting: object
   // 多标签
   multiTabsSetting: object
-  // 面包屑
-  crumbsSetting: object
   // 权限模式
   permissionMode: string
 }
@@ -34,11 +32,6 @@ export interface IMenuSetting {
   mixMenu: boolean
   collapsed: boolean
   mobileWidth: number
-}
-
-export interface ICrumbsSetting {
-  show: boolean
-  showIcon: boolean
 }
 
 export interface IMultiTabsSetting {
