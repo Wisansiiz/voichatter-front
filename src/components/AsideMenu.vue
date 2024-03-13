@@ -1,222 +1,145 @@
-<script setup lang="ts">
-import { h } from 'vue'
+<script lang="ts">
 import type { FormInst } from 'naive-ui'
-import { Add } from '@vicons/ionicons5'
-import { RouterLink } from 'vue-router'
-import { service } from '~/utils/request'
-import type { response } from '~/composables/result'
 import { useProjectSettingStore } from '~/store/modules/projectSetting'
-import { createImageVNode, renderIcon } from '~/utils'
-import { useUserStore } from '~/store/modules/user'
+import { useServerListStore } from '~/store/modules/serverList'
+import { useServerInfo } from '~/hooks/useServerInfo'
 
-const props = defineProps({
-  mode: {
-    // 菜单模式
-    type: String,
-    default: 'vertical',
+export default defineComponent({
+  props: {
+    mode: {
+      // 菜单模式
+      type: String,
+      default: 'vertical',
+    },
+    collapsed: {
+      // 侧边栏菜单是否收起
+      type: Boolean,
+      default: false,
+    },
+    // 位置
+    location: {
+      type: String,
+      default: 'left',
+    },
   },
-  collapsed: {
-    // 侧边栏菜单是否收起
-    type: Boolean,
-    default: false,
-  },
-  // 位置
-  location: {
-    type: String,
-    default: 'left',
-  },
-})
-const emit = defineEmits(['serverName', 'clickMenuItem'])
+  setup(props) {
+    const serverListStore = useServerListStore()
+    const showModal2 = ref(false)
+    const showJoinServer = ref(false)
+    const formRef = ref<FormInst | null>(null)
+    const model = ref({ serverName: null, serverType: null })
 
-const menuOptions: any[] = reactive([])
-const showModal = ref(false)
-const showModal2 = ref(false)
-const showJoinServer = ref(false)
-const formRef = ref<FormInst | null>(null)
-const model = ref({ serverName: null, serverType: null })
-const userStore = useUserStore()
-const rules = {
-  serverName: {
-    required: true,
-    trigger: ['blur', 'input'],
-    message: '请输入 名字',
-  },
-  serverType: {
-    required: true,
-    trigger: ['blur', 'change'],
-    message: '请选择 类型',
-  },
-}
-const generalOptions = ['public', 'private'].map(
-  v => ({
-    label: v,
-    value: v,
-  }),
-)
+    const rules = {
+      serverName: {
+        required: true,
+        trigger: ['blur', 'input'],
+        message: '请输入 名字',
+      },
+      serverType: {
+        required: true,
+        trigger: ['blur', 'change'],
+        message: '请选择 类型',
+      },
+    }
+    const generalOptions = ['public', 'private'].map(
+      v => ({
+        label: v,
+        value: v,
+      }),
+    )
 
-function handleShowModal2() {
-  showModal2.value = true
-}
+    function handleCreateServer() {
+      formRef.value?.validate((errors) => {
+        if (!errors) {
+          serverListStore.toCreateServer(model.value).then(() => {
+            window.$message.success('创建成功')
+            showModal2.value = false
+            serverListStore.showModal = false
+            serverListStore.setServerInfo()
+          })
+        }
+        else {
+          window.$message.error('验证失败')
+        }
+      })
+    }
+    const joinModel = ref({ serverId: null })
+    const joinRules = {
+      serverId: {
+        required: true,
+        trigger: ['blur', 'input'],
+        message: '请输入 id',
+      },
+    }
+    function handleJoinServer() {
+      formRef.value?.validate((errors) => {
+        if (!errors) {
+          serverListStore.toJoinServer(Number(joinModel.value.serverId)).then(() => {
+            window.$message.success('添加成功')
+            showJoinServer.value = false
+            serverListStore.showModal = false
+            serverListStore.setServerInfo()
+          })
+        }
+        else {
+          window.$message.error('验证失败')
+        }
+      })
+    }
 
-const serverName = ref('')
-function sendServerInfo(name: string) {
-  serverName.value = name
-  emit('serverName', name)
-}
-async function handleServerList() {
-  menuOptions.push({
-    label: () =>
-      h(
-        'a',
-        {
-          onClick: () => {
-            showModal.value = true
-          },
-        },
-        { default: () => '添加服务器' },
-      ),
-    key: 'add',
-    icon: renderIcon(Add),
-  })
-  const res: response = await service.get('/servers')
-  const data = res.data.serverList
-  const map = new Map<number, any[]>()
-  for (let i = 0; i < data.length; i++) {
-    map.set(data[i].serverId, [])
-    menuOptions.push({
-      label: () =>
-        h(
-          RouterLink,
-          {
-            to: {
-              path: `/${encodeURIComponent(data[i].serverId)}`,
-            },
-            onClick: () => {
-              sendServerInfo(data[i].serverName)
-            },
-          },
-          { default: () => data[i].serverName },
-        ),
-      key: data[i].serverId,
-      icon: renderIcon(createImageVNode(data[i].serverImgUrl, data[i].serverName)),
+    const settingStore = useProjectSettingStore()
+
+    const inverted = computed(() => {
+      return ['dark', 'header-dark'].includes(settingStore.navTheme)
     })
-  }
-  userStore.setServerList(map)
-}
-interface serverRep {
-  serverId: number
-  serverName: string
-  creatorUserId: number
-  createDate: string
-  serverType: string
-  serverImgUrl: string
-}
-function handleCreateServer() {
-  formRef.value?.validate(async (errors) => {
-    if (!errors) {
-      const res: response = await service.post('/servers', model.value)
-      const server: serverRep = res.data.server
-      menuOptions.push({
-        label: () =>
-          h(
-            RouterLink,
-            {
-              to: {
-                path: `/${encodeURIComponent(server.serverId)}`,
-              },
-              onClick: () => {
-                sendServerInfo(server.serverName)
-              },
-            },
-            { default: () => server.serverName },
-          ),
-        key: server.serverId,
-        icon: renderIcon(createImageVNode(server.serverImgUrl, server.serverName)),
-      })
-      gMessage.success('创建成功')
-      showModal2.value = false
-      showModal.value = false
+    const route: any = useRoute()
+    const serverId = computed(() => {
+      return route.params.server_id
+    })
+    const { menu } = useServerInfo()
+    onMounted(() => {
+      serverListStore.setServerInfo()
+    })
+
+    return {
+      serverListStore,
+      showModal2,
+      showJoinServer,
+      formRef,
+      model,
+      rules,
+      generalOptions,
+      handleCreateServer,
+      joinModel,
+      joinRules,
+      handleJoinServer,
+      inverted,
+      route,
+      serverId,
+      menu,
+      mode: computed(() => props.mode),
+      collapsed: computed(() => props.collapsed),
+      location: computed(() => props.location),
     }
-    else {
-      gMessage.error('验证失败')
-    }
-  })
-}
-const joinModel = ref({ serverId: null })
-const joinRules = {
-  serverId: {
-    required: true,
-    trigger: ['blur', 'input'],
-    message: '请输入 id',
   },
-}
-async function handleJoinServer() {
-  formRef.value?.validate(async (errors) => {
-    if (!errors) {
-      const res = await service.post(`/servers/${Number(joinModel.value.serverId)}`)
-      const server = res.data.server
-      menuOptions.push({
-        label: () =>
-          h(
-            RouterLink,
-            {
-              to: {
-                path: `/${encodeURIComponent(server.serverId)}`,
-              },
-              onClick: () => {
-                sendServerInfo(server.serverName)
-              },
-            },
-            { default: () => server.serverName },
-          ),
-        key: server.serverId,
-        icon: renderIcon(createImageVNode(server.serverImgUrl, server.serverName)),
-      })
-      gMessage.success('添加成功')
-      showJoinServer.value = false
-      showModal.value = false
-    }
-    else {
-      gMessage.error('验证失败')
-    }
-  })
-}
-function clickMenuItem(key: string) {
-  if (/http(s)?:/.test(key))
-    window.open(key)
-  else
-    gMessage.info(key)
-
-  // router.push(`/${key}`)
-  emit('clickMenuItem', key)
-}
-const settingStore = useProjectSettingStore()
-
-const inverted = computed(() => {
-  return ['dark', 'header-dark'].includes(settingStore.navTheme)
-})
-const route: any = useRoute()
-onMounted(() => {
-  handleServerList()
 })
 </script>
 
 <template>
   <n-menu
-    :collapsed="props.collapsed"
-    :mode="props.mode"
+    :collapsed="collapsed"
+    :mode="mode"
     :collapsed-width="64"
+    :options="menu"
     :collapsed-icon-size="35"
-    :options="menuOptions"
     :indent="24"
     :inverted="inverted"
-    :value="Number(route.params.server_id)"
+    :value="Number(serverId)"
     :icon-size="30"
-    @update:value="clickMenuItem"
-    @update:expanded-keys="sendServerInfo"
   />
   <n-modal
-    v-model:show="showModal"
+    v-model:show="serverListStore.showModal"
+    :on-mask-click="() => serverListStore.showModal = false"
     class="custom-card"
     preset="card"
     :style="{ width: '400px' }"
@@ -237,7 +160,7 @@ onMounted(() => {
     <br>
     <n-button
       style="margin-top: 30px; width: 100%"
-      @click="handleShowModal2"
+      @click="showModal2 = true"
     >
       创建服务器
     </n-button>
