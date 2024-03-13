@@ -16,8 +16,6 @@ export function useProjectSetting() {
 
   const menuSetting = computed(() => projectStore.menuSetting)
 
-  const crumbsSetting = computed(() => projectStore.crumbsSetting)
-
   const permissionMode = computed(() => projectStore.permissionMode)
 
   const showFooter = computed(() => projectStore.showFooter)
@@ -33,7 +31,6 @@ export function useProjectSetting() {
     headerSetting,
     multiTabsSetting,
     menuSetting,
-    crumbsSetting,
     permissionMode,
     showFooter,
     isPageAnimate,
