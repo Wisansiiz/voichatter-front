@@ -7,30 +7,26 @@ const sessionStore = useAuthSessionStore()
 const baseURL = 'https://192.168.31.198:9000'
 const service = axios.create({ baseURL, timeout: 10000 })
 service.interceptors.request.use((config) => {
-  if (sessionStore.token)
-    config.headers.Authorization = `Bearer ${sessionStore.token}`
-  else if (localStore.token)
-    config.headers.Authorization = `Bearer ${localStore.token}`
+  if (sessionStore.token || localStore.token)
+    config.headers.Authorization = `Bearer ${sessionStore.token || localStore.token}`
   return config
-}, (err) => {
-  return Promise.reject(err)
 })
 service.interceptors.response.use(
   async (result) => {
     if (result.data.code === 200 || result.data.code === 0)
       return result.data
-
-    else if (result.data.code !== 200 || result.data.code === 0)
-      gMessage.error(result.data.message)
-    if (router.currentRoute.value.path !== '/login')
+    window.$message.error(result.data.message)
+    if (result.data.code > 100 && router.currentRoute.value.path !== '/login') {
       await router.push('/login')
-
+      sessionStore.token = ''
+      localStore.token = ''
+    }
     return Promise.reject(result.data)
   },
   (err) => {
-    if (err.code === 'ECONNABORTED' || err.message === 'Network Error')
-      gMessage.error('请求超时, 请稍后再试')
-
+    if (err.code === 'ECONNABORTED' || err.code === 'ERR_NETWORK')
+      window.$message.error('请求超时, 请稍后再试')
+    window.$loadingBar.error()
     return Promise.reject(err)
   },
 )

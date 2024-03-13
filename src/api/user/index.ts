@@ -55,3 +55,7 @@ export async function userLogout() {
     gMessage.success('退出成功')
   }).then(() => router.push('/login'))
 }
+export async function userList(serverId: any) {
+  const res: { data: { users: any } } = await service.get(`/users/${serverId}`)
+  return res.data.users
+}
