@@ -40,28 +40,28 @@ export default defineComponent({
     )
 
     const directionsOptions = computed(() => {
-      return animateOptions.find(item => item.value == unref(settingStore.pageAnimateType))
+      return animateOptions.find(item => item.value === unref(settingStore.pageAnimateType))
     })
 
-    // function openDrawer() {
-    //   state.isDrawer = true
-    // }
-    //
-    // function closeDrawer() {
-    //   state.isDrawer = false
-    // }
+    function openDrawer() {
+      state.isDrawer = true
+    }
 
-    function togNavTheme(theme) {
+    function closeDrawer() {
+      state.isDrawer = false
+    }
+
+    function togNavTheme(theme: any) {
       settingStore.navTheme = theme
       if (settingStore.navMode === 'horizontal' && ['light'].includes(theme))
         settingStore.navTheme = 'dark'
     }
 
-    function togTheme(color) {
+    function togTheme(color: any) {
       designStore.appTheme = color
     }
 
-    function togNavMode(mode) {
+    function togNavMode(mode: any) {
       settingStore.navMode = mode
       settingStore.menuSetting.mixMenu = false
     }
@@ -74,8 +74,8 @@ export default defineComponent({
       togNavMode,
       togTheme,
       darkTheme,
-      // openDrawer,
-      // closeDrawer,
+      openDrawer,
+      closeDrawer,
       animateOptions,
       directionsOptions,
     }
@@ -148,19 +148,19 @@ export default defineComponent({
             <n-badge v-show="settingStore.navMode === 'vertical'" dot color="#19be6b" />
           </div>
 
-          <div class="drawer-setting-item-style">
-            <n-tooltip placement="top">
-              <template #trigger>
-                <img
-                  src="/src/assets/images/nav-horizontal.svg"
-                  alt="顶部菜单模式"
-                  @click="togNavMode('horizontal')"
-                >
-              </template>
-              <span>顶部菜单模式</span>
-            </n-tooltip>
-            <n-badge v-show="settingStore.navMode === 'horizontal'" dot color="#19be6b" />
-          </div>
+          <!--          <div class="drawer-setting-item-style"> -->
+          <!--            <n-tooltip placement="top"> -->
+          <!--              <template #trigger> -->
+          <!--                <img -->
+          <!--                  src="/src/assets/images/nav-horizontal.svg" -->
+          <!--                  alt="顶部菜单模式" -->
+          <!--                  @click="togNavMode('horizontal')" -->
+          <!--                > -->
+          <!--              </template> -->
+          <!--              <span>顶部菜单模式</span> -->
+          <!--            </n-tooltip> -->
+          <!--            <n-badge v-show="settingStore.navMode === 'horizontal'" dot color="#19be6b" /> -->
+          <!--          </div> -->
 
           <div class="drawer-setting-item-style">
             <n-tooltip placement="top">
@@ -249,15 +249,6 @@ export default defineComponent({
           </div>
         </div>
 
-        <!--        <div class="drawer-setting-item"> -->
-        <!--          <div class="drawer-setting-item-title"> -->
-        <!--            固定多页签 -->
-        <!--          </div> -->
-        <!--          <div class="drawer-setting-item-action"> -->
-        <!--            <n-switch v-model:value="settingStore.multiTabsSetting.fixed" /> -->
-        <!--          </div> -->
-        <!--        </div> -->
-
         <n-divider title-placement="center">
           界面显示
         </n-divider>
@@ -268,24 +259,6 @@ export default defineComponent({
           </div>
           <div class="drawer-setting-item-action">
             <n-switch v-model:value="settingStore.headerSetting.isReload" />
-          </div>
-        </div>
-
-        <div class="drawer-setting-item">
-          <div class="drawer-setting-item-title">
-            显示面包屑导航
-          </div>
-          <div class="drawer-setting-item-action">
-            <n-switch v-model:value="settingStore.crumbsSetting.show" />
-          </div>
-        </div>
-
-        <div class="drawer-setting-item">
-          <div class="drawer-setting-item-title">
-            显示面包屑显示图标
-          </div>
-          <div class="drawer-setting-item-action">
-            <n-switch v-model:value="settingStore.crumbsSetting.showIcon" />
           </div>
         </div>
 
