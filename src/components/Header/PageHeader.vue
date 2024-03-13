@@ -4,11 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { NDialogProvider, useDialog, useMessage } from 'naive-ui'
 import components from './components'
 import ProjectSetting from './ProjectSetting.vue'
-
-// import { TABS_ROUTES } from '~/store/mutation-types'
 import { useUserStore } from '~/store/modules/user'
-
-// import { useScreenLockStore } from '~/store/modules/screenLock'
 import AsideMenu from '~/components/AsideMenu.vue'
 import { useProjectSetting } from '~/hooks/setting/useProjectSetting'
 import { websiteConfig } from '~/config/website.config'
@@ -28,7 +24,7 @@ export default defineComponent({
     const userStore = useUserStore()
     const message = useMessage()
     const dialog = useDialog()
-    const { navMode, navTheme, headerSetting, menuSetting, crumbsSetting } = useProjectSetting()
+    const { navMode, navTheme, headerSetting, menuSetting } = useProjectSetting()
 
     const { username } = userStore?.info || {}
 
@@ -40,7 +36,6 @@ export default defineComponent({
       navMode,
       navTheme,
       headerSetting,
-      crumbsSetting,
     })
 
     const getInverted = computed(() => {
@@ -69,37 +64,9 @@ export default defineComponent({
     const router = useRouter()
     const route = useRoute()
 
-    // const generator: any = (routerMap) => {
-    //   return routerMap.map((item) => {
-    //     const currentMenu = {
-    //       ...item,
-    //       label: item.meta.title,
-    //       key: item.name,
-    //       disabled: item.path === '/',
-    //     }
-    //     // 是否有子菜单，并递归处理
-    //     if (item.children && item.children.length > 0) {
-    //       // Recursion
-    //       currentMenu.children = generator(item.children, currentMenu)
-    //     }
-    //     return currentMenu
-    //   })
-    // }
-
-    // const breadcrumbList = computed(() => {
-    // return generator(route.matched)
-    // })
-
     const dropdownSelect = (key: any) => {
       router.push({ name: key })
     }
-
-    // 刷新页面
-    // const reloadPage = () => {
-    //   router.push({
-    //     path: `/redirect${unref(route).fullPath}`,
-    //   })
-    // }
 
     // 退出登录
     const doLogout = () => {
@@ -111,8 +78,6 @@ export default defineComponent({
         onPositiveClick: () => {
           userStore.logout().then(() => {
             message.success('成功退出登录')
-            // // 移除标签页
-            // localStorage.removeItem(TABS_ROUTES)
             router
               .replace({
                 name: '/login',
@@ -152,13 +117,13 @@ export default defineComponent({
         icon: 'SearchOutlined',
         tips: '搜索',
       },
-      // {
-      //   icon: 'GithubOutlined',
-      //   tips: 'github',
-      //   eventObject: {
-      //     click: () => window.open('https://github.com/jekip/naive-ui-admin'),
-      //   },
-      // },
+      {
+        icon: 'GithubOutlined',
+        tips: 'github',
+        eventObject: {
+          click: () => window.open('https://github.com/Wisansiiz'),
+        },
+      },
     ]
     const avatarOptions = [
       {
@@ -198,8 +163,6 @@ export default defineComponent({
       avatarOptions,
       getChangeStyle,
       avatarSelect,
-      // breadcrumbList,
-      // reloadPage,
       drawerSetting,
       openSetting,
       getInverted,
@@ -225,8 +188,8 @@ export default defineComponent({
         </h2>
       </div>
       <AsideMenu
-        v-model:collapsed="collapsed"
-        v-model:location="getMenuLocation"
+        :collapsed="collapsed"
+        :location="getMenuLocation"
         :inverted="getInverted"
         mode="horizontal"
       />
@@ -245,46 +208,6 @@ export default defineComponent({
           <MenuFoldOutlined />
         </n-icon>
       </div>
-      <!-- 刷新 -->
-      <!--      <div -->
-      <!--        v-if="headerSetting.isReload" -->
-      <!--        class="layout-header-trigger layout-header-trigger-min mr-1" -->
-      <!--        @click="reloadPage" -->
-      <!--      > -->
-      <!--        <n-icon size="18"> -->
-      <!--          <ReloadOutlined /> -->
-      <!--        </n-icon> -->
-      <!--      </div> -->
-    <!-- 面包屑 -->
-    <!--      <n-breadcrumb v-if="crumbsSetting.show"> -->
-    <!--        <template -->
-    <!--          v-for="routeItem in breadcrumbList" -->
-    <!--          :key="routeItem.name === 'Redirect' ? void 0 : routeItem.name" -->
-    <!--        > -->
-    <!--          <n-breadcrumb-item v-if="routeItem.meta.title"> -->
-    <!--            <n-dropdown -->
-    <!--              v-if="routeItem.children.length" -->
-    <!--              :options="routeItem.children" -->
-    <!--              @select="dropdownSelect" -->
-    <!--            > -->
-    <!--              <span class="link-text"> -->
-    <!--                <component -->
-    <!--                  :is="routeItem.meta.icon" -->
-    <!--                  v-if="crumbsSetting.showIcon && routeItem.meta.icon" -->
-    <!--                /> -->
-    <!--                {{ routeItem.meta.title }} -->
-    <!--              </span> -->
-    <!--            </n-dropdown> -->
-    <!--            <span v-else class="link-text"> -->
-    <!--              <component -->
-    <!--                :is="routeItem.meta.icon" -->
-    <!--                v-if="crumbsSetting.showIcon && routeItem.meta.icon" -->
-    <!--              /> -->
-    <!--              {{ routeItem.meta.title }} -->
-    <!--            </span> -->
-    <!--          </n-breadcrumb-item> -->
-    <!--        </template> -->
-    <!--      </n-breadcrumb> -->
     </div>
     <div class="layout-header-right">
       <div
