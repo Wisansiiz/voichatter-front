@@ -29,10 +29,9 @@ const fixedHeader = computed(() => {
   const { fixed } = unref(headerSetting)
   return fixed ? 'absolute' : 'static'
 })
-
+const currentRoute = useRoute()
 const isMixMenuNoneSub = computed(() => {
   const mixMenu = unref(menuSetting).mixMenu
-  const currentRoute = useRoute()
   if (unref(navMode) !== 'horizontal-mix')
     return true
   return !(unref(navMode) === 'horizontal-mix' && mixMenu && currentRoute.meta.isRoot)
@@ -42,10 +41,6 @@ const fixedMenu = computed(() => {
   const { fixed } = unref(headerSetting)
   return fixed ? 'absolute' : 'static'
 })
-
-// const isMultiTabs = computed(() => {
-//   return unref(multiTabsSetting).show
-// })
 
 const fixedMulti = computed(() => {
   return unref(multiTabsSetting).fixed
@@ -85,10 +80,6 @@ function watchWidth() {
   collapsed.value = Width <= 950
   checkMobileMode()
 }
-const serverName = ref('')
-function getServerName(name: string) {
-  serverName.value = name
-}
 
 onMounted(() => {
   checkMobileMode()
@@ -118,7 +109,6 @@ onMounted(() => {
       <AsideMenu
         v-model:collapsed="collapsed"
         v-model:location="getMenuLocation"
-        @server-name="getServerName"
       />
     </n-layout-sider>
 
@@ -157,16 +147,7 @@ onMounted(() => {
             'fluid-header': fixedHeader === 'static',
           }"
         >
-          <!--          <div -->
-          <!--            class="main-view" -->
-          <!--            :class="{ -->
-          <!--              'main-view-fix': fixedMulti, -->
-          <!--              'noMultiTabs': !isMultiTabs, -->
-          <!--              'mt-3': !isMultiTabs, -->
-          <!--            }" -->
-          <!--          > -->
-          <MainView :server-name="serverName" />
-          <!--        </div> -->
+          <MainView />
         </div>
       </n-layout-content>
       <n-back-top :right="100" />
