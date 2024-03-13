@@ -51,7 +51,7 @@ function login() {
           </n-input>
         </n-form-item>
         <n-form-item path="password" label="密码">
-          <n-input v-model:value="model.password" type="password" show-password-on="mousedown" maxlength="24" @keydown.enter.prevent>
+          <n-input v-model:value="model.password" type="password" show-password-on="click" maxlength="24" @keydown.enter.prevent>
             <template #prefix>
               <n-icon>
                 <Password />
