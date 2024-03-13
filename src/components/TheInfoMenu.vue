@@ -54,22 +54,6 @@ export default defineComponent({
         title: '用户',
         key: 'username',
       },
-      // {
-      //   title: () =>
-      //     h(
-      //       NButton,
-      //       {
-      //         size: 'small',
-      //         on: {
-      //           // click: handleSelect,
-      //         },
-      //       },
-      //       {
-      //         default: () => h('span', { style: { color: 'green' } }, '刷新'),
-      //       },
-      //     ),
-      //   key: 'SPermissions',
-      // },
       {
         title: '身份',
         key: 'SPermissions',
@@ -94,7 +78,6 @@ export default defineComponent({
     return {
       menu,
       cols: colsReactive,
-      // data,
       options,
       showDropdown: showDropdownRef,
       x: xRef,
@@ -136,96 +119,7 @@ export default defineComponent({
     :on-clickoutside="onClickoutside"
     @select="handleSelect"
   />
-<!--  <n-popover v-for="(option, index) in menuOptions" :key="index" placement="left-start" trigger="click"> -->
-<!--    &lt;!&ndash;    <template #trigger> &ndash;&gt; -->
-<!--    &lt;!&ndash;      <n-data-table :columns="cols" :data="menu" :row-props="rowProps" /> &ndash;&gt; -->
-<!--    &lt;!&ndash;      <n-dropdown &ndash;&gt; -->
-<!--    &lt;!&ndash;        placement="bottom-start" &ndash;&gt; -->
-<!--    &lt;!&ndash;        trigger="manual" &ndash;&gt; -->
-<!--    &lt;!&ndash;        :x="x" &ndash;&gt; -->
-<!--    &lt;!&ndash;        :y="y" &ndash;&gt; -->
-<!--    &lt;!&ndash;        :options="options" &ndash;&gt; -->
-<!--    &lt;!&ndash;        :show="showDropdown" &ndash;&gt; -->
-<!--    &lt;!&ndash;        :on-clickoutside="onClickoutside" &ndash;&gt; -->
-<!--    &lt;!&ndash;        @select="handleSelect" &ndash;&gt; -->
-<!--    &lt;!&ndash;      /> &ndash;&gt; -->
-<!--    &lt;!&ndash;    </template> &ndash;&gt; -->
-<!--    <div style="width: 200px; height: 300px"> -->
-<!--      <n-avatar -->
-<!--        round -->
-<!--        size="large" -->
-<!--        src="https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100" -->
-<!--      /> -->
-<!--      <n-flex style="border: #e8e8e8 1px solid; width: 100%; height: 80%;" justify="start"> -->
-<!--        <n-text> -->
-<!--          name: {{ option.username }} -->
-<!--        </n-text> -->
-<!--        <n-text> -->
-<!--          id: {{ option.userID }} -->
-<!--        </n-text> -->
-<!--      </n-flex> -->
-<!--    </div> -->
-<!--  </n-popover> -->
 </template>
-<!-- <template> -->
-<!--  &lt;!&ndash;  <n-layout-sider &ndash;&gt; -->
-<!--  &lt;!&ndash;    bordered &ndash;&gt; -->
-<!--  &lt;!&ndash;    show-trigger="bar" &ndash;&gt; -->
-<!--  &lt;!&ndash;    collapse-mode="width" &ndash;&gt; -->
-<!--  &lt;!&ndash;    :collapsed-width="0" &ndash;&gt; -->
-<!--  &lt;!&ndash;    :width="240" &ndash;&gt; -->
-<!--  &lt;!&ndash;    :collapsed="collapsed" &ndash;&gt; -->
-<!--  &lt;!&ndash;    @collapse="collapsed = true" &ndash;&gt; -->
-<!--  &lt;!&ndash;    @expand="collapsed = false" &ndash;&gt; -->
-<!--  &lt;!&ndash;  > &ndash;&gt; -->
-<!--  <n-flex justify="center"> -->
-<!--    <n-h3>服务器成员列表</n-h3> -->
-<!--  </n-flex> -->
-<!--  <n-flex justify="center"> -->
-<!--    <n-popover v-for="(option, index) in menuOptions" :key="index" placement="left-start" trigger="click"> -->
-<!--      <template #trigger> -->
-<!--        <n-button -->
-<!--          style="width: 80%; height: 36px; border: #e8e8e8 1px solid;" -->
-<!--          bordered -->
-<!--          justify-start -->
-<!--        > -->
-<!--          <n-button text style="font-size: 24px; margin-bottom: 3px"> -->
-<!--            <n-icon> -->
-<!--              <n-avatar -->
-<!--                round -->
-<!--                size="small" -->
-<!--                src="https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100" -->
-<!--              /> -->
-<!--            </n-icon> -->
-<!--          </n-button> -->
-<!--          <n-flex justify="start" style="height: 34px;"> -->
-<!--            <n-text -->
-<!--              style="margin-left: 20px; line-height: 34px;" -->
-<!--            > -->
-<!--              {{ option.username }} -->
-<!--            </n-text> -->
-<!--          </n-flex> -->
-<!--        </n-button> -->
-<!--      </template> -->
-<!--      <div style="width: 200px; height: 300px"> -->
-<!--        <n-avatar -->
-<!--          round -->
-<!--          size="large" -->
-<!--          src="https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100" -->
-<!--        /> -->
-<!--        <n-flex style="border: #e8e8e8 1px solid; width: 100%; height: 80%;" justify="start"> -->
-<!--          <n-text> -->
-<!--            name: {{ option.username }} -->
-<!--          </n-text> -->
-<!--          <n-text> -->
-<!--            id: {{ option.userId }} -->
-<!--          </n-text> -->
-<!--        </n-flex> -->
-<!--      </div> -->
-<!--    </n-popover> -->
-<!--  </n-flex> -->
-<!-- &lt;!&ndash;  </n-layout-sider> &ndash;&gt; -->
-<!-- </template> -->
 
 <style scoped lang="less">
 </style>
