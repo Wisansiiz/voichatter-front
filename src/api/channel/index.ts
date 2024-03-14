@@ -13,7 +13,7 @@ export async function createChannel(formRef: any, model: any, serverId: any) {
   })
 }
 
-export async function channelList(serverId: any) {
+export async function findChannelList(serverId: any) {
   const res: response = await service.get(`/groups/${serverId}`)
   return res.data
 }
