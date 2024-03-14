@@ -4,7 +4,7 @@ import type { FormInst } from 'naive-ui'
 import { NIcon } from 'naive-ui'
 import { RouterLink } from 'vue-router'
 import { Add, BookOutline as BookIcon } from '@vicons/ionicons5'
-import { service } from '~/utils/request'
+import { service } from '~/api'
 import type { response } from '~/composables/result'
 import { useProjectSetting } from '~/hooks/setting/useProjectSetting'
 
@@ -34,15 +34,6 @@ const generalOptions = ['public', 'private'].map(
     value: v,
   }),
 )
-function createImageVNode(url: string) {
-  return h('img', {
-    src: url,
-    alt: '描述',
-    style: {
-      width: '35px', // 设置图片宽度
-    },
-  })
-}
 function handleShowModal2() {
   showModal2.value = true
 }
@@ -73,28 +64,6 @@ async function handleServerList() {
       icon: renderIcon(BookIcon),
     })
   }
-  // menuOptions.push({
-  //   label: () =>
-  //     h(
-  //       RouterLink,
-  //       {
-  //         to: {
-  //           path: '/125',
-  //         },
-  //       },
-  //       { default: () => '测试' },
-  //     ),
-  //   key: 'test',
-  //   icon: renderIcon(createImageVNode('https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100')),
-  // }, {
-  //   key: 'divider-1',
-  //   type: 'divider',
-  //   props: {
-  //     style: {
-  //       marginLeft: '15px',
-  //     },
-  //   },
-  // })
 }
 
 onMounted(() => {
@@ -146,12 +115,7 @@ async function handleJoinServer() {
   })
 }
 const {
-  // showFooter,
-  // navMode,
-  // navTheme,
   headerSetting,
-  // menuSetting,
-  // multiTabsSetting,
 } = useProjectSetting()
 const fixedMenu = computed(() => {
   const { fixed } = unref(headerSetting)
