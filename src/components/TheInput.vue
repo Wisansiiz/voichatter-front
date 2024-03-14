@@ -7,5 +7,6 @@
     placeholder="基本的 Textarea"
     style="max-height: 54px"
     :style="{ width: '80%' }"
+    :autosize="{ minRows: 1 }"
   />
 </template>
