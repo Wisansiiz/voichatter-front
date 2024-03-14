@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { service } from '~/utils/request.js'
+import { service } from '~/api'
 
 const localVideo = ref()
 const remoteVideo = ref()
