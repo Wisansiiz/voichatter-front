@@ -1,84 +1,79 @@
-<script setup>
-import { service } from '~/utils/request.js'
+<script lang="ts">
+import { service } from '~/api'
 import { useUserStore } from '~/store/modules/user'
 
-const channelID = ref('')
-const messageText = ref('')
-const messages = ref([])
-const isChatBoxVisible = ref(false)
-let ws = null
-const active = ref(false)
-const userStore = useUserStore()
+interface Message {
+  messageId: number
+  senderUserId: number
+  channelId: number
+  content: string
+  attachment: string
+  sendDate: string
+  serverId: number
+  avatarUrl: string
+  senderName: string
+}
+export default defineComponent({
+  setup() {
+    const messageText = ref('')
+    const messages = ref([] as Message[])
+    let socket: any = null
+    const userStore = useUserStore()
+    const route: any = useRoute()
 
-function joinRoom() {
-  if (channelID.value.trim() !== '') {
-    ws = new WebSocket(`ws://localhost:9000/api/ws?channelID=${channelID.value.trim()}`)
-    ws.onopen = () => {
-      ws.send(JSON.stringify({ code: 'authorization', data: { token: userStore.getToken } }))
+    async function queryHistoryMessages() {
+      const response = await service.get(`/messages/${route.params.server_id}/${route.params.name}`)
+      const { messageList } = response.data
+      messages.value = messageList
+      if (!messages.value)
+        gMessage.warning('该频道没有更多信息了')
     }
-    messages.value = []
-    ws.onmessage = (e) => {
-      const message = JSON.parse(e.data)
-      messages.value.push(message)
+    function initWebsocket() {
+      socket = new WebSocket(`wss://192.168.31.198:9000/api/wz?serverId=${route.params.server_id}&channelId=${route.params.name}`)
+      socket.onopen = () => {
+        socket.send(JSON.stringify({ code: 'authorization', data: { token: userStore.getToken } }))
+      }
     }
-    isChatBoxVisible.value = true
-    active.value = true
-  }
-}
-const route = useRoute()
-async function queryHistoryMessages() {
-  const response = await service.get(`/messages/${route.params.server_id}/${route.params.name}`)
-  messages.value = response.data.messageList
-  // console.log(messages.value)
-  // if (!messages.value)
-  //   gMessage.warning('该频道没有更多信息了')
-}
-function sendMessage() {
-  if (messageText.value.trim() !== '') {
-    ws.send(JSON.stringify({ data: messageText.value }))
-    messageText.value = null
-  }
-}
+    function sendMessage() {
+      socket.onmessage = (e: any) => {
+        const data = e.data
+        const { message } = JSON.parse(data)
+        messages.value.push(message)
+      }
+      if (messageText.value.trim() !== '') {
+        socket.send(JSON.stringify({ data: messageText.value }))
+        messageText.value = ''
+      }
+    }
+    return {
+      queryHistoryMessages,
+      sendMessage,
+      messages,
+      initWebsocket,
+      messageText,
+      userId: userStore.getUserId,
+    }
+  },
+})
 </script>
 
 <template>
-  <!--  <n-scrollbar style="margin-bottom: 50px"> -->
-  <!--    {{ messages }} -->
   <ChatBubble
     v-for="(msg, index) in messages"
     :key="index"
     :message="msg.content"
-    :is-sent="msg.sender_user_id === 1"
-    :avatar="msg.avatar"
-    :time="msg.send_date"
-    :username="msg.username"
+    :is-sent="msg.senderUserId === userId"
+    :avatar="msg.avatarUrl"
+    :time="msg.sendDate"
+    :username="msg.senderName"
   />
-  <!--    <n-scrollbar style="margin-bottom: 50px"> -->
-  <!--      <n-flex v-show="isChatBoxVisible" justify="center"> -->
-  <!--        <n-scrollbar style="max-width: 300px"> -->
-  <!--          <n-list clickable hoverable> -->
-  <!--            <n-list-item v-for="(message, index) in messages" :key="index"> -->
-  <!--              {{ message }} -->
-  <!--            </n-list-item> -->
-  <!--          </n-list> -->
-  <!--        </n-scrollbar> -->
-  <!--      </n-flex> -->
-  <!--      <n-input -->
-  <!--        v-model:value="channelID" -->
-  <!--        type="text" -->
-  <!--        placeholder="Enter room ID" -->
-  <!--        :disabled="active" -->
-  <!--      /> -->
-  <!--      <n-button @click="joinRoom"> -->
-  <!--        Join Room -->
-  <!--      </n-button> -->
+  <n-button @click="initWebsocket">
+    加入频道
+  </n-button>
   <n-button @click="queryHistoryMessages">
     Search
   </n-button>
-  <!--  <div style="height: 300px"> -->
-  <!--    sss -->
-  <!--  </div> -->
-  <!--      </n-scrollbar> -->
+  <div style="margin-bottom: 70px" />
   <n-layout-footer
     bordered
     position="absolute"
@@ -93,7 +88,6 @@ function sendMessage() {
       </div>
     </n-flex>
   </n-layout-footer>
-<!--  </n-scrollbar> -->
 </template>
 
 <style scoped>
