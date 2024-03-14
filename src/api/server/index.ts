@@ -15,7 +15,7 @@ export async function getServerList() {
 }
 
 export async function createServer(model: any) {
-  const res: response = await service.post('/servers', model.value)
+  const res: response = await service.post('/servers', { serverName: model.serverName, serverType: model.serverType })
   return res.data.server
 }
 export async function joinServer(serverId: any) {
