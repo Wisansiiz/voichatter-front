@@ -1,11 +1,9 @@
 <script lang="ts">
 import type { DropdownOption, FormInst } from 'naive-ui'
 import { Menu } from '@vicons/ionicons5'
-import { RouterLink } from 'vue-router'
-import { channelList, createChannel } from '~/api/channel'
+import { createChannel } from '~/api/channel'
 import { deleteServerByOwner, modifyServerNameByOwner } from '~/api/server'
 import { useServerListStore } from '~/store/modules/serverList'
-import { useServerInfo } from '~/hooks/useServerInfo'
 
 export default defineComponent({
   // eslint-disable-next-line vue/no-reserved-component-names
@@ -17,10 +15,14 @@ export default defineComponent({
     const showModal = ref(false)
     const modifyServerNameShowModal = ref(false)
     const formRef = ref<FormInst | null>(null)
+    const showGroupModal = ref(false)
 
     const model = ref({
       channel_name: null,
       type: null,
+    })
+    const groupModel = ref({
+      groupName: null,
     })
     const modifyServerNameModel = ref({
       serverId: null,
@@ -56,6 +58,19 @@ export default defineComponent({
       {
         label: '服务器设置',
         key: 'serverSetting',
+      },
+      {
+        label: () =>
+          h(
+            'a',
+            {
+              onClick: () => {
+                showGroupModal.value = true
+              },
+            },
+            { default: () => '创建新分组' },
+          ),
+        key: 'createNewGroup',
       },
       {
         label: () =>
@@ -112,88 +127,19 @@ export default defineComponent({
       },
     ]
 
+    const serverListStore = useServerListStore()
     async function deleteServer() {
       await deleteServerByOwner(route.params.server_id)
+      await serverListStore.setServerInfo()
     }
     async function channel() {
       await createChannel(formRef, model, route.params.server_id)
       showModal.value = false
     }
-    interface dataRep {
-      channelList: channelRep[]
-      groupList?: groupRep[]
-    }
-    interface channelRep {
-      channelId: number
-      channelName: string
-      serverId: number
-      type: string
-      createUserId: number
-      groupId?: number
-    }
-    interface groupRep {
-      groupId: number
-      serverId: number
-      groupName: string
-      channelList: [
-        {
-          channelId: number
-          channelName: string
-          serverId: number
-          type: string
-          createUserId: number
-        },
-      ]
-    }
-    const data2: Ref<any[]> = ref([])
+
     function channels() {
-      channelList(route.params.server_id).then((res: dataRep) => {
-        data2.value = []
-        if (res.channelList) {
-          const data = res.channelList
-          const arr = []
-          for (let i = 0; i < data.length; i++) {
-            arr.push({
-              label: () =>
-                h(
-                  RouterLink,
-                  {
-                    to: `/${route.params.server_id}/${encodeURIComponent(data[i].channelId)}`,
-                  },
-                  { default: () => `${data[i].channelName}` },
-                ),
-              key: data[i].channelId,
-              channelType: data[i].type,
-            })
-          }
-          data2.value.push(arr)
-        }
-        if (res.groupList) {
-          const data = res.groupList
-          for (let i = 0; i < data.length; i++) {
-            data2.value.push({
-              name: data[i].groupName,
-              index: data[i].groupId,
-              option: data[i].channelList.map((v) => {
-                return {
-                  label: () =>
-                    h(
-                      RouterLink,
-                      {
-                        to: `/${route.params.server_id}/${encodeURIComponent(v.channelId)}`,
-                      },
-                      { default: () => `${v.channelName}` },
-                    ),
-                  key: v.channelId,
-                  channelType: v.type,
-                }
-              }),
-            })
-          }
-        }
-      })
+      serverListStore.toSetChannelList()
     }
-    const serverListStore = useServerListStore()
     watch(() => route.params.server_id, (value, oldValue) => {
       if (value !== oldValue)
         channels()
@@ -212,19 +158,14 @@ export default defineComponent({
     const xRef = ref(0)
     const yRef = ref(0)
 
-    const { serverMap } = useServerInfo()
-    const serverName = ref()
     onMounted(() => {
-      channels()
+      serverListStore.toSetChannelList()
     })
 
     function modifyServerName() {
       modifyServerNameModel.value.serverId = route.params.server_id
       modifyServerNameByOwner(modifyServerNameModel).then((data: { serverInfo: any }) => {
         serverListStore.setServerInfo()
-        setTimeout(() => {
-          serverName.value = serverMap.value.get(Number(route.params.server_id))
-        }, 1000)
         window.$message.info(data.serverInfo.serverName)
       })
       modifyServerNameShowModal.value = false
@@ -235,7 +176,6 @@ export default defineComponent({
     }
 
     return {
-      serverName,
       options,
       showModal,
       formRef,
@@ -271,7 +211,6 @@ export default defineComponent({
         }
       },
       dataTableOption,
-      data2,
       serverId: computed(() => {
         return route.params.server_id
       }),
@@ -280,6 +219,9 @@ export default defineComponent({
       }),
       handleUpdateValue,
       serverListStore,
+      showGroupModal,
+      groupModel,
+      channelList: serverListStore.getChannelList,
     }
   },
 })
@@ -287,7 +229,7 @@ export default defineComponent({
 
 <template>
   <div style="padding: 10px">
-    <n-flex justify="space-between" style="width: 220px">
+    <n-flex justify="center" style="width: 220px">
       {{ serverListStore.getServerName }}
       <n-dropdown
         placement="bottom"
@@ -306,7 +248,7 @@ export default defineComponent({
       <n-collapse style="width: 220px;">
         <n-collapse style="margin-top: 20px">
           <n-menu
-            :options="data2[0]"
+            :options="channelList[0]"
             :value="Number(v)"
             :node-props="handleContextMenu"
             @update:value="handleUpdateValue"
@@ -322,7 +264,7 @@ export default defineComponent({
           :on-clickoutside="onClickOutside"
           @select="handleSelect"
         />
-        <template v-for="(item, index) in data2">
+        <template v-for="(item, index) in channelList">
           <n-collapse-item v-if="item.option" :key="index" :title="item.name" :name="item.index">
             <n-collapse>
               <n-menu
@@ -384,6 +326,37 @@ export default defineComponent({
       @click="channel"
     >
       创建频道
+    </n-button>
+  </n-modal>
+  <n-modal
+    v-model:show="showGroupModal"
+    class="custom-card"
+    preset="card"
+    :style="{ maxWidth: '600px' }"
+    title="创建一个分组"
+    size="huge"
+    :bordered="false"
+    :segmented="{
+      content: 'soft',
+      footer: 'soft',
+    }"
+  >
+    <n-form
+      ref="formRef"
+      :model="groupModel"
+    >
+      <n-form-item label="为分组取个名字" path="groupName">
+        <n-input
+          v-model:value="groupModel.groupName"
+          placeholder="什么名字呢"
+        />
+      </n-form-item>
+    </n-form>
+    <n-button
+      style="margin-top: 30px; width: 100%"
+      @click="channel"
+    >
+      创建分组
     </n-button>
   </n-modal>
   <n-modal
