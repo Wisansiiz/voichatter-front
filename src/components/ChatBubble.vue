@@ -26,7 +26,7 @@ export default {
 </script>
 
 <template>
-  <div class="chat" :class="{ 'chat-start': isSent, 'chat-end': !isSent }">
+  <div class="chat" :class="{ 'chat-start': !isSent, 'chat-end': isSent }">
     <div class="chat-image avatar">
       <div class="w-10 rounded-full">
         <img class="w-10 rounded-full" :src="avatar" :alt="username">
@@ -35,12 +35,11 @@ export default {
     <div class="chat-header">
       {{ username }}
     </div>
-    <div class="chat-bubble" :class="{ sent: !isSent, received: isSent }">
+    <div class="chat-bubble" :class="{ sent: isSent, received: !isSent }">
       {{ message }}
     </div>
     <div class="chat-footer opacity-50">
       {{ time }}
-      <!--      <time class="text-xs opacity-50"></time> -->
     </div>
   </div>
 </template>
