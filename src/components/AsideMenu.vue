@@ -2,7 +2,8 @@
 import type { FormInst } from 'naive-ui'
 import { useProjectSettingStore } from '~/store/modules/projectSetting'
 import { useServerListStore } from '~/store/modules/serverList'
-import { useServerInfo } from '~/hooks/useServerInfo'
+
+// import { useServerInfo } from '~/hooks/useServerInfo'
 
 export default defineComponent({
   props: {
@@ -51,8 +52,9 @@ export default defineComponent({
     function handleCreateServer() {
       formRef.value?.validate((errors) => {
         if (!errors) {
-          serverListStore.toCreateServer(model.value).then(() => {
-            window.$message.success('创建成功')
+          serverListStore.toCreateServer(model.value).then((data) => {
+            if (data === 'success')
+              window.$message.success('创建成功')
             showModal2.value = false
             serverListStore.showModal = false
             serverListStore.setServerInfo()
@@ -96,7 +98,8 @@ export default defineComponent({
     const serverId = computed(() => {
       return route.params.server_id
     })
-    const { menu } = useServerInfo()
+    // const { menu } = useServerInfo()
+    const menu = serverListStore.getMenuOptions
     onMounted(() => {
       serverListStore.setServerInfo()
     })
@@ -120,6 +123,7 @@ export default defineComponent({
       mode: computed(() => props.mode),
       collapsed: computed(() => props.collapsed),
       location: computed(() => props.location),
+      // menu2,
     }
   },
 })
