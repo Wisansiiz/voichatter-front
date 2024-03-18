@@ -1,8 +1,7 @@
 import { defineStore } from 'pinia'
-
 import { RouterLink } from 'vue-router'
 import { Add } from '@vicons/ionicons5'
-import { createImageVNode, renderIcon } from '~/utils'
+import { createImageVNode, renderIcon } from '~/composables/utils'
 import { createServer, getServerList, joinServer } from '~/api/server'
 import { findChannelList } from '~/api/channel'
 
@@ -44,24 +43,30 @@ export const useServerListStore = defineStore(
   'server-list-info',
   () => {
     const route: any = useRoute()
-    const serverList = ref(new Map<number, any[]>())
-    const channelList = ref<any[]>([])
+    const serverList = ref(new Map<number, any[] | null>())
     const menuOptions = ref<any[]>([])
     const showModal = ref(false)
     const channelType = ref('')
-    const serverName = ref('未找到')
     const serverMap = ref(new Map<number, string>())
 
     const changeShowModal = computed(() => !showModal.value)
     const getServerName = computed(() => {
       const serverId = Number(route.params.server_id)
       const name = serverMap.value.get(serverId)
-      if (name) {
-        serverName.value = name
-        return serverName
-      }
+      if (name)
+        return name
     })
-    const getChannelList = computed(() => channelList)
+    const getChannelList = computed(() => {
+      const serverId = Number(route.params.server_id)
+      const cl = serverList.value.get(serverId)
+      if (cl)
+        return cl
+      let cl2 = [] as any[]
+      toSetChannelList().then(({ channelList }) => {
+        cl2 = channelList
+      })
+      return cl2
+    })
     const getMenuOptions = computed(() => menuOptions)
     const getChannelType = computed(() => channelType)
 
@@ -85,7 +90,7 @@ export const useServerListStore = defineStore(
       serverMap.value = new Map<number, any>()
       getServerList().then((res: any) => {
         res.serverList.forEach((item: serverRep) => {
-          serverList.value.set(item.serverId, [])
+          serverList.value.set(item.serverId, null)
           serverMap.value.set(item.serverId, item.serverName)
           menu.push({
             label: () =>
@@ -149,8 +154,8 @@ export const useServerListStore = defineStore(
       })
     }
     async function toSetChannelList() {
+      const channelList = [] as any[]
       findChannelList(route.params.server_id).then((res: dataRep) => {
-        const all = [] as any[]
         if (res.channelList) {
           const arr = [] as any[]
           res.channelList.forEach((data: channelRep) => {
@@ -167,11 +172,11 @@ export const useServerListStore = defineStore(
               channelType: data.type,
             })
           })
-          all.push(arr)
+          channelList.push(arr)
         }
         if (res.groupList) {
           res.groupList.forEach((data: groupRep) => {
-            all.push({
+            channelList.push({
               name: data.groupName,
               index: data.groupId,
               option: data.channelList.map((v) => {
@@ -191,14 +196,13 @@ export const useServerListStore = defineStore(
             })
           })
         }
-        channelList.value = all
+        serverList.value.set(Number(route.params.server_id), channelList)
       })
-      return channelList
+      return { channelList, serverList }
     }
 
     return {
       serverList,
-      channelList,
       menuOptions,
       showModal,
       serverMap,
@@ -206,7 +210,6 @@ export const useServerListStore = defineStore(
       changeShowModal,
       toCreateServer,
       toJoinServer,
-      serverName,
       getServerName,
       toSetChannelList,
       getChannelList,
