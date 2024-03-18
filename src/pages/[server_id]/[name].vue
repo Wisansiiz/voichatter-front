@@ -1,32 +1,19 @@
 <script lang="ts">
-// interface message {
-//   message: string
-//   isSent: boolean
-//   send_date: string
-//   avatar: string
-//   username: string
-//   content: any
-// }
-import Ws from '~/pages/[server_id]/[name]/ws.vue'
-import Multiple from '~/pages/[server_id]/[name]/multiple.vue'
-import { useServerInfo } from '~/hooks/useServerInfo'
+import Ws from '~/pages/[server_id]/ws.vue'
+import Multiple from '~/pages/[server_id]/multiple.vue'
+import { useServerListStore } from '~/store/modules/serverList'
 
 export default defineComponent({
   components: { Ws, Multiple },
   setup() {
     const router = useRouter()
-    const route = useRoute()
-    const params = ref()
-    params.value = route.params
-    const { channelType } = useServerInfo()
-    watch(route, () => {
-      params.value = route.params
-    })
+    const route: any = useRoute()
+    const serverListStore = useServerListStore()
+    const channelType = serverListStore.getChannelType
     return {
       channelType,
-      params,
+      route,
       router,
-      Ws,
     }
   },
 })
@@ -36,7 +23,7 @@ export default defineComponent({
   <n-h1>这里是channel</n-h1>
 
   <n-flex>
-    <n-h1>{{ params.name }}</n-h1>
+    <n-h1>{{ route.params.name }}</n-h1>
     <n-layout-footer
       bordered
       position="absolute"
@@ -45,7 +32,7 @@ export default defineComponent({
       <n-flex justify="center">
         <div style="height: 54px; line-height: 54px">
           <n-button type="primary" ghost>
-            发送{{ params.name }}
+            发送{{ route.params.name }}
           </n-button>
         </div>
       </n-flex>
