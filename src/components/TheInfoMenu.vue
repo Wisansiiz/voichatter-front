@@ -2,7 +2,7 @@
 import { defineComponent, h, nextTick, ref } from 'vue'
 import type { DataTableColumns, DropdownOption } from 'naive-ui'
 import { NTag, useMessage } from 'naive-ui'
-import { createImageVNode } from '~/utils'
+import { createImageVNode } from '~/composables/utils'
 
 interface ServerMember {
   userID: number

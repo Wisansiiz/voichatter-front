@@ -36,7 +36,7 @@ const options = [
 function handleSelect(key: any) {
   if (key === 'logout')
     userLogout()
-  gMessage.info(String(key))
+  window.$message.info(String(key))
 }
 const theme = ref<GlobalTheme | null>(null)
 watch(theme, () => {
