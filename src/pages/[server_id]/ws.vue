@@ -26,13 +26,22 @@ export default defineComponent({
       const { messageList } = response.data
       messages.value = messageList
       if (!messages.value)
-        gMessage.warning('该频道没有更多信息了')
+        window.$message.warning('该频道没有更多信息了')
     }
     function initWebsocket() {
-      socket = new WebSocket(`wss://192.168.31.198:9000/api/wz?serverId=${route.params.server_id}&channelId=${route.params.name}`)
+      socket = new WebSocket(`wss://192.168.31.198:9000/api/wz?serverId=${route.params.server_id}&channelId=${route.params.name}&token=${encodeURIComponent(userStore.getToken)}`)
       socket.onopen = () => {
-        socket.send(JSON.stringify({ code: 'authorization', data: { token: userStore.getToken } }))
+        window.$message.success('连接成功')
+        queryHistoryMessages()
       }
+      socket.onclose = () => {
+        window.$message.error('连接已关闭')
+      }
+    }
+    function relinkWebsocket() {
+      if (socket)
+        socket.close()
+      initWebsocket()
     }
     function sendMessage() {
       socket.onmessage = (e: any) => {
@@ -52,6 +61,7 @@ export default defineComponent({
       initWebsocket,
       messageText,
       userId: userStore.getUserId,
+      relinkWebsocket,
     }
   },
 })
@@ -67,11 +77,14 @@ export default defineComponent({
     :time="msg.sendDate"
     :username="msg.senderName"
   />
-  <n-button @click="initWebsocket">
+  <n-button :focusable="false" @click="initWebsocket">
     加入频道
   </n-button>
-  <n-button @click="queryHistoryMessages">
+  <n-button :focusable="false" @click="queryHistoryMessages">
     Search
+  </n-button>
+  <n-button :focusable="false" @click="relinkWebsocket">
+    Relink
   </n-button>
   <div style="margin-bottom: 70px" />
   <n-layout-footer
@@ -82,7 +95,7 @@ export default defineComponent({
     <n-flex justify="center">
       <TheInput v-model:value="messageText" />
       <div style="height: 54px; line-height: 54px">
-        <n-button type="primary" ghost @click="sendMessage()">
+        <n-button type="primary" ghost @click="sendMessage">
           发送
         </n-button>
       </div>

@@ -14,9 +14,12 @@ const channelId = params.server_id + params.name
 const userStore = useUserStore()
 
 function initWebsocket() {
-  socket = new WebSocket(`wss://192.168.31.198:9000/api/yy?channelId=${channelId}`)
+  socket = new WebSocket(`wss://192.168.31.198:9000/api/yy?channelId=${channelId}&token=${encodeURIComponent(userStore.getToken)}`)
   socket.onopen = () => {
-    socket.send(JSON.stringify({ code: 'authorization', data: { token: userStore.getToken } }))
+    window.$message.success('连接成功')
+  }
+  socket.onclose = () => {
+    window.$message.error('连接断开')
   }
 
   socket.onmessage = (e) => {
