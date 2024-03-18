@@ -1,7 +1,7 @@
 <script lang="ts">
-import type { DropdownOption, FormInst } from 'naive-ui'
+import type { CollapseProps, DropdownOption, FormInst } from 'naive-ui'
 import { Menu } from '@vicons/ionicons5'
-import { createChannel } from '~/api/channel'
+import { createChannel, deleteChannel } from '~/api/channel'
 import { deleteServerByOwner, modifyServerNameByOwner } from '~/api/server'
 import { useServerListStore } from '~/store/modules/serverList'
 
@@ -10,7 +10,6 @@ export default defineComponent({
   components: { Menu },
   setup() {
     const route: any = useRoute()
-    const dialog = useDialog()
     const message = useMessage()
     const showModal = ref(false)
     const modifyServerNameShowModal = ref(false)
@@ -107,7 +106,7 @@ export default defineComponent({
                 color: 'red',
               },
               onClick: () => {
-                dialog.warning({
+                window.$dialog.warning({
                   title: '警告',
                   content: '确定删除该服务器吗',
                   positiveText: '确定',
@@ -133,16 +132,13 @@ export default defineComponent({
       await serverListStore.setServerInfo()
     }
     async function channel() {
-      await createChannel(formRef, model, route.params.server_id)
-      showModal.value = false
+      createChannel(formRef, model, route.params.server_id).then(() => {
+        showModal.value = false
+      })
     }
 
-    function channels() {
-      serverListStore.toSetChannelList()
-    }
-    watch(() => route.params.server_id, (value, oldValue) => {
-      if (value !== oldValue)
-        channels()
+    const channelInfo = ref({
+      key: null,
     })
     const dataTableOption: DropdownOption[] = [
       {
@@ -150,7 +146,14 @@ export default defineComponent({
         key: 'edit',
       },
       {
-        label: () => h('span', { style: { color: 'red' } }, '删除'),
+        label: () =>
+          h('a', {
+            style: { color: 'red' },
+            onClick: () => {
+              deleteChannel(route.params.server_id, channelInfo.value.key)
+              serverListStore.toSetChannelList()
+            },
+          }, '删除'),
         key: 'delete',
       },
     ]
@@ -175,6 +178,20 @@ export default defineComponent({
       serverListStore.channelType = channelType
     }
 
+    const groupInfoModel = ref({
+      name: '',
+      expanded: false,
+    })
+
+    const handleItemHeaderClick: CollapseProps['onItemHeaderClick'] = ({
+      name,
+      expanded,
+    }) => {
+      groupInfoModel.value.name = name
+      groupInfoModel.value.expanded = expanded
+    }
+
+    const showGroupSetting = ref(false)
     return {
       options,
       showModal,
@@ -199,7 +216,8 @@ export default defineComponent({
         return {
           onContextmenu:
             (e: MouseEvent) => {
-              message.info(JSON.stringify([data], null, 2))
+              channelInfo.value.key = data.key
+              message.info(JSON.stringify(data.key, null, 2))
               e.preventDefault()
               showDropdownRef.value = false
               nextTick().then(() => {
@@ -221,7 +239,11 @@ export default defineComponent({
       serverListStore,
       showGroupModal,
       groupModel,
-      channelList: serverListStore.getChannelList,
+      triggerAreas: ['main', 'arrow'],
+      handleItemHeaderClick,
+      showGroupSetting,
+      groupInfoModel,
+      channelList: computed(() => serverListStore.getChannelList),
     }
   },
 })
@@ -230,7 +252,9 @@ export default defineComponent({
 <template>
   <div style="padding: 10px">
     <n-flex justify="center" style="width: 220px">
-      {{ serverListStore.getServerName }}
+      <n-h4>
+        {{ serverListStore.getServerName }}
+      </n-h4>
       <n-dropdown
         placement="bottom"
         trigger="click"
@@ -245,7 +269,15 @@ export default defineComponent({
       </n-dropdown>
     </n-flex>
     <n-layout-sider>
-      <n-collapse style="width: 220px;">
+      <n-collapse style="width: 220px;" @item-header-click="handleItemHeaderClick">
+        <template #header-extra>
+          <n-button
+            text
+            :focusable="false"
+            i-carbon:settings
+            @click="showGroupSetting = true"
+          />
+        </template>
         <n-collapse style="margin-top: 20px">
           <n-menu
             :options="channelList[0]"
@@ -392,6 +424,26 @@ export default defineComponent({
     <n-button
       style="margin-top: 30px; width: 100%"
       @click="modifyServerName"
+    >
+      确定
+    </n-button>
+  </n-modal>
+  <n-modal
+    v-model:show="showGroupSetting"
+    class="custom-card"
+    preset="card"
+    :style="{ maxWidth: '600px' }"
+    title="设置"
+    size="huge"
+    :bordered="false"
+    :segmented="{
+      content: 'soft',
+      footer: 'soft',
+    }"
+  >
+    {{ groupInfoModel }}
+    <n-button
+      style="margin-top: 30px; width: 100%"
     >
       确定
     </n-button>
