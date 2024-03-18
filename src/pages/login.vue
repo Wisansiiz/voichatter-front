@@ -18,7 +18,7 @@ const rules = {
       validator(_rule: any, value: any) {
         if (!value)
           return new Error('需要用户名')
-        else if (!/^[a-zA-Z0-9_-]{4,16}$/.test(value))
+        else if (!/^[a-zA-Z0-9_-]{4,10}$/.test(value))
           return new Error('用户名不和规范')
         return true
       },

@@ -25,7 +25,7 @@ async function handleStart() {
 function initWebsocket(currentUserId) {
   socket = new WebSocket(`wss://192.168.31.198:9000/api/yy?id=${currentUserId.value}`)
   socket.onopen = () => {
-    gMessage.info('open_success')
+    window.$message.info('open_success')
   }
 
   socket.onmessage = (e) => {

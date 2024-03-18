@@ -29,33 +29,6 @@ const getThemeOverrides: any = computed(() => {
 })
 
 const getDarkTheme = computed(() => (designStore.darkTheme ? darkTheme : undefined))
-
-// let timer: NodeJS.Timer
-// function timekeeping() {
-//   // clearInterval(timer)
-//   // if (route.name == 'login' || isLock.value)
-//   //   return
-//   // 设置不锁屏
-//   // useScreenLock.setLock(false)
-//   // 重置锁屏时间
-//   // useScreenLock.setLockTime()
-//   timer = setInterval(() => {
-//     // 锁屏倒计时递减
-//     useScreenLock.setLockTime(lockTime.value - 1)
-//     if (lockTime.value <= 0) {
-//       // 设置锁屏
-//       useScreenLock.setLock(true)
-//       return clearInterval(timer)
-//     }
-//   }, 1000)
-// }
-// onMounted(() => {
-//   document.addEventListener('mousedown', timekeeping)
-// })
-
-// onUnmounted(() => {
-//   document.removeEventListener('mousedown', timekeeping)
-// })
 </script>
 
 <template>

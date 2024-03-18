@@ -68,7 +68,7 @@ onMounted(async () => {
 .layout-content {
   max-height: 90vh;
   min-height: 40vh;
-  padding: 20px;
+  padding: 10px;
 }
 .layout {
   max-height: 90vh;

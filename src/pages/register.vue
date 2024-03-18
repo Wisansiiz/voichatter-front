@@ -93,19 +93,6 @@ function register() {
   <n-flex justify="center">
     <div style="margin-top: 50px">
       <n-form ref="formRef" :model="model" :rules="rules">
-        <n-form-item path="username" label="用户名">
-          <n-input
-            v-model:value="model.username"
-            maxlength="20"
-            @keydown.enter.prevent
-          >
-            <template #prefix>
-              <n-icon>
-                <User />
-              </n-icon>
-            </template>
-          </n-input>
-        </n-form-item>
         <n-form-item path="email" label="邮箱">
           <n-auto-complete
             v-model:value="model.email"
@@ -119,11 +106,24 @@ function register() {
             </template>
           </n-auto-complete>
         </n-form-item>
+        <n-form-item path="username" label="用户名">
+          <n-input
+            v-model:value="model.username"
+            maxlength="20"
+            @keydown.enter.prevent
+          >
+            <template #prefix>
+              <n-icon>
+                <User />
+              </n-icon>
+            </template>
+          </n-input>
+        </n-form-item>
         <n-form-item path="password" label="密码">
           <n-input
             v-model:value="model.password"
             type="password"
-            show-password-on="mousedown"
+            show-password-on="click"
             maxlength="25"
             @input="handlePasswordInput"
             @keydown.enter.prevent
@@ -155,7 +155,7 @@ function register() {
           </n-input>
         </n-form-item>
       </n-form>
-      <div style="margin-top: 40px">
+      <div style="margin-top: 20px">
         <n-button
           style="width: 270px"
           type="warning"

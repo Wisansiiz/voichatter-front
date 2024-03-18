@@ -93,7 +93,6 @@ onMounted(() => {
       v-if="
         !isMobile && isMixMenuNoneSub && (navMode === 'vertical' || navMode === 'horizontal-mix')
       "
-      show-trigger="bar"
       :position="fixedMenu"
       :collapsed="collapsed"
       collapse-mode="width"

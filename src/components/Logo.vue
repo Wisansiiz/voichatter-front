@@ -1,26 +1,28 @@
 <script lang="ts">
 import { websiteConfig } from '~/config/website.config'
 
-export default {
+export default defineComponent({
   name: 'Logo',
   props: {
     collapsed: {
       type: Boolean,
     },
   },
-  data() {
+  setup() {
     return {
       websiteConfig,
     }
   },
-}
+})
 </script>
 
 <template>
   <div class="logo">
     <img :src="websiteConfig.logo" alt="" :class="{ 'mr-2': !collapsed }">
     <h2 v-show="!collapsed" class="title">
-      {{ websiteConfig.title }}
+      <RouterLink to="/">
+        {{ websiteConfig.title }}
+      </RouterLink>
     </h2>
   </div>
 </template>
@@ -43,5 +45,10 @@ export default {
   .title {
     margin: 0;
   }
+}
+h2 a {
+  text-decoration: none;
+  outline: none;
+  color: inherit;
 }
 </style>

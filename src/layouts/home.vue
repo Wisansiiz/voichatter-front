@@ -1,15 +1,20 @@
+<script setup lang="ts">
+</script>
+
 <template>
+  <!--  <n-flex justify="center"> -->
   <div class="contain">
     <RouterView />
     <div mx-auto mt-5 text-center text-sm opacity-50>
       [Home Layout]
     </div>
   </div>
+<!--  </n-flex> -->
 </template>
 
 <style scoped>
 .contain {
-  height: 100%;
+  margin-top: 10%;
   background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
