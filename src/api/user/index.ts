@@ -24,10 +24,11 @@ export async function userLogin(isLoading: Ref<UnwrapRef<boolean>>, model: Ref<U
       userStore.setToken(data.data.token)
       if (localStore.token || sessionStore.token) {
         await router.push('/')
-        gMessage.success('登录成功')
+        window.$message.success('登录成功')
+        storage.set('ACCESS_TOKEN', userStore.token)
       }
       else {
-        gMessage.error(data.message)
+        window.$message.error(data.message)
       }
     })
     .finally(() => {
@@ -43,16 +44,15 @@ export function userRegister(formRef: any, model: Ref<UnwrapRef<{
   formRef.value?.validate(async (errors: any) => {
     if (!errors) {
       await service.post('/register', model)
-      gMessage.success('注册成功！')
+      window.$message.success('注册成功！')
     }
-    else { gMessage.warning('请完整填写注册表单内容！') }
+    else { window.$message.warning('请完整填写注册表单内容！') }
   })
 }
 export async function userLogout() {
   await service.post('/logout').then(() => {
-    localStore.token = ''
-    sessionStore.token = ''
-    gMessage.success('退出成功')
+    storage.clear()
+    window.$message.success('退出成功')
   }).then(() => router.push('/login'))
 }
 export async function userList(serverId: any) {

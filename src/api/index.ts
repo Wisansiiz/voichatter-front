@@ -16,10 +16,9 @@ service.interceptors.response.use(
     if (result.data.code === 200 || result.data.code === 0)
       return result.data
     window.$message.error(result.data.message)
-    if (result.data.code > 100 && router.currentRoute.value.path !== '/login') {
+    if (!storage.get('ACCESS_TOKEN') && router.currentRoute.value.path !== '/login') {
       await router.push('/login')
-      sessionStore.token = ''
-      localStore.token = ''
+      storage.clear()
     }
     return Promise.reject(result.data)
   },
@@ -30,4 +29,5 @@ service.interceptors.response.use(
     return Promise.reject(err)
   },
 )
-export { service, baseURL }
+
+export { service }
