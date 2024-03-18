@@ -6,6 +6,8 @@
 export {}
 declare global {
   const EffectScope: typeof import('vue')['EffectScope']
+  const Storage: typeof import('~/composables/utils/Storage')['default']
+  const addOnMessage: typeof import('./src/composables/websocket')['addOnMessage']
   const asyncComputed: typeof import('@vueuse/core')['asyncComputed']
   const autoResetRef: typeof import('@vueuse/core')['autoResetRef']
   const computed: typeof import('vue')['computed']
@@ -18,6 +20,7 @@ declare global {
   const createApp: typeof import('vue')['createApp']
   const createEventHook: typeof import('@vueuse/core')['createEventHook']
   const createGlobalState: typeof import('@vueuse/core')['createGlobalState']
+  const createImageVNode: typeof import('~/composables/utils')['createImageVNode']
   const createInjectionState: typeof import('@vueuse/core')['createInjectionState']
   const createReactiveFn: typeof import('@vueuse/core')['createReactiveFn']
   const createReusableTemplate: typeof import('@vueuse/core')['createReusableTemplate']
@@ -34,13 +37,14 @@ declare global {
   const eagerComputed: typeof import('@vueuse/core')['eagerComputed']
   const effectScope: typeof import('vue')['effectScope']
   const extendRef: typeof import('@vueuse/core')['extendRef']
-  const gDialog: typeof import('./src/composables/gDiscreteApi')['gDialog']
-  const gLoadingBar: typeof import('./src/composables/gDiscreteApi')['gLoadingBar']
-  const gLoadingBarDone: typeof import('./src/composables/gDiscreteApi')['gLoadingBarDone']
-  const gMessage: typeof import('./src/composables/gDiscreteApi')['gMessage']
-  const gNotification: typeof import('./src/composables/gDiscreteApi')['gNotification']
+  const gDialog: typeof import('~/composables/test/gDiscreteApi')['gDialog']
+  const gLoadingBar: typeof import('~/composables/test/gDiscreteApi')['gLoadingBar']
+  const gLoadingBarDone: typeof import('~/composables/test/gDiscreteApi')['gLoadingBarDone']
+  const gNotification: typeof import('~/composables/test/gDiscreteApi')['gNotification']
+  const getActive: typeof import('./src/composables/websocket')['getActive']
   const getCurrentInstance: typeof import('vue')['getCurrentInstance']
   const getCurrentScope: typeof import('vue')['getCurrentScope']
+  const getSocket: typeof import('./src/composables/websocket')['getSocket']
   const h: typeof import('vue')['h']
   const ignorableWatch: typeof import('@vueuse/core')['ignorableWatch']
   const inject: typeof import('vue')['inject']
@@ -51,6 +55,7 @@ declare global {
   const isReactive: typeof import('vue')['isReactive']
   const isReadonly: typeof import('vue')['isReadonly']
   const isRef: typeof import('vue')['isRef']
+  const lighten: typeof import('~/composables/utils')['lighten']
   const login: typeof import('./src/composables/authorized')['login']
   const logout: typeof import('./src/composables/authorized')['logout']
   const makeDestructurable: typeof import('@vueuse/core')['makeDestructurable']
@@ -92,12 +97,15 @@ declare global {
   const refThrottled: typeof import('@vueuse/core')['refThrottled']
   const refWithControl: typeof import('@vueuse/core')['refWithControl']
   const register: typeof import('./src/composables/authorized')['register']
+  const renderIcon: typeof import('~/composables/utils')['renderIcon']
   const resolveComponent: typeof import('vue')['resolveComponent']
   const resolveRef: typeof import('@vueuse/core')['resolveRef']
   const resolveUnref: typeof import('@vueuse/core')['resolveUnref']
+  const sendMsg: typeof import('./src/composables/websocket')['sendMsg']
   const shallowReactive: typeof import('vue')['shallowReactive']
   const shallowReadonly: typeof import('vue')['shallowReadonly']
   const shallowRef: typeof import('vue')['shallowRef']
+  const storage: typeof import('~/composables/utils/Storage')['storage']
   const syncRef: typeof import('@vueuse/core')['syncRef']
   const syncRefs: typeof import('@vueuse/core')['syncRefs']
   const templateRef: typeof import('@vueuse/core')['templateRef']
@@ -297,6 +305,7 @@ declare global {
   const watchThrottled: typeof import('@vueuse/core')['watchThrottled']
   const watchTriggerable: typeof import('@vueuse/core')['watchTriggerable']
   const watchWithFilter: typeof import('@vueuse/core')['watchWithFilter']
+  const websocket: typeof import('./src/composables/websocket')['default']
   const whenever: typeof import('@vueuse/core')['whenever']
 }
 // for type re-export
@@ -339,8 +348,6 @@ declare module 'vue' {
     readonly eagerComputed: UnwrapRef<typeof import('@vueuse/core')['eagerComputed']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
-    readonly gLoadingBar: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gLoadingBar']>
-    readonly gMessage: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gMessage']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
@@ -630,8 +637,6 @@ declare module '@vue/runtime-core' {
     readonly eagerComputed: UnwrapRef<typeof import('@vueuse/core')['eagerComputed']>
     readonly effectScope: UnwrapRef<typeof import('vue')['effectScope']>
     readonly extendRef: UnwrapRef<typeof import('@vueuse/core')['extendRef']>
-    readonly gLoadingBar: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gLoadingBar']>
-    readonly gMessage: UnwrapRef<typeof import('./src/composables/gDiscreteApi')['gMessage']>
     readonly getCurrentInstance: UnwrapRef<typeof import('vue')['getCurrentInstance']>
     readonly getCurrentScope: UnwrapRef<typeof import('vue')['getCurrentScope']>
     readonly h: UnwrapRef<typeof import('vue')['h']>
