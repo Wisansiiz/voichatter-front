@@ -20,9 +20,10 @@ export default defineComponent({
     let socket: any = null
     const userStore = useUserStore()
     const route: any = useRoute()
+    const params = useRoute('/[server_id]/[name]').params
 
     async function queryHistoryMessages() {
-      const response = await service.get(`/messages/${route.params.server_id}/${route.params.name}`)
+      const response = await service.get(`/messages/${params.server_id}/${params.name}`)
       const { messageList } = response.data
       messages.value = messageList
       if (!messages.value)

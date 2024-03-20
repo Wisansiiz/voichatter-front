@@ -1,20 +1,20 @@
 <script setup>
 import { ref } from 'vue'
 import { useUserStore } from '~/store/modules/user'
+import { wssBase } from '~/api'
 
-// eslint-disable-next-line unused-imports/no-unused-vars
-let currentUserId = null
+// let currentUserId = null
 const videoContainer = ref()
 let socket = null
 const pcMap = new Map()
 let localStream = null
 const localVideo = ref()
 const params = useRoute('/[server_id]/[name]').params
-const channelId = params.server_id + params.name
+// const channelId = params.server_id + params.name
 const userStore = useUserStore()
 
 function initWebsocket() {
-  socket = new WebSocket(`wss://192.168.31.198:9000/api/yy?channelId=${channelId}&token=${encodeURIComponent(userStore.getToken)}`)
+  socket = new WebSocket(`${wssBase}?serverId=${params.server_id}&channelId=${params.name}&token=${encodeURIComponent(userStore.getToken)}`)
   socket.onopen = () => {
     window.$message.success('连接成功')
   }
@@ -25,10 +25,7 @@ function initWebsocket() {
   socket.onmessage = (e) => {
     const message = e.data
     const { code, data } = JSON.parse(message)
-    if (code === 'authorization') {
-      currentUserId = data.userId
-    }
-    else if (code === 'offer') {
+    if (code === 'offer') {
       // 接收offer
       getOffer(data)
     }
@@ -36,7 +33,7 @@ function initWebsocket() {
       // 接收answer
       getAnswer(data)
     }
-    else if (code === 'icecandidate') {
+    else if (code === 'candidate') {
       const { fromId, candidate } = data
       const pc = pcMap.get(fromId)
       pc.addIceCandidate(candidate)
@@ -87,7 +84,7 @@ async function sendOffer(targetId) {
   pc.addEventListener('icecandidate', (e) => {
     if (e.candidate) {
       const message = {
-        code: 'icecandidate',
+        code: 'candidate',
         data: {
           targetId,
           candidate: e.candidate,
@@ -125,7 +122,7 @@ async function getOffer({ fromId: targetId, offer }) {
   pc.addEventListener('icecandidate', (e) => {
     if (e.candidate) {
       const message = {
-        code: 'icecandidate',
+        code: 'candidate',
         data: {
           targetId,
           candidate: e.candidate,
