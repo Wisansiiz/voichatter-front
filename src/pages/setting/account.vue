@@ -1,7 +1,5 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
-import BasicSetting from './BasicSetting.vue'
-import SafetySetting from './SafetySetting.vue'
 
 const typeTabList = [
   {
@@ -19,7 +17,7 @@ const typeTabList = [
 const type = ref(1)
 const typeTitle = ref('基本设置')
 
-function switchType(e) {
+function switchType(e: any) {
   type.value = e.key
   typeTitle.value = e.name
 }

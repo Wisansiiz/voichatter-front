@@ -1,5 +1,5 @@
 <script lang="ts">
-import { service } from '~/api'
+import { service, wssBase } from '~/api'
 import { useUserStore } from '~/store/modules/user'
 
 interface Message {
@@ -30,7 +30,7 @@ export default defineComponent({
         window.$message.warning('该频道没有更多信息了')
     }
     function initWebsocket() {
-      socket = new WebSocket(`wss://192.168.31.198:9000/api/wz?serverId=${route.params.server_id}&channelId=${route.params.name}&token=${encodeURIComponent(userStore.getToken)}`)
+      socket = new WebSocket(`${wssBase}/api/wz?serverId=${route.params.server_id}&channelId=${route.params.name}&token=${encodeURIComponent(userStore.getToken)}`)
       socket.onopen = () => {
         window.$message.success('连接成功')
         queryHistoryMessages()

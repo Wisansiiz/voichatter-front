@@ -1,10 +1,7 @@
 <script lang="ts">
-import Ws from '~/pages/[server_id]/ws.vue'
-import Multiple from '~/pages/[server_id]/multiple.vue'
 import { useServerListStore } from '~/store/modules/serverList'
 
 export default defineComponent({
-  components: { Ws, Multiple },
   setup() {
     const router = useRouter()
     const route: any = useRoute()

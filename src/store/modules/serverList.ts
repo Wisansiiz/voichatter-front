@@ -70,6 +70,9 @@ export const useServerListStore = defineStore(
     const getMenuOptions = computed(() => menuOptions)
     const getChannelType = computed(() => channelType)
 
+    function setChannelType(type: string) {
+      channelType.value = type
+    }
     async function setServerInfo() {
       const menu = [] as any[]
       menu.push({
@@ -213,9 +216,10 @@ export const useServerListStore = defineStore(
       getServerName,
       toSetChannelList,
       getChannelList,
-      channelType,
       getMenuOptions,
       getChannelType,
+      channelType,
+      setChannelType,
     }
   },
 )

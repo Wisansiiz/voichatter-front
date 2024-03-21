@@ -175,7 +175,7 @@ export default defineComponent({
     }
 
     function handleUpdateValue(key: any, { channelType }: any) {
-      serverListStore.channelType = channelType
+      serverListStore.setChannelType(channelType)
     }
 
     const groupInfoModel = ref({
