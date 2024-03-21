@@ -43,15 +43,10 @@ declare module 'vue-router/auto/routes' {
     '/[...all]': RouteRecordInfo<'/[...all]', '/:all(.*)', { all: ParamValue<true> }, { all: ParamValue<false> }>,
     '/[server_id]': RouteRecordInfo<'/[server_id]', '/:server_id', { server_id: ParamValue<true> }, { server_id: ParamValue<false> }>,
     '/[server_id]/[name]': RouteRecordInfo<'/[server_id]/[name]', '/:server_id/:name', { server_id: ParamValue<true>, name: ParamValue<true> }, { server_id: ParamValue<false>, name: ParamValue<false> }>,
-    '/[server_id]/multiple': RouteRecordInfo<'/[server_id]/multiple', '/:server_id/multiple', { server_id: ParamValue<true> }, { server_id: ParamValue<false> }>,
-    '/[server_id]/single': RouteRecordInfo<'/[server_id]/single', '/:server_id/single', { server_id: ParamValue<true> }, { server_id: ParamValue<false> }>,
-    '/[server_id]/ws': RouteRecordInfo<'/[server_id]/ws', '/:server_id/ws', { server_id: ParamValue<true> }, { server_id: ParamValue<false> }>,
     '/hi/[name]': RouteRecordInfo<'/hi/[name]', '/hi/:name', { name: ParamValue<true> }, { name: ParamValue<false> }>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/register': RouteRecordInfo<'/register', '/register', Record<never, never>, Record<never, never>>,
     '/setting/account': RouteRecordInfo<'/setting/account', '/setting/account', Record<never, never>, Record<never, never>>,
-    '/setting/BasicSetting': RouteRecordInfo<'/setting/BasicSetting', '/setting/BasicSetting', Record<never, never>, Record<never, never>>,
-    '/setting/SafetySetting': RouteRecordInfo<'/setting/SafetySetting', '/setting/SafetySetting', Record<never, never>, Record<never, never>>,
   }
 }
 

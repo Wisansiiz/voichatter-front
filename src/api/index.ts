@@ -5,6 +5,7 @@ import { router } from '~/router'
 const localStore = useAuthLocalStore()
 const sessionStore = useAuthSessionStore()
 const baseURL = 'https://192.168.31.198:9000'
+const wssBase = 'wss://192.168.31.198:9000'
 const service = axios.create({ baseURL, timeout: 10000 })
 service.interceptors.request.use((config) => {
   if (sessionStore.token || localStore.token)
@@ -30,4 +31,4 @@ service.interceptors.response.use(
   },
 )
 
-export { service }
+export { service, wssBase }

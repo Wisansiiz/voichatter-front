@@ -9,10 +9,12 @@ declare module 'vue' {
   export interface GlobalComponents {
     AppProvider: typeof import('./src/components/AppProvider.vue')['default']
     AsideMenu: typeof import('./src/components/AsideMenu.vue')['default']
+    BasicSetting: typeof import('./src/components/BasicSetting.vue')['default']
     ChatBubble: typeof import('./src/components/ChatBubble.vue')['default']
     Footer: typeof import('./src/components/Footer.vue')['default']
     Logo: typeof import('./src/components/Logo.vue')['default']
     MainView: typeof import('./src/components/MainView.vue')['default']
+    Multiple: typeof import('./src/components/Multiple.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
     NAutoComplete: typeof import('naive-ui')['NAutoComplete']
     NAvatar: typeof import('naive-ui')['NAvatar']
@@ -73,6 +75,8 @@ declare module 'vue' {
     ProjectSetting: typeof import('./src/components/Header/ProjectSetting.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SafetySetting: typeof import('./src/components/SafetySetting.vue')['default']
+    Single: typeof import('./src/components/Single.vue')['default']
     TheChannelList: typeof import('./src/components/TheChannelList.vue')['default']
     TheContent: typeof import('./src/components/TheContent.vue')['default']
     TheFooter: typeof import('./src/components/TheFooter.vue')['default']
@@ -80,5 +84,6 @@ declare module 'vue' {
     TheInfoMenu: typeof import('./src/components/TheInfoMenu.vue')['default']
     TheInput: typeof import('./src/components/TheInput.vue')['default']
     TheServerMenu: typeof import('./src/components/TheServerMenu.vue')['default']
+    Ws: typeof import('./src/components/Ws.vue')['default']
   }
 }
