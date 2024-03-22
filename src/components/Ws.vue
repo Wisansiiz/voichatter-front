@@ -55,6 +55,17 @@ export default defineComponent({
         messageText.value = ''
       }
     }
+
+    function shutdown() {
+      try {
+        if (socket)
+          socket.close()
+      }
+      catch (e) {
+        console.error(e)
+        window.$message.error('发生错误')
+      }
+    }
     return {
       queryHistoryMessages,
       sendMessage,
@@ -63,6 +74,7 @@ export default defineComponent({
       messageText,
       userId: userStore.getUserId,
       relinkWebsocket,
+      shutdown,
     }
   },
 })
@@ -86,6 +98,9 @@ export default defineComponent({
   </n-button>
   <n-button :focusable="false" @click="relinkWebsocket">
     Relink
+  </n-button>
+  <n-button :focusable="false" @click="shutdown">
+    断开
   </n-button>
   <div style="margin-bottom: 70px" />
   <n-layout-footer
