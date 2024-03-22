@@ -2,16 +2,7 @@
 import { defineComponent, h, nextTick, ref } from 'vue'
 import type { DataTableColumns, DropdownOption } from 'naive-ui'
 import { NTag, useMessage } from 'naive-ui'
-import { createImageVNode } from '~/composables/utils'
-
-interface ServerMember {
-  userID: number
-  username: string
-  email: string
-  avatarURL: string
-  SPermissions: string
-  lastLoginDate: string
-}
+import { useServerListStore } from '~/store/modules/serverList'
 
 const options: DropdownOption[] = [
   {
@@ -25,27 +16,14 @@ const options: DropdownOption[] = [
 ]
 
 export default defineComponent({
-  props: {
-    menuOptions: {
-      type: Array<ServerMember>,
-      default: () => [],
-    },
-  },
-  setup(props) {
-    const menu = computed(() => {
-      return props.menuOptions.map((item) => {
-        return {
-          avatarURL: createImageVNode('https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100', item.username),
-          username: item.username,
-          SPermissions: item.SPermissions,
-        }
-      })
-    })
+  setup() {
+    const serverListStore = useServerListStore()
+    const route: any = useRoute()
     const message = useMessage()
     const showDropdownRef = ref(false)
     const xRef = ref(0)
     const yRef = ref(0)
-    const colsReactive: DataTableColumns<ServerMember> = [
+    const colsReactive: DataTableColumns = [
       {
         title: '头像',
         key: 'avatarURL',
@@ -74,9 +52,13 @@ export default defineComponent({
         },
       },
     ]
+    const updateMemberList = () => {
+      serverListStore.toSetMemberList()
+    }
+    onMounted(updateMemberList)
+    watch(() => route.params.server_id, updateMemberList)
 
     return {
-      menu,
       cols: colsReactive,
       options,
       showDropdown: showDropdownRef,
@@ -102,13 +84,14 @@ export default defineComponent({
           },
         }
       },
+      data: computed(() => serverListStore.memberList),
     }
   },
 })
 </script>
 
 <template>
-  <n-data-table :columns="cols" :data="menu" :row-props="rowProps" />
+  <n-data-table :columns="cols" :data="data" :row-props="rowProps" />
   <n-dropdown
     placement="bottom-start"
     trigger="manual"

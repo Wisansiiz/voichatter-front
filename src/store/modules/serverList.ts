@@ -4,6 +4,7 @@ import { Add } from '@vicons/ionicons5'
 import { createImageVNode, renderIcon } from '~/composables/utils'
 import { createServer, getServerList, joinServer } from '~/api/server'
 import { findChannelList } from '~/api/channel'
+import { userList } from '~/api/user'
 
 interface serverRep {
   serverId: number
@@ -39,6 +40,14 @@ interface groupRep {
     },
   ]
 }
+interface serverMember {
+  userID: number
+  username: string
+  email: string
+  avatarURL: string
+  SPermissions: string
+  lastLoginDate: string
+}
 export const useServerListStore = defineStore(
   'server-list-info',
   () => {
@@ -48,6 +57,7 @@ export const useServerListStore = defineStore(
     const showModal = ref(false)
     const channelType = ref('')
     const serverMap = ref(new Map<number, string>())
+    const memberList = ref([] as any[])
 
     const changeShowModal = computed(() => !showModal.value)
     const getServerName = computed(() => {
@@ -69,6 +79,20 @@ export const useServerListStore = defineStore(
     })
     const getMenuOptions = computed(() => menuOptions)
     const getChannelType = computed(() => channelType)
+    const getMemberList = computed(() => memberList)
+
+    async function toSetMemberList() {
+      userList(route.params.server_id).then((res: serverMember[]) => {
+        memberList.value = res.map((item) => {
+          return {
+            avatarURL: createImageVNode(item.avatarURL, item.username),
+            username: item.username,
+            SPermissions: item.SPermissions,
+          }
+        })
+      })
+      return memberList.value
+    }
 
     function setChannelType(type: string) {
       channelType.value = type
@@ -220,6 +244,9 @@ export const useServerListStore = defineStore(
       getChannelType,
       channelType,
       setChannelType,
+      toSetMemberList,
+      getMemberList,
+      memberList,
     }
   },
 )
