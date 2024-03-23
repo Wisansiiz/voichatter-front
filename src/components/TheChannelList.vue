@@ -1,7 +1,8 @@
 <script lang="ts">
 import type { CollapseProps, DropdownOption, FormInst } from 'naive-ui'
 import { Menu } from '@vicons/ionicons5'
-import { createChannel, deleteChannel } from '~/api/channel'
+import { RouterLink } from 'vue-router'
+import { createChannel, deleteChannel, findChannelList } from '~/api/channel'
 import { deleteServerByOwner, modifyServerNameByOwner } from '~/api/server'
 import { useServerListStore } from '~/store/modules/serverList'
 
@@ -151,7 +152,7 @@ export default defineComponent({
             style: { color: 'red' },
             onClick: () => {
               deleteChannel(route.params.server_id, channelInfo.value.key)
-              serverListStore.toSetChannelList()
+              toSetChannelList()
             },
           }, '删除'),
         key: 'delete',
@@ -160,10 +161,6 @@ export default defineComponent({
     const showDropdownRef = ref(false)
     const xRef = ref(0)
     const yRef = ref(0)
-
-    onMounted(() => {
-      serverListStore.toSetChannelList()
-    })
 
     function modifyServerName() {
       modifyServerNameModel.value.serverId = route.params.server_id
@@ -190,8 +187,86 @@ export default defineComponent({
       groupInfoModel.value.name = name
       groupInfoModel.value.expanded = expanded
     }
-
     const showGroupSetting = ref(false)
+
+    interface dataRep {
+      channelList: channelRep[]
+      groupList?: groupRep[]
+    }
+    interface channelRep {
+      channelId: number
+      channelName: string
+      serverId: number
+      type: string
+      createUserId: number
+      groupId?: number
+    }
+    interface groupRep {
+      groupId: number
+      serverId: number
+      groupName: string
+      channelList: [
+        {
+          channelId: number
+          channelName: string
+          serverId: number
+          type: string
+          createUserId: number
+        },
+      ]
+    }
+    const channelList = ref([] as any[])
+    async function toSetChannelList() {
+      channelList.value = [] as any[]
+      findChannelList(route.params.server_id).then((res: dataRep) => {
+        if (res.channelList) {
+          const arr = [] as any[]
+          res.channelList.forEach((data: channelRep) => {
+            arr.push({
+              label: () =>
+                h(
+                  RouterLink,
+                  {
+                    to: `/${route.params.server_id}/${encodeURIComponent(data.channelId)}`,
+                  },
+                  { default: () => `${data.channelName}` },
+                ),
+              key: data.channelId,
+              channelType: data.type,
+            })
+          })
+          channelList.value.push(arr)
+        }
+        if (res.groupList) {
+          res.groupList.forEach((data: groupRep) => {
+            channelList.value.push({
+              name: data.groupName,
+              index: data.groupId,
+              option: data.channelList.map((v) => {
+                return {
+                  label: () =>
+                    h(
+                      RouterLink,
+                      {
+                        to: `/${route.params.server_id}/${encodeURIComponent(v.channelId)}`,
+                      },
+                      { default: () => `${v.channelName}` },
+                    ),
+                  key: v.channelId,
+                  channelType: v.type,
+                }
+              }),
+            })
+          })
+        }
+      })
+    }
+    watch(() => route.params.server_id, () => {
+      toSetChannelList()
+    })
+    onMounted(() => {
+      toSetChannelList()
+    })
     return {
       options,
       showModal,
@@ -243,7 +318,7 @@ export default defineComponent({
       handleItemHeaderClick,
       showGroupSetting,
       groupInfoModel,
-      channelList: computed(() => serverListStore.getChannelList),
+      channelList,
     }
   },
 })
