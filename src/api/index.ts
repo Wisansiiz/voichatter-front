@@ -21,6 +21,9 @@ service.interceptors.response.use(
       await router.push('/login')
       storage.clear()
     }
+    else {
+      router.back()
+    }
     return Promise.reject(result.data)
   },
   (err) => {
