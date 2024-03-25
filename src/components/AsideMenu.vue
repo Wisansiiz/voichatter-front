@@ -53,11 +53,12 @@ export default defineComponent({
       formRef.value?.validate((errors) => {
         if (!errors) {
           serverListStore.toCreateServer(model.value).then((data) => {
-            if (data === 'success')
+            if (data === 'success') {
               window.$message.success('创建成功')
-            showModal2.value = false
-            serverListStore.showModal = false
-            serverListStore.setServerInfo()
+              showModal2.value = false
+              serverListStore.showModal = false
+              serverListStore.setServerInfo()
+            }
           })
         }
         else {
