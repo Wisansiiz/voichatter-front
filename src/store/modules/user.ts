@@ -18,7 +18,7 @@ export interface IUserState {
 const localStore = useAuthLocalStore()
 const sessionStore = useAuthSessionStore()
 export const useUserStore = defineStore({
-  id: 'app-user',
+  id: 'USER_INFO',
   state: (): IUserState => ({
     token: localStore.token || sessionStore.token,
     userId: 0,
