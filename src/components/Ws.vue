@@ -1,6 +1,6 @@
 <script lang="ts">
-import { service, wssBase } from '~/api'
 import { useUserStore } from '~/store/modules/user'
+import { service, wssBase } from '~/api'
 
 interface Message {
   messageId: number
@@ -17,13 +17,12 @@ export default defineComponent({
   setup() {
     const messageText = ref('')
     const messages = ref([] as Message[])
-    let socket: any = null
+    let socket: WebSocket
     const userStore = useUserStore()
     const route: any = useRoute()
-    const params = useRoute('/[server_id]/[name]').params
 
     async function queryHistoryMessages() {
-      const response = await service.get(`/messages/${params.server_id}/${params.name}`)
+      const response = await service.get(`/messages/${route.params.server_id}/${route.params.name}`)
       const { messageList } = response.data
       messages.value = messageList
       if (!messages.value)

@@ -1,73 +1,82 @@
 <script lang="ts">
-import { ref } from 'vue'
 import { useUserStore } from '~/store/modules/user'
 import { wssBase } from '~/api'
 
 export default defineComponent({
   setup() {
     const videoContainer = ref()
-    let socket: WebSocket
+    const socket: Ref<WebSocket | null> = ref(null)
     const pcMap = new Map()
     let localStream: MediaStream
     const localVideo = ref()
-    const params = useRoute('/[server_id]/[name]').params
     const userStore = useUserStore()
+    const route: any = useRoute()
 
-    function initWebsocket() {
-      socket = new WebSocket(`${wssBase}/api/yy?serverId=${params.server_id}&channelId=${params.name}&token=${encodeURIComponent(userStore.getToken)}`)
-      socket.onopen = () => {
-        window.$message.success('连接成功')
-      }
-      socket.onclose = () => {
-        window.$message.error('连接断开')
-      }
-
-      socket.onmessage = (e) => {
-        const message = e.data
-        const { code, data } = JSON.parse(message)
-        if (code === 'offer') {
-          // 接收offer
-          getOffer(data)
+    async function createWebsocket() {
+      return new Promise((resolve) => {
+        // try {
+        if (socket.value) {
+          socket.value.close()
+          socket.value = null
         }
-        else if (code === 'answer') {
-          // 接收answer
-          getAnswer(data)
+        socket.value = new WebSocket(`${wssBase}/api/yy?serverId=${route.params.server_id}&channelId=${route.params.name}&token=${encodeURIComponent(userStore.getToken)}`)
+        socket.value.onopen = () => {
+          window.$message.success('连接成功')
+          resolve(socket.value)
         }
-        else if (code === 'candidate') {
-          const { fromId, candidate } = data
-          const pc = pcMap.get(fromId)
-          pc.addIceCandidate(candidate)
+        socket.value.onclose = () => {
+          window.$message.error('连接断开')
         }
-        else if (code === 'join_group') {
-          const { fromId } = data
-          sendOffer(fromId)
+      })
+    }
+    async function initWebsocket() {
+      await createWebsocket()
+      if (socket.value && socket.value.readyState === WebSocket.OPEN) {
+        socket.value.onmessage = async (e) => {
+          const message = e.data
+          const { code, data } = JSON.parse(message)
+          console.log(code)
+          if (code === 'offer') {
+            // 接收offer
+            await getOffer(data)
+          }
+          else if (code === 'answer') {
+            // 接收answer
+            await getAnswer(data)
+          }
+          else if (code === 'candidate') {
+            const { fromId, candidate } = data
+            const pc = pcMap.get(fromId)
+            pc.addIceCandidate(candidate)
+          }
+          else if (code === 'join_group') {
+            const { fromId } = data
+            await sendOffer(fromId)
+          }
+          else if (code === 'leave_group') {
+            const { fromId } = data
+            pcMap.delete(fromId)
+            const video = document.getElementById(fromId)
+            if (video)
+              video.remove()
+          }
         }
-        else if (code === 'leave_group') {
-          const { fromId } = data
-          pcMap.delete(fromId)
-          const video = document.getElementById(fromId)
-          if (video)
-            video.remove()
-        }
-      }
-
-      socket.onerror = (e) => {
-        window.$message.warning('连接错误')
-        console.error(e)
       }
     }
-
     async function handleJoin() {
-      initWebsocket()
-      localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-      } })
+      await initWebsocket()
+      localStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+        },
+      })
       localVideo.value.srcObject = localStream
       const message = {
         code: 'join_group',
       }
-      socket.send(JSON.stringify(message))
+      socket.value?.send(JSON.stringify(message))
     }
 
     async function sendOffer(targetId: any) {
@@ -92,7 +101,7 @@ export default defineComponent({
               candidate: e.candidate,
             },
           }
-          socket.send(JSON.stringify(message))
+          socket.value?.send(JSON.stringify(message))
         }
       })
       const description = await pc.createOffer()
@@ -104,7 +113,7 @@ export default defineComponent({
           offer: description,
         },
       }
-      socket.send(JSON.stringify(message))
+      socket.value?.send(JSON.stringify(message))
     }
 
     // 接收offer
@@ -130,7 +139,7 @@ export default defineComponent({
               candidate: e.candidate,
             },
           }
-          socket.send(JSON.stringify(message))
+          socket.value?.send(JSON.stringify(message))
         }
       })
       await pc.setRemoteDescription(offer)
@@ -143,7 +152,7 @@ export default defineComponent({
           answer: description,
         },
       }
-      socket.send(JSON.stringify(message))
+      socket.value?.send(JSON.stringify(message))
     }
 
     async function getAnswer({ fromId, answer }: any) {
@@ -157,7 +166,7 @@ export default defineComponent({
       const message = {
         code: 'leave_group',
       }
-      socket.send(JSON.stringify(message))
+      socket.value?.send(JSON.stringify(message))
       // 关闭所有与当前用户相关的RTCPeerConnections
       for (const [key, pc] of pcMap.entries()) {
         pc.close()
@@ -174,6 +183,10 @@ export default defineComponent({
       localVideo,
       handleJoin,
       hangUp,
+      socket,
+      show: () => {
+        console.log(socket.value?.readyState)
+      },
     }
   },
 })
@@ -190,6 +203,9 @@ export default defineComponent({
       </n-button>
       <n-button @click="hangUp">
         挂断
+      </n-button>
+      <n-button @click="show">
+        showDetails
       </n-button>
     </div>
   </div>
