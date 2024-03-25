@@ -21,7 +21,7 @@ service.interceptors.response.use(
       await router.push('/login')
       storage.clear()
     }
-    else {
+    else if (result.data.message === '验证失败') {
       router.back()
     }
     return Promise.reject(result.data)
