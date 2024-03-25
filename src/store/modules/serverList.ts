@@ -1,10 +1,12 @@
 import { defineStore } from 'pinia'
 import { RouterLink } from 'vue-router'
 import { Add } from '@vicons/ionicons5'
-import { createImageVNode, renderIcon } from '~/composables/utils'
+import { createImageVNode, renderIcon } from '~/composables'
 import { createServer, getServerList, joinServer } from '~/api/server'
-import { findChannelList } from '~/api/channel'
+
+// import { findChannelList } from '~/api/channel'
 import { userList } from '~/api/user'
+import { findChannelList } from '~/api/channel'
 
 interface serverRep {
   serverId: number
@@ -30,7 +32,7 @@ interface groupRep {
   groupId: number
   serverId: number
   groupName: string
-  channelList: [
+  channelList?: [
     {
       channelId: number
       channelName: string
@@ -52,10 +54,10 @@ export const useServerListStore = defineStore(
   'server-list-info',
   () => {
     const route: any = useRoute()
-    const serverList = ref(new Map<number, any[] | null>())
+    // const serverList = ref(new Map<number, any[] | null>())
     const menuOptions = ref<any[]>([])
     const showModal = ref(false)
-    const channelType = ref('')
+    const channelType = ref(storage.get('channelType'))
     const serverMap = ref(new Map<number, string>())
     const memberList = ref([] as any[])
 
@@ -66,32 +68,24 @@ export const useServerListStore = defineStore(
       if (name)
         return name
     })
-    const getChannelList = computed(() => {
-      const serverId = Number(route.params.server_id)
-      const cl = serverList.value.get(serverId)
-      if (cl)
-        return cl
-      let cl2 = [] as any[]
-      toSetChannelList().then(({ channelList }) => {
-        cl2 = channelList
-      })
-      return cl2
-    })
     const getMenuOptions = computed(() => menuOptions)
     const getChannelType = computed(() => channelType)
     const getMemberList = computed(() => memberList)
 
     async function toSetMemberList() {
-      userList(route.params.server_id).then((res: serverMember[]) => {
-        memberList.value = res.map((item) => {
-          return {
-            avatarURL: createImageVNode(item.avatarURL, item.username),
-            username: item.username,
-            SPermissions: item.SPermissions,
-          }
+      let ml = [] as any[]
+      return new Promise((resolve) => {
+        userList(route.params.server_id).then((res: serverMember[]) => {
+          ml = res.map((item) => {
+            return {
+              avatarURL: createImageVNode(item.avatarURL, item.username),
+              username: item.username,
+              SPermissions: item.SPermissions,
+            }
+          })
+          resolve(ml)
         })
       })
-      return memberList.value
     }
 
     function setChannelType(type: string) {
@@ -99,66 +93,70 @@ export const useServerListStore = defineStore(
     }
     async function setServerInfo() {
       const menu = [] as any[]
-      menu.push({
-        label: () =>
-          h(
-            'a',
-            {
-              onClick: () => {
-                showModal.value = true
+      return new Promise((resolve) => {
+        menu.push({
+          label: () =>
+            h(
+              'a',
+              {
+                onClick: () => {
+                  showModal.value = true
+                },
               },
-            },
-            { default: () => '添加服务器' },
-          ),
-        key: 'add',
-        icon: renderIcon(Add),
+              { default: () => '添加服务器' },
+            ),
+          key: 'add',
+          icon: renderIcon(Add),
+        })
+        serverMap.value = new Map<number, any>()
+        getServerList().then((res: { serverList: any }) => {
+          if (res.serverList) {
+            res.serverList.forEach((item: serverRep) => {
+              serverMap.value.set(item.serverId, item.serverName)
+              menu.push({
+                label: () =>
+                  h(
+                    RouterLink,
+                    {
+                      to: {
+                        path: `/${encodeURIComponent(item.serverId)}`,
+                      },
+                    },
+                    { default: () => item.serverName },
+                  ),
+                name: item.serverName,
+                key: item.serverId,
+                icon: renderIcon(createImageVNode(item.serverImgUrl, item.serverName)),
+              })
+            })
+          }
+          menuOptions.value = menu
+          resolve(menu)
+        })
       })
-      serverList.value = new Map<number, any[]>()
-      serverMap.value = new Map<number, any>()
-      getServerList().then((res: any) => {
-        res.serverList.forEach((item: serverRep) => {
-          serverList.value.set(item.serverId, null)
-          serverMap.value.set(item.serverId, item.serverName)
-          menu.push({
+    }
+
+    async function toCreateServer(model: any) {
+      return new Promise((resolve) => {
+        createServer(model).then((server: serverRep) => {
+          menuOptions.value.push({
             label: () =>
               h(
                 RouterLink,
                 {
                   to: {
-                    path: `/${encodeURIComponent(item.serverId)}`,
+                    path: `/${encodeURIComponent(server.serverId)}`,
                   },
                 },
-                { default: () => item.serverName },
+                { default: () => server.serverName },
               ),
-            name: item.serverName,
-            key: item.serverId,
-            icon: renderIcon(createImageVNode(item.serverImgUrl, item.serverName)),
+            name: server.serverName,
+            key: server.serverId,
+            icon: renderIcon(createImageVNode(server.serverImgUrl, server.serverName)),
           })
         })
-        menuOptions.value = menu
+        resolve('success')
       })
-      return { serverList, serverMap, menuOptions }
-    }
-
-    async function toCreateServer(model: any) {
-      createServer(model).then((server: serverRep) => {
-        menuOptions.value.push({
-          label: () =>
-            h(
-              RouterLink,
-              {
-                to: {
-                  path: `/${encodeURIComponent(server.serverId)}`,
-                },
-              },
-              { default: () => server.serverName },
-            ),
-          name: server.serverName,
-          key: server.serverId,
-          icon: renderIcon(createImageVNode(server.serverImgUrl, server.serverName)),
-        })
-      })
-      return 'success'
     }
 
     async function toJoinServer(serverId: number) {
@@ -180,56 +178,66 @@ export const useServerListStore = defineStore(
         })
       })
     }
-    async function toSetChannelList() {
-      const channelList = [] as any[]
-      findChannelList(route.params.server_id).then((res: dataRep) => {
-        if (res.channelList) {
-          const arr = [] as any[]
-          res.channelList.forEach((data: channelRep) => {
-            arr.push({
-              label: () =>
-                h(
-                  RouterLink,
-                  {
-                    to: `/${route.params.server_id}/${encodeURIComponent(data.channelId)}`,
-                  },
-                  { default: () => `${data.channelName}` },
-                ),
-              key: data.channelId,
-              channelType: data.type,
+    function toSetChannelList() {
+      const list = [] as any[]
+      return new Promise((resolve) => {
+        findChannelList(route.params.server_id).then((res: dataRep) => {
+          if (res.channelList) {
+            const arr = [] as any[]
+            res.channelList.forEach((data: channelRep) => {
+              arr.push({
+                label: () =>
+                  h(
+                    RouterLink,
+                    {
+                      to: `/${route.params.server_id}/${encodeURIComponent(data.channelId)}`,
+                    },
+                    { default: () => `${data.channelName}` },
+                  ),
+                key: data.channelId,
+                channelType: data.type,
+              })
             })
-          })
-          channelList.push(arr)
-        }
-        if (res.groupList) {
-          res.groupList.forEach((data: groupRep) => {
-            channelList.push({
-              name: data.groupName,
-              index: data.groupId,
-              option: data.channelList.map((v) => {
-                return {
-                  label: () =>
-                    h(
-                      RouterLink,
-                      {
-                        to: `/${route.params.server_id}/${encodeURIComponent(v.channelId)}`,
-                      },
-                      { default: () => `${v.channelName}` },
-                    ),
-                  key: v.channelId,
-                  channelType: v.type,
-                }
-              }),
+            list.push(arr)
+          }
+          if (res.groupList) {
+            res.groupList.forEach((data: groupRep) => {
+              if (data.channelList) {
+                list.push({
+                  name: data.groupName,
+                  index: data.groupId,
+                  option: data.channelList.map((v) => {
+                    return {
+                      label: () =>
+                        h(
+                          RouterLink,
+                          {
+                            to: `/${route.params.server_id}/${encodeURIComponent(v.channelId)}`,
+                          },
+                          { default: () => `${v.channelName}` },
+                        ),
+                      key: v.channelId,
+                      channelType: v.type,
+                    }
+                  }),
+                })
+              }
+              else {
+                list.push({
+                  name: data.groupName,
+                  index: data.groupId,
+                  option: [],
+                })
+              }
             })
-          })
-        }
-        serverList.value.set(Number(route.params.server_id), channelList)
+          }
+          resolve(list)
+        })
       })
-      return { channelList, serverList }
     }
 
     return {
-      serverList,
+      // serverList,
       menuOptions,
       showModal,
       serverMap,
@@ -238,8 +246,6 @@ export const useServerListStore = defineStore(
       toCreateServer,
       toJoinServer,
       getServerName,
-      toSetChannelList,
-      getChannelList,
       getMenuOptions,
       getChannelType,
       channelType,
@@ -247,6 +253,7 @@ export const useServerListStore = defineStore(
       toSetMemberList,
       getMemberList,
       memberList,
+      toSetChannelList,
     }
   },
 )
