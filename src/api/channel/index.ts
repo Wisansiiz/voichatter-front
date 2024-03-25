@@ -2,14 +2,18 @@ import { service } from '~/api'
 import type { response } from '~/composables/result'
 
 export async function createChannel(formRef: any, model: any, serverId: any) {
-  formRef.value?.validate(async (errors: any) => {
-    if (!errors) {
-      await service.post(`/channel/${serverId}`, model.value)
-      window.$message.success('创建成功')
-    }
-    else {
-      window.$message.error('验证失败')
-    }
+  let res: any
+  return new Promise((resolve) => {
+    formRef.value?.validate(async (errors: any) => {
+      if (!errors) {
+        res = await service.post(`/channel/${serverId}`, model.value)
+        window.$message.success('创建成功')
+      }
+      else {
+        window.$message.error('验证失败')
+      }
+      resolve(res)
+    })
   })
 }
 
