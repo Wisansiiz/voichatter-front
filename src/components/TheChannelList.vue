@@ -1,8 +1,7 @@
 <script lang="ts">
 import type { CollapseProps, DropdownOption, FormInst } from 'naive-ui'
 import { Menu } from '@vicons/ionicons5'
-import { RouterLink } from 'vue-router'
-import { createChannel, deleteChannel, findChannelList } from '~/api/channel'
+import { createChannel, deleteChannel } from '~/api/channel'
 import { deleteServerByOwner, modifyServerNameByOwner } from '~/api/server'
 import { useServerListStore } from '~/store/modules/serverList'
 
@@ -128,14 +127,24 @@ export default defineComponent({
     ]
 
     const serverListStore = useServerListStore()
-    async function deleteServer() {
-      await deleteServerByOwner(route.params.server_id)
-      await serverListStore.setServerInfo()
+    function deleteServer() {
+      deleteServerByOwner(route.params.server_id)
+      serverListStore.setServerInfo()
+    }
+
+    const channelList = ref([] as any[])
+    const toSetChannelList = () => {
+      serverListStore.toSetChannelList().then((res: any) => {
+        channelList.value = res
+      })
     }
     async function channel() {
-      createChannel(formRef, model, route.params.server_id).then(() => {
+      await createChannel(formRef, model, route.params.server_id).then((_res) => {
         showModal.value = false
       })
+      model.value.channel_name = null
+      model.value.type = null
+      toSetChannelList()
     }
 
     const channelInfo = ref({
@@ -150,8 +159,8 @@ export default defineComponent({
         label: () =>
           h('a', {
             style: { color: 'red' },
-            onClick: () => {
-              deleteChannel(route.params.server_id, channelInfo.value.key)
+            onClick: async () => {
+              await deleteChannel(route.params.server_id, channelInfo.value.key)
               toSetChannelList()
             },
           }, '删除'),
@@ -172,7 +181,9 @@ export default defineComponent({
     }
 
     function handleUpdateValue(key: any, { channelType }: any) {
+      // 更新频道类型
       serverListStore.setChannelType(channelType)
+      storage.set('channelType', channelType)
     }
 
     const groupInfoModel = ref({
@@ -189,84 +200,9 @@ export default defineComponent({
     }
     const showGroupSetting = ref(false)
 
-    interface dataRep {
-      channelList: channelRep[]
-      groupList?: groupRep[]
-    }
-    interface channelRep {
-      channelId: number
-      channelName: string
-      serverId: number
-      type: string
-      createUserId: number
-      groupId?: number
-    }
-    interface groupRep {
-      groupId: number
-      serverId: number
-      groupName: string
-      channelList: [
-        {
-          channelId: number
-          channelName: string
-          serverId: number
-          type: string
-          createUserId: number
-        },
-      ]
-    }
-    const channelList = ref([] as any[])
-    async function toSetChannelList() {
-      channelList.value = [] as any[]
-      findChannelList(route.params.server_id).then((res: dataRep) => {
-        if (res.channelList) {
-          const arr = [] as any[]
-          res.channelList.forEach((data: channelRep) => {
-            arr.push({
-              label: () =>
-                h(
-                  RouterLink,
-                  {
-                    to: `/${route.params.server_id}/${encodeURIComponent(data.channelId)}`,
-                  },
-                  { default: () => `${data.channelName}` },
-                ),
-              key: data.channelId,
-              channelType: data.type,
-            })
-          })
-          channelList.value.push(arr)
-        }
-        if (res.groupList) {
-          res.groupList.forEach((data: groupRep) => {
-            channelList.value.push({
-              name: data.groupName,
-              index: data.groupId,
-              option: data.channelList.map((v) => {
-                return {
-                  label: () =>
-                    h(
-                      RouterLink,
-                      {
-                        to: `/${route.params.server_id}/${encodeURIComponent(v.channelId)}`,
-                      },
-                      { default: () => `${v.channelName}` },
-                    ),
-                  key: v.channelId,
-                  channelType: v.type,
-                }
-              }),
-            })
-          })
-        }
-      })
-    }
-    watch(() => route.params.server_id, () => {
-      toSetChannelList()
-    })
-    onMounted(() => {
-      toSetChannelList()
-    })
+    onMounted(toSetChannelList)
+    watch(() => route.params.server_id, toSetChannelList)
+
     return {
       options,
       showModal,
@@ -319,6 +255,7 @@ export default defineComponent({
       showGroupSetting,
       groupInfoModel,
       channelList,
+      serverName: computed(() => serverListStore.getServerName),
     }
   },
 })
@@ -328,7 +265,7 @@ export default defineComponent({
   <div style="padding: 10px">
     <n-flex justify="center" style="width: 220px">
       <n-h4>
-        {{ serverListStore.getServerName }}
+        {{ serverName }}
       </n-h4>
       <n-dropdown
         placement="bottom"
@@ -461,7 +398,6 @@ export default defineComponent({
     </n-form>
     <n-button
       style="margin-top: 30px; width: 100%"
-      @click="channel"
     >
       创建分组
     </n-button>

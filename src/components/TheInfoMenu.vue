@@ -52,8 +52,19 @@ export default defineComponent({
         },
       },
     ]
-    const updateMemberList = () => {
-      serverListStore.toSetMemberList()
+
+    const menu = ref([] as any[])
+    const isLoading = ref(false)
+    const updateMemberList = async () => {
+      isLoading.value = true
+      // try {
+      await serverListStore.toSetMemberList().then((res: any) => {
+        menu.value = res
+      })
+      // }
+      // finally {
+      isLoading.value = false
+      // }
     }
     onMounted(updateMemberList)
     watch(() => route.params.server_id, updateMemberList)
@@ -84,14 +95,15 @@ export default defineComponent({
           },
         }
       },
-      data: computed(() => serverListStore.memberList),
+      menu,
+      isLoading,
     }
   },
 })
 </script>
 
 <template>
-  <n-data-table :columns="cols" :data="data" :row-props="rowProps" />
+  <n-data-table :columns="cols" :data="menu" :row-props="rowProps" :loading="isLoading" />
   <n-dropdown
     placement="bottom-start"
     trigger="manual"
