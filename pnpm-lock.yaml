@@ -40,6 +40,9 @@ devDependencies:
   '@vicons/carbon':
     specifier: ^0.12.0
     version: 0.12.0
+  '@vicons/ionicons4':
+    specifier: ^0.12.0
+    version: 0.12.0
   '@vicons/ionicons5':
     specifier: ^0.12.0
     version: 0.12.0
@@ -1752,6 +1755,10 @@ packages:
 
   /@vicons/carbon@0.12.0:
     resolution: {integrity: sha512-kCOgr/ZOhZzoiFLJ8pwxMa2TMxrkCUOA22qExPabus35F4+USqzcsxaPoYtqRd9ROOYiHrSqwapak/ywF0D9bg==}
+    dev: true
+
+  /@vicons/ionicons4@0.12.0:
+    resolution: {integrity: sha512-i+7YwlpCrqD6m9esbZLy1bpVQlh4CKugtS3OzgfNw6BLTQQK6HT7drktaJgcESj/BTr4avdNbAtMQXx56wSVMg==}
     dev: true
 
   /@vicons/ionicons5@0.12.0:
