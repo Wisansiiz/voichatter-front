@@ -21,7 +21,7 @@ service.interceptors.response.use(
       await router.push('/login')
       storage.clear()
     }
-    else if (result.data.message === '验证失败') {
+    else if (result.data.message === 'Operation Failed: 权限不足') {
       router.back()
     }
     return Promise.reject(result.data)
