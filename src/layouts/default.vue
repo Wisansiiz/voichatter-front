@@ -5,6 +5,7 @@ import { useProjectSetting } from '~/hooks/setting/useProjectSetting'
 import { useDesignSetting } from '~/hooks/setting/useDesignSetting'
 import { useProjectSettingStore } from '~/store/modules/projectSetting'
 import PageHeader from '~/components/Header/PageHeader.vue'
+import { useShowSettingStore } from '~/store/modules/showStetting'
 
 const { getDarkTheme } = useDesignSetting()
 const {
@@ -17,6 +18,8 @@ const {
 const settingStore = useProjectSettingStore()
 
 const collapsed = ref<boolean>(false)
+const showSettingStore = useShowSettingStore()
+const isShow = showSettingStore.isShowMembersList
 
 const { mobileWidth, menuWidth } = unref(menuSetting)
 
@@ -85,6 +88,7 @@ onMounted(() => {
   checkMobileMode()
   window.addEventListener('resize', watchWidth)
 })
+const loading = computed(() => showSettingStore.showMenu)
 </script>
 
 <template>
@@ -104,11 +108,13 @@ onMounted(() => {
       @collapse="collapsed = true"
       @expand="collapsed = false"
     >
-      <Logo :collapsed="collapsed" />
-      <AsideMenu
-        v-model:collapsed="collapsed"
-        v-model:location="getMenuLocation"
-      />
+      <n-spin :show="loading">
+        <Logo :collapsed="collapsed" />
+        <AsideMenu
+          v-model:collapsed="collapsed"
+          v-model:location="getMenuLocation"
+        />
+      </n-spin>
     </n-layout-sider>
 
     <n-drawer
@@ -125,14 +131,16 @@ onMounted(() => {
         :inverted="inverted"
         class="layout-sider"
       >
-        <Logo :collapsed="collapsed" />
-        <AsideMenu v-model:location="getMenuLocation" />
+        <n-spin :show="loading">
+          <Logo :collapsed="collapsed" />
+          <AsideMenu v-model:location="getMenuLocation" />
+        </n-spin>
       </n-layout-sider>
     </n-drawer>
 
     <n-layout :inverted="inverted">
       <n-layout-header :inverted="getHeaderInverted" :position="fixedHeader">
-        <PageHeader v-model:collapsed="collapsed" :inverted="inverted" />
+        <PageHeader v-model:collapsed="collapsed" v-model:isShow="isShow" :inverted="inverted" />
       </n-layout-header>
 
       <n-layout-content

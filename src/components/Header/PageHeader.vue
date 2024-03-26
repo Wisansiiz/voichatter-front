@@ -8,6 +8,7 @@ import { useUserStore } from '~/store/modules/user'
 import AsideMenu from '~/components/AsideMenu.vue'
 import { useProjectSetting } from '~/hooks/setting/useProjectSetting'
 import { websiteConfig } from '~/config/website.config'
+import { useShowSettingStore } from '~/store/modules/showStetting'
 
 export default defineComponent({
   name: 'PageHeader',
@@ -17,6 +18,9 @@ export default defineComponent({
       type: Boolean,
     },
     inverted: {
+      type: Boolean,
+    },
+    isShow: {
       type: Boolean,
     },
   },
@@ -152,6 +156,7 @@ export default defineComponent({
       const { openDrawer } = drawerSetting.value
       openDrawer()
     }
+    const showSettingStore = useShowSettingStore()
 
     return {
       ...toRefs(state),
@@ -169,6 +174,9 @@ export default defineComponent({
       getMenuLocation,
       mixMenu,
       websiteConfig,
+      toggleMembersList: () => {
+        showSettingStore.toggleMembersList()
+      },
     }
   },
 })
@@ -257,6 +265,20 @@ export default defineComponent({
             </n-icon>
           </template>
           <span>项目配置</span>
+        </n-tooltip>
+      </div>
+      <!-- 设置 -->
+      <div
+        class="layout-header-trigger layout-header-trigger-min"
+        @click="toggleMembersList"
+      >
+        <n-tooltip placement="bottom-end">
+          <template #trigger>
+            <n-icon size="18" style="font-weight: bold">
+              <SettingOutlined />
+            </n-icon>
+          </template>
+          <span>配置</span>
         </n-tooltip>
       </div>
     </div>

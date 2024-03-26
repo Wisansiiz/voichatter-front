@@ -7,6 +7,7 @@ import { createServer, getServerList, joinServer } from '~/api/server'
 // import { findChannelList } from '~/api/channel'
 import { userList } from '~/api/user'
 import { findChannelList } from '~/api/channel'
+import { useShowSettingStore } from '~/store/modules/showStetting'
 
 interface serverRep {
   serverId: number
@@ -18,7 +19,7 @@ interface serverRep {
 }
 interface dataRep {
   channelList: channelRep[]
-  groupList?: groupRep[]
+  groupList: groupRep[]
 }
 interface channelRep {
   channelId: number
@@ -32,7 +33,7 @@ interface groupRep {
   groupId: number
   serverId: number
   groupName: string
-  channelList?: [
+  channelList: [
     {
       channelId: number
       channelName: string
@@ -54,6 +55,7 @@ export const useServerListStore = defineStore(
   'server-list-info',
   () => {
     const route: any = useRoute()
+    const showSettingStore = useShowSettingStore()
     // const serverList = ref(new Map<number, any[] | null>())
     const menuOptions = ref<any[]>([])
     const showModal = ref(false)
@@ -93,6 +95,7 @@ export const useServerListStore = defineStore(
     }
     async function setServerInfo() {
       const menu = [] as any[]
+      showSettingStore.loadingMenu()
       return new Promise((resolve) => {
         menu.push({
           label: () =>
@@ -131,6 +134,7 @@ export const useServerListStore = defineStore(
             })
           }
           menuOptions.value = menu
+          showSettingStore.loadedMenu()
           resolve(menu)
         })
       })
@@ -180,10 +184,11 @@ export const useServerListStore = defineStore(
     }
     function toSetChannelList() {
       const list = [] as any[]
+      showSettingStore.loadingShowChannelList()
       return new Promise((resolve) => {
         findChannelList(route.params.server_id).then((res: dataRep) => {
+          const arr = [] as any[]
           if (res.channelList) {
-            const arr = [] as any[]
             res.channelList.forEach((data: channelRep) => {
               arr.push({
                 label: () =>
@@ -199,6 +204,9 @@ export const useServerListStore = defineStore(
               })
             })
             list.push(arr)
+          }
+          else {
+            list.push([])
           }
           if (res.groupList) {
             res.groupList.forEach((data: groupRep) => {
@@ -231,6 +239,7 @@ export const useServerListStore = defineStore(
               }
             })
           }
+          showSettingStore.loadedShowChannelList()
           resolve(list)
         })
       })

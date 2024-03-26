@@ -15,6 +15,7 @@ export default defineComponent({
     const modifyServerNameShowModal = ref(false)
     const formRef = ref<FormInst | null>(null)
     const showGroupModal = ref(false)
+    const showCreateNotification = ref(false)
 
     const model = ref({
       channel_name: null,
@@ -70,6 +71,19 @@ export default defineComponent({
             { default: () => '创建新分组' },
           ),
         key: 'createNewGroup',
+      },
+      {
+        label: () =>
+          h(
+            'a',
+            {
+              onClick: () => {
+                showCreateNotification.value = true
+              },
+            },
+            { default: () => '创建公告' },
+          ),
+        key: 'createNotification',
       },
       {
         label: () =>
@@ -202,7 +216,6 @@ export default defineComponent({
 
     onMounted(toSetChannelList)
     watch(() => route.params.server_id, toSetChannelList)
-
     return {
       options,
       showModal,
@@ -256,6 +269,7 @@ export default defineComponent({
       groupInfoModel,
       channelList,
       serverName: computed(() => serverListStore.getServerName),
+      showCreateNotification,
     }
   },
 })
@@ -455,6 +469,40 @@ export default defineComponent({
     {{ groupInfoModel }}
     <n-button
       style="margin-top: 30px; width: 100%"
+    >
+      确定
+    </n-button>
+  </n-modal>
+  <n-modal
+    v-model:show="showCreateNotification"
+    class="custom-card"
+    preset="card"
+    :style="{ maxWidth: '600px' }"
+    title="创建通知"
+    size="huge"
+    :bordered="false"
+    :segmented="{
+      content: 'soft',
+      footer: 'soft',
+    }"
+  >
+    <n-form
+      ref="formRef"
+    >
+      <n-form-item label="标题" path="title">
+        <n-input value="title" />
+      </n-form-item>
+      <n-form-item :span="12" label="内容" path="content">
+        <n-input
+          type="textarea"
+          style="max-height: 54px"
+          :autosize="{ minRows: 1 }"
+          value="content"
+        />
+      </n-form-item>
+    </n-form>
+    <n-button
+      style="width: 100%"
     >
       确定
     </n-button>
