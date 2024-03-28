@@ -1,7 +1,16 @@
 <script lang="ts">
+import { useShowSettingStore } from '~/store/modules/showStetting'
+
 export default defineComponent({
   setup() {
+    const showSettingStore = useShowSettingStore()
+    const isShow = computed(() => showSettingStore.isShowMembersList)
+    const loading = computed(() => showSettingStore.showChannelList)
 
+    return {
+      isShow,
+      loading,
+    }
   },
 })
 </script>
@@ -19,7 +28,9 @@ export default defineComponent({
       style="max-width: 240px; border-right: 1px solid #e8e8e8"
       :native-scrollbar="false"
     >
-      <TheChannelList />
+      <n-spin :show="loading">
+        <TheChannelList />
+      </n-spin>
     </n-layout-content>
     <n-layout-content
       class="layout-content"
@@ -28,11 +39,11 @@ export default defineComponent({
       <RouterView />
     </n-layout-content>
     <n-layout-sider
+      v-if="isShow"
       collapse-mode="width"
       :collapsed-width="0"
       :width="240"
       :native-scrollbar="false"
-      show-trigger="bar"
       bordered
       class="layout-sider"
     >
@@ -50,7 +61,7 @@ export default defineComponent({
 }
 .layout-content {
   max-height: 91vh;
-  min-height: 40vh;
+  min-height: 91vh;
   padding: 10px;
 }
 .layout {
