@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
 import { useMessage } from 'naive-ui'
+import { useUserStore } from '~/store/modules/user'
 
 const rules = {
   username: {
@@ -22,20 +23,44 @@ const rules = {
 const formRef: any = ref(null)
 const message = useMessage()
 
+const userStore = useUserStore()
+
 const formValue = reactive({
   username: '',
   mobile: '',
   email: '',
-  // address: '',
+  avatar: userStore.getAvatar,
 })
 
 function formSubmit() {
-  formRef.value.validate((errors) => {
+  formRef.value.validate((errors: any) => {
     if (!errors)
       message.success('验证成功')
     else
       message.error('验证失败，请填写完整信息')
   })
+}
+
+const cropperRef = ref()
+const fileInputRef = ref<any>()
+function selectImageFile(e: any) {
+  const { files } = e.target
+  if (!files || !files.length)
+    return
+  const file = files[0]
+  const reader = new FileReader()
+  // 读取文件 base64
+  reader.readAsDataURL(file)
+  reader.onload = () => {
+    const imgURL = String(reader.result)
+    if (fileInputRef.value)
+      fileInputRef.value.value = ''
+    cropperRef.value.showCropperWindow(imgURL)
+  }
+}
+function getResultData(res: any) {
+  formValue.avatar = res.dataURL
+  console.log(res)
 }
 </script>
 
@@ -55,10 +80,21 @@ function formSubmit() {
           <n-input v-model:value="formValue.mobile" placeholder="请输入联系电话" />
         </n-form-item>
 
-        <!--        <n-form-item label="联系地址" path="address"> -->
-        <!--          <n-input v-model:value="formValue.address" type="textarea" placeholder="请输入联系地址" /> -->
-        <!--        </n-form-item> -->
-
+        <n-form-item label="头像" path="avatar">
+          <label>
+            <n-avatar round :size="120" :src="formValue.avatar" />
+            <input
+              ref="fileInputRef"
+              type="file" style="display: none"
+              accept="image/jpeg, image/png, image/jpg, image/gif"
+              @change="selectImageFile"
+            >
+          </label>
+        </n-form-item>
+        <CropperWindow
+          ref="cropperRef"
+          @update:result-data="getResultData"
+        />
         <div>
           <n-space>
             <n-button type="primary" @click="formSubmit">
@@ -70,3 +106,6 @@ function formSubmit() {
     </n-grid-item>
   </n-grid>
 </template>
+
+<style scoped>
+</style>
