@@ -80,6 +80,7 @@ export const useServerListStore = defineStore(
         userList(route.params.server_id).then((res: serverMember[]) => {
           ml = res.map((item) => {
             return {
+              userId: item.userID,
               avatarURL: createImageVNode(item.avatarURL, item.username),
               username: item.username,
               SPermissions: item.SPermissions,

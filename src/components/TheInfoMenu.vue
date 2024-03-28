@@ -1,28 +1,79 @@
 <script lang="ts">
 import { defineComponent, h, nextTick, ref } from 'vue'
 import type { DataTableColumns, DropdownOption } from 'naive-ui'
-import { NTag, useMessage } from 'naive-ui'
+import { NTag } from 'naive-ui'
 import { useServerListStore } from '~/store/modules/serverList'
-
-const options: DropdownOption[] = [
-  {
-    label: '编辑',
-    key: 'edit',
-  },
-  {
-    label: () => h('span', { style: { color: 'red' } }, '删除'),
-    key: 'delete',
-  },
-]
+import { modifyUserSPermissionsApi } from '~/api/user'
 
 export default defineComponent({
   setup() {
     const serverListStore = useServerListStore()
     const route: any = useRoute()
-    const message = useMessage()
     const showDropdownRef = ref(false)
     const xRef = ref(0)
     const yRef = ref(0)
+    const userInfo = ref({
+      userId: 0,
+      username: '',
+      sPermissions: '',
+    })
+
+    async function modifyUserSPermissions(): Promise<void> {
+      await modifyUserSPermissionsApi(route.params.server_id, userInfo)
+    }
+
+    const menu = ref([] as any[])
+    const isLoading = ref(false)
+    const updateMemberList = async () => {
+      isLoading.value = true
+      await serverListStore.toSetMemberList().then((res: any) => {
+        menu.value = res
+      })
+      isLoading.value = false
+    }
+    const options: DropdownOption[] = [
+      {
+        label: '编辑',
+        key: 'edit',
+        children: [
+          {
+            label: '管理员',
+            key: 'admin',
+            props: {
+              onClick: async () => {
+                userInfo.value.sPermissions = 'admin'
+                await modifyUserSPermissions()
+                await updateMemberList()
+              },
+            },
+          },
+          {
+            label: '普通成员',
+            key: 'member',
+            props: {
+              onClick: async () => {
+                userInfo.value.sPermissions = 'member'
+                await modifyUserSPermissions()
+                await updateMemberList()
+              },
+            },
+          },
+        ],
+      },
+      {
+        label: () => h('span', { style: { color: 'red' } }, '举报'),
+        key: 'report',
+        props: {
+          onClick: () => {
+            window.$message.success(`你举报了${userInfo.value.username}感谢你的为社区做的贡献`)
+          },
+        },
+      },
+      {
+        label: () => h('span', { style: { color: 'red' } }, '删除'),
+        key: 'delete',
+      },
+    ]
     const colsReactive: DataTableColumns = [
       {
         title: '头像',
@@ -53,19 +104,6 @@ export default defineComponent({
       },
     ]
 
-    const menu = ref([] as any[])
-    const isLoading = ref(false)
-    const updateMemberList = async () => {
-      isLoading.value = true
-      // try {
-      await serverListStore.toSetMemberList().then((res: any) => {
-        menu.value = res
-      })
-      // }
-      // finally {
-      isLoading.value = false
-      // }
-    }
     onMounted(updateMemberList)
     watch(() => route.params.server_id, updateMemberList)
 
@@ -81,10 +119,11 @@ export default defineComponent({
       onClickoutside() {
         showDropdownRef.value = false
       },
-      rowProps: (row: { username: string, SPermissions: string }) => {
+      rowProps: (row: { username: string, SPermissions: string, userId: number }) => {
         return {
           onContextmenu: (e: MouseEvent) => {
-            message.info(JSON.stringify([row.SPermissions, row.username], null, 2))
+            userInfo.value = { username: row.username, sPermissions: row.SPermissions, userId: row.userId }
+            // window.$message.info(JSON.stringify([row.SPermissions, row.username, row.userId], null, 2))
             e.preventDefault()
             showDropdownRef.value = false
             nextTick().then(() => {

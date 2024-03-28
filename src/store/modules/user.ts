@@ -20,7 +20,7 @@ const sessionStore = useAuthSessionStore()
 export const useUserStore = defineStore({
   id: 'USER_INFO',
   state: (): IUserState => ({
-    token: localStore.token || sessionStore.token,
+    token: storage.get('ACCESS_TOKEN'),
     userId: 0,
     welcome: '',
     avatar: '',
