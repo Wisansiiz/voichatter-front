@@ -9,6 +9,7 @@ import VueRouter from 'unplugin-vue-router/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import Layouts from 'vite-plugin-vue-layouts'
 import { NaiveUiResolver } from 'unplugin-vue-components/resolvers'
+import VueDevTools from 'vite-plugin-vue-devtools'
 
 export default defineConfig({
   resolve: {
@@ -26,6 +27,7 @@ export default defineConfig({
     proxy: {},
   },
   plugins: [
+    VueDevTools(),
     Vue(),
     VueRouter(),
     Layouts(),
