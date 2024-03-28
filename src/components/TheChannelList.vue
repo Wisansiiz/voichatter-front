@@ -4,25 +4,65 @@ import { Menu } from '@vicons/ionicons5'
 import { createChannel, deleteChannel } from '~/api/channel'
 import { deleteServerByOwner, modifyServerNameByOwner } from '~/api/server'
 import { useServerListStore } from '~/store/modules/serverList'
+import { createGroupApi, deleteGroupApi } from '~/api/group'
+import { useNotificationStore } from '~/store/modules/notificationSetting'
 
 export default defineComponent({
   // eslint-disable-next-line vue/no-reserved-component-names
   components: { Menu },
   setup() {
     const route: any = useRoute()
+    const router = useRouter()
     const message = useMessage()
     const showModal = ref(false)
     const modifyServerNameShowModal = ref(false)
     const formRef = ref<FormInst | null>(null)
     const showGroupModal = ref(false)
     const showCreateNotification = ref(false)
+    const notificationModel = ref({
+      title: '',
+      content: '',
+    })
+    const notificationStore = useNotificationStore()
+    const createNotification = async () => {
+      showCreateNotification.value = false
+      await notificationStore.createNotification(route.params.server_id, {
+        title: notificationModel.value.title,
+        content: notificationModel.value.content,
+        meta: '',
+        markAsRead: false,
+      })
+      window.$message.success('创建成功')
+    }
+    const { getNotification } = notificationStore
+    const init = async (serverId: string) => {
+      if (notificationStore.notificationInfo[serverId] && notificationStore.notificationInfo[serverId].markAsRead)
+        return
+      const res = await getNotification(serverId)
+      res()
+    }
+    const serverListStore = useServerListStore()
+    const channelList = ref([] as any[])
+    const toSetChannelList = () => {
+      serverListStore.toSetChannelList().then((res: any) => {
+        channelList.value = res
+      })
+    }
+    onMounted(async () => {
+      toSetChannelList()
+      await init(route.params.server_id)
+    })
+    watch(() => route.params.server_id, async () => {
+      toSetChannelList()
+      await init(route.params.server_id)
+    })
 
     const model = ref({
       channel_name: null,
       type: null,
     })
     const groupModel = ref({
-      groupName: null,
+      groupName: '',
     })
     const modifyServerNameModel = ref({
       serverId: null,
@@ -58,6 +98,11 @@ export default defineComponent({
       {
         label: '服务器设置',
         key: 'serverSetting',
+        props: {
+          onClick: () => {
+            router.push(`/server-setting?serverId=${route.params.server_id}`)
+          },
+        },
       },
       {
         label: () =>
@@ -140,18 +185,11 @@ export default defineComponent({
       },
     ]
 
-    const serverListStore = useServerListStore()
     function deleteServer() {
       deleteServerByOwner(route.params.server_id)
       serverListStore.setServerInfo()
     }
 
-    const channelList = ref([] as any[])
-    const toSetChannelList = () => {
-      serverListStore.toSetChannelList().then((res: any) => {
-        channelList.value = res
-      })
-    }
     async function channel() {
       await createChannel(formRef, model, route.params.server_id).then((_res) => {
         showModal.value = false
@@ -173,9 +211,20 @@ export default defineComponent({
         label: () =>
           h('a', {
             style: { color: 'red' },
-            onClick: async () => {
-              await deleteChannel(route.params.server_id, channelInfo.value.key)
-              toSetChannelList()
+            onClick: () => {
+              window.$dialog.warning({
+                title: '警告',
+                content: '确定删除该频道吗',
+                positiveText: '确定',
+                negativeText: '不确定',
+                onPositiveClick: async () => {
+                  await deleteChannel(route.params.server_id, channelInfo.value.key)
+                  toSetChannelList()
+                },
+                onNegativeClick: () => {
+                  window.$message.error('不确定')
+                },
+              })
             },
           }, '删除'),
         key: 'delete',
@@ -186,12 +235,12 @@ export default defineComponent({
     const yRef = ref(0)
 
     function modifyServerName() {
+      modifyServerNameShowModal.value = false
       modifyServerNameModel.value.serverId = route.params.server_id
       modifyServerNameByOwner(modifyServerNameModel).then((data: { serverInfo: any }) => {
         serverListStore.setServerInfo()
         window.$message.info(data.serverInfo.serverName)
       })
-      modifyServerNameShowModal.value = false
     }
 
     function handleUpdateValue(key: any, { channelType }: any) {
@@ -214,8 +263,11 @@ export default defineComponent({
     }
     const showGroupSetting = ref(false)
 
-    onMounted(toSetChannelList)
-    watch(() => route.params.server_id, toSetChannelList)
+    const createGroup = async () => {
+      await createGroupApi(route.params.server_id, groupModel.value.groupName)
+      toSetChannelList()
+      showGroupModal.value = false
+    }
     return {
       options,
       showModal,
@@ -270,6 +322,50 @@ export default defineComponent({
       channelList,
       serverName: computed(() => serverListStore.getServerName),
       showCreateNotification,
+      notificationModel,
+      handleClear() {
+        notificationModel.value.title = ''
+        notificationModel.value.content = ''
+      },
+      createGroup,
+      options2: [
+        {
+          label: '编辑分组',
+          key: 'editGroup',
+          props: {
+            onClick: () => {
+              showGroupSetting.value = true
+            },
+          },
+        },
+        {
+          label:
+            () => h(
+              'a',
+              {
+                style: 'color: red',
+                onClick: async () => {
+                  window.$dialog.warning({
+                    title: '警告',
+                    content: '确定删除该分组吗',
+                    positiveText: '确定',
+                    negativeText: '不确定',
+                    onPositiveClick: async () => {
+                      await deleteGroupApi(route.params.server_id, groupInfoModel.value.name)
+                      toSetChannelList()
+                    },
+                    onNegativeClick: () => {
+                      message.error('不确定')
+                    },
+                  })
+                },
+              },
+              { default: () => '删除分组' },
+            ),
+          key: 'deleteGroup',
+        },
+      ],
+      createNotification,
     }
   },
 })
@@ -278,16 +374,18 @@ export default defineComponent({
 <template>
   <div style="padding: 10px">
     <n-flex justify="center" style="width: 220px">
-      <n-h4>
-        {{ serverName }}
-      </n-h4>
       <n-dropdown
         placement="bottom"
         trigger="click"
         size="medium"
         :options="options"
       >
-        <n-button style="height: 30px">
+        <n-button
+          style="height: 30px; width: 100%"
+          size="large"
+          tertiary type="info"
+        >
+          {{ serverName }}
           <n-icon size="large">
             <Menu />
           </n-icon>
@@ -295,14 +393,18 @@ export default defineComponent({
       </n-dropdown>
     </n-flex>
     <n-layout-sider>
-      <n-collapse style="width: 220px;" @item-header-click="handleItemHeaderClick">
+      <n-collapse
+        style="width: 220px;"
+        @item-header-click="handleItemHeaderClick"
+      >
         <template #header-extra>
-          <n-button
-            text
-            :focusable="false"
-            i-carbon:settings
-            @click="showGroupSetting = true"
-          />
+          <n-dropdown :options="options2" trigger="click">
+            <n-button
+              text
+              :focusable="false"
+              i-carbon:settings
+            />
+          </n-dropdown>
         </template>
         <n-collapse style="margin-top: 20px">
           <n-menu
@@ -412,6 +514,7 @@ export default defineComponent({
     </n-form>
     <n-button
       style="margin-top: 30px; width: 100%"
+      @click="createGroup"
     >
       创建分组
     </n-button>
@@ -488,23 +591,33 @@ export default defineComponent({
   >
     <n-form
       ref="formRef"
+      :model="notificationModel"
     >
       <n-form-item label="标题" path="title">
-        <n-input value="title" />
+        <n-input v-model:value="notificationModel.title" />
       </n-form-item>
       <n-form-item :span="12" label="内容" path="content">
         <n-input
+          v-model:value="notificationModel.content"
           type="textarea"
           style="max-height: 54px"
-          :autosize="{ minRows: 1 }"
-          value="content"
+          :autosize="{ minRows: 2 }"
+          maxlength="99"
+          show-count
         />
       </n-form-item>
     </n-form>
     <n-button
       style="width: 100%"
+      @click="createNotification"
     >
       确定
+    </n-button>
+    <n-button
+      style="margin-top: 30px;width: 100%"
+      @click="handleClear"
+    >
+      清空
     </n-button>
   </n-modal>
 </template>
