@@ -4,33 +4,26 @@ import { NAvatar, NIcon } from 'naive-ui'
 export function createImageVNode(url: string, name: string) {
   if (url !== '') {
     return h(
-      // NAvatar,
-      'img',
+      NAvatar,
       {
         src: url,
-        // round: true,
-        // size: 'medium',
+        round: true,
         style: {
-          'width': '35px',
-          'border-radius': '50%',
+          width: '35px',
+          height: '35px',
         },
       },
     )
   }
   else {
     return h(
-      // 'div',
-      // {
-      //   style: {
-      //     'width': '35px',
-      //     'border-radius': '50%',
-      //     'font-style': 'normal',
-      //   },
-      // },
       NAvatar,
       {
         round: true,
-        size: 'medium',
+        style: {
+          width: '35px',
+          height: '35px',
+        },
       },
       { default: () => name.substring(0, 1) },
     )
