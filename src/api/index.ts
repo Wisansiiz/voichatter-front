@@ -14,7 +14,7 @@ service.interceptors.request.use((config) => {
 })
 service.interceptors.response.use(
   async (result) => {
-    if (result.data.code === 200 || result.data.code === 0)
+    if (result.data.code === 0)
       return result.data
     window.$message.error(result.data.message)
     if (!storage.get('ACCESS_TOKEN') && router.currentRoute.value.path !== '/login') {
@@ -23,6 +23,9 @@ service.interceptors.response.use(
     }
     else if (result.data.message === 'Operation Failed: 权限不足') {
       router.back()
+    }
+    else if (result.data.message === '验证失败') {
+      await router.push('/login')
     }
     return Promise.reject(result.data)
   },

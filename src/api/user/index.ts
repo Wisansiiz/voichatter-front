@@ -20,7 +20,7 @@ export async function userLogin(isLoading: Ref<UnwrapRef<boolean>>, model: Ref<U
       else sessionStore.token = data.data.token
       userStore.setUserInfo({ username: data.data.username })
       userStore.setUserId(data.data.userId)
-      userStore.setAvatar(data.data.avatar)
+      userStore.setAvatar(data.data.avatarUrl)
       userStore.setToken(data.data.token)
       if (localStore.token || sessionStore.token) {
         await router.push('/')
@@ -58,4 +58,36 @@ export async function userLogout() {
 export async function userList(serverId: any) {
   const res: { data: { users: any } } = await service.get(`/users/${serverId}`)
   return res.data.users
+}
+/**
+ * Request
+ */
+export interface Response {
+  code: number
+  data: null | Data
+  message: string
+  [property: string]: any
+}
+
+export interface Data {
+  userInput: UserInput
+  [property: string]: any
+}
+
+export interface UserInput {
+  serverId: number
+  SPermissions: string
+  userId: number
+  [property: string]: any
+}
+
+export async function modifyUserSPermissionsApi(serverId: any, userInfo: any) {
+  const { userId, username, sPermissions } = userInfo.value
+  try {
+    const res: Response = await service.put(`/user/${serverId}`, { userId, username, sPermissions })
+    return res.data?.userInput
+  }
+  catch (e) {
+    return undefined
+  }
 }
