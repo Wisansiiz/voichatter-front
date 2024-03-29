@@ -1,23 +1,25 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
+import type { FormItemRule } from 'naive-ui'
 import { useMessage } from 'naive-ui'
 import { useUserStore } from '~/store/modules/user'
+import { uploadAvatarApi } from '~/api/user'
 
 const rules = {
   username: {
-    required: true,
     message: '请输入昵称',
     trigger: 'blur',
   },
   email: {
-    required: true,
     message: '请输入邮箱',
     trigger: 'blur',
   },
   mobile: {
-    required: true,
     message: '请输入联系电话',
     trigger: 'input',
+    validator: (_rule: FormItemRule, value: string) => {
+      return /^1[3456789]\d{9}$/.test(value)
+    },
   },
 }
 const formRef: any = ref(null)
@@ -58,9 +60,14 @@ function selectImageFile(e: any) {
     cropperRef.value.showCropperWindow(imgURL)
   }
 }
-function getResultData(res: any) {
-  formValue.avatar = res.dataURL
-  console.log(res)
+function getResultData({ blobData, dataURL }: any) {
+  formValue.avatar = dataURL
+  uploadAvatarApi(blobData).then((res) => {
+    userStore.setAvatar(res.avatarUrl)
+    const { username, email } = res
+    userStore.setUserInfo({ username, email })
+    message.success('头像修改成功')
+  })
 }
 </script>
 

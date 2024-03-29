@@ -91,3 +91,39 @@ export async function modifyUserSPermissionsApi(serverId: any, userInfo: any) {
     return undefined
   }
 }
+
+export function modifyUserInfoApi(userInfo: any) {
+  const { username, avatarUrl } = userInfo
+  return service.put(`/user`, { username, avatarUrl })
+}
+
+export interface uploadAvatarApiResponse {
+  code: number
+  data: uploadAvatarApiData
+  message: string
+  [property: string]: any
+}
+
+export interface uploadAvatarApiData {
+  userInfo: UserInfo
+  [property: string]: any
+}
+
+export interface UserInfo {
+  avatarUrl: string
+  email: string
+  userId: number
+  username: string
+  [property: string]: any
+}
+
+export async function uploadAvatarApi(file: any) {
+  const formData = new FormData()
+  formData.append('file', file)
+  const res: uploadAvatarApiResponse = await service.put('/user/avatar', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+  return res.data.userInfo
+}

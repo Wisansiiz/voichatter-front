@@ -6,7 +6,7 @@ import { nextTick, ref } from 'vue'
 // 向父元素传递resultData
 const emit = defineEmits(['update:resultData'])
 
-const resultDate = {
+const resultDate: any = {
   blobData: null,
   dataURL: null,
 }
@@ -40,11 +40,11 @@ function getCropperCanvas() {
     width: 120,
     height: 120,
   })
+  resultDate.dataURL = croppedCanvas.toDataURL('image/png')
   croppedCanvas.toBlob((blob) => {
     resultDate.blobData = blob
-    resultDate.dataURL = croppedCanvas.toDataURL('image/webp')
     emit('update:resultData', resultDate)
-  }, 'image/webp')
+  })
   showCropper.value = false
 }
 
