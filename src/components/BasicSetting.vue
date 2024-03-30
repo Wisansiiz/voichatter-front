@@ -44,7 +44,7 @@ function formSubmit() {
 }
 
 const cropperRef = ref()
-const fileInputRef = ref<any>()
+const fileInputRef = ref()
 function selectImageFile(e: any) {
   const { files } = e.target
   if (!files || !files.length)
