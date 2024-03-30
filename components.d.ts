@@ -88,6 +88,7 @@ declare module 'vue' {
     RouterView: typeof import('vue-router')['RouterView']
     SafetySetting: typeof import('./src/components/SafetySetting.vue')['default']
     Single: typeof import('./src/components/Single.vue')['default']
+    Test: typeof import('./src/components/Test.vue')['default']
     TheChannelList: typeof import('./src/components/TheChannelList.vue')['default']
     TheContent: typeof import('./src/components/TheContent.vue')['default']
     TheFooter: typeof import('./src/components/TheFooter.vue')['default']
