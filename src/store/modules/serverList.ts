@@ -91,9 +91,9 @@ export const useServerListStore = defineStore(
       })
     }
 
-    function setChannelType(type: string) {
-      channelType.value = type
-    }
+    // function setChannelType(type: string) {
+    //   channelType.value = type
+    // }
     async function setServerInfo() {
       const menu = [] as any[]
       showSettingStore.loadingMenu()
@@ -259,7 +259,7 @@ export const useServerListStore = defineStore(
       getMenuOptions,
       getChannelType,
       channelType,
-      setChannelType,
+      // setChannelType,
       toSetMemberList,
       getMemberList,
       memberList,

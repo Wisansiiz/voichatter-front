@@ -1,9 +1,13 @@
 import { defineStore } from 'pinia'
-import { service, wssBase } from '~/api'
 import { useUserStore } from '~/store/modules/user'
-import type { Request } from '~/api/message'
+import { wssBase } from '~/api'
 
-interface Message {
+interface Data {
+  count: number
+  code: string
+  message: IMessage
+}
+interface IMessage {
   messageId: number
   senderUserId: number
   channelId: number
@@ -14,214 +18,89 @@ interface Message {
   avatarUrl: string
   senderName: string
 }
+interface MessageMap {
+  [key: string]: IMessage[]
+}
 
 export const useWebsocketStore = defineStore(
+  // id
   'websocket',
   () => {
-    const socket: Ref<WebSocket | null> = ref(null)
+    // state
+    const socket = ref(null as WebSocket | null)
     const userStore = useUserStore()
-    const pcMap = new Map()
-    let localStream: MediaStream
+    const messages: MessageMap = reactive({})
+    const members: { [key: string]: number } = reactive({})
     const route: any = useRoute()
-    const videoContainer = ref()
-    const localVideo = ref()
-    async function getPagesMessages(page: any, pageCount: any, pageSize: any, r: any = null): Promise<Message[]> {
-      r = r === null ? route : r
-      const res: Request = await service.get(`/messages/page/${r.params.server_id}/${r.params.name}?page=${page.value}&pageSize=${pageSize.value}`)
-      const { messageInfo, pageTotal } = res.data.messagePages
-      pageCount.value = pageTotal
-      return messageInfo
-    }
-    function setVideoContainer(container: HTMLElement) {
-      videoContainer.value = container
-    }
-    function getVideoContainer(): Ref<any> {
-      return videoContainer
-    }
-    function setLocalVideo(video: HTMLVideoElement) {
-      localVideo.value = video
-    }
-    function getLocalVideo(): Ref<any> {
-      return localVideo
-    }
+    const isActive = ref(false)
 
-    async function createWebsocket() {
-      return new Promise((resolve) => {
-        if (socket.value) {
-          socket.value.close()
-          socket.value = null
-        }
-        socket.value = new WebSocket(`${wssBase}/api/yy?serverId=${route.params.server_id}&channelId=${route.params.name}&token=${encodeURIComponent(userStore.getToken)}`)
-        socket.value.onopen = () => {
-          window.$message.success('连接成功')
-          resolve(socket.value)
-        }
-        socket.value.onclose = () => {
-          window.$message.error('连接断开')
-        }
-      })
-    }
+    // getters
+    const isConnected = computed(() => socket.value?.readyState === 1 || isActive.value)
+    const getMessages = computed(() => messages[route.params.name] || [])
+    const getMembers = computed(() => members[route.params.name] || 0)
 
-    async function initWebsocket() {
-      await createWebsocket()
-      if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-        socket.value.onmessage = async (e) => {
-          const message = e.data
-          const { code, data } = JSON.parse(message)
-          if (code === 'offer') {
-            // 接收offer
-            await getOffer(data)
-          }
-          else if (code === 'answer') {
-            // 接收answer
-            await getAnswer(data)
-          }
-          else if (code === 'candidate') {
-            const { fromId, candidate } = data
-            const pc = pcMap.get(fromId)
-            pc.addIceCandidate(candidate)
-          }
-          else if (code === 'join_group') {
-            const { fromId } = data
-            await sendOffer(fromId)
-          }
-          else if (code === 'leave_group') {
-            const { fromId } = data
-            pcMap.delete(fromId)
-            const video = document.getElementById(fromId)
-            if (video)
-              video.remove()
+    // actions
+    const initChatSocket = () => {
+      socket.value = new WebSocket(`${wssBase}/api/wz?token=${encodeURIComponent(userStore.getToken)}`)
+      socket.value.onopen = () => {
+        console.log('websocket连接成功')
+        const msg = { code: 'ping', data: null, targetId: route.params.name }
+        socket.value?.send(JSON.stringify(msg))
+        isActive.value = true
+      }
+      socket.value.close = (_) => {
+        console.log('websocket连接关闭')
+        isActive.value = false
+        members[route.params.name] -= 1
+      }
+      socket.value.onerror = (_) => {
+        console.log('WebSocket:发生错误')
+        isActive.value = false
+        members[route.params.name] -= 1
+      }
+      window.onbeforeunload = (_) => {
+        socket.value?.close()
+      }
+      if (isConnected && socket) {
+        socket.value.onmessage = (e) => {
+          const result: Data = JSON.parse(e.data)
+          const { count, code, message } = result
+          switch (code) {
+            case 'text':
+              // 处理消息
+              if (!messages[message.channelId])
+                messages[message.channelId] = []
+              messages[message.channelId].push(message)
+              break
+            case 'notice':
+              // 处理通知
+              break
+            case 'ping':
+              if (!members[message.channelId])
+                members[message.channelId] = 0
+              members[message.channelId] = count
+              window.$message.success('ping')
+              break
+            default:
+              break
           }
         }
       }
     }
-
-    async function handleJoin(isVideo: boolean, isAudio: boolean) {
-      await initWebsocket()
-      let audioStream: boolean | { echoCancellation: true, noiseSuppression: true }
-      if (isAudio)
-        audioStream = { echoCancellation: true, noiseSuppression: true }
-      else
-        audioStream = false
-      localStream = await navigator.mediaDevices.getUserMedia({
-        video: isVideo,
-        audio: audioStream,
-      })
-      localVideo.value.srcObject = localStream
-      const message = {
-        code: 'join_group',
+    const sendMsg = (code: string, data: any, targetId = route.params.name) => {
+      if (isConnected) {
+        const msg = { code, data, targetId }
+        socket.value?.send(JSON.stringify(msg))
       }
-      socket.value?.send(JSON.stringify(message))
-    }
-
-    async function sendOffer(targetId: any) {
-      const pc = new RTCPeerConnection({})
-      pcMap.set(targetId, pc)
-      localStream.getTracks().forEach(track => pc.addTrack(track, localStream))
-      const video = document.createElement('video')
-      video.id = targetId
-      video.autoplay = true
-      videoContainer.value.appendChild(video)
-      pc.addEventListener('track', (e) => {
-        // 更新远程的视频
-        video.srcObject = e.streams[0]
-      })
-
-      pc.addEventListener('icecandidate', (e) => {
-        if (e.candidate) {
-          const message = {
-            code: 'candidate',
-            data: {
-              targetId,
-              candidate: e.candidate,
-            },
-          }
-          socket.value?.send(JSON.stringify(message))
-        }
-      })
-      const description = await pc.createOffer()
-      await pc.setLocalDescription(description)
-      const message = {
-        code: 'offer',
-        data: {
-          targetId,
-          offer: description,
-        },
-      }
-      socket.value?.send(JSON.stringify(message))
-    }
-
-    // 接收offer
-    async function getOffer({ fromId: targetId, offer }: any) {
-      const pc = new RTCPeerConnection({})
-      pcMap.set(targetId, pc)
-      localStream.getTracks().forEach(track => pc.addTrack(track, localStream))
-      const video = document.createElement('video')
-      video.id = targetId
-      video.autoplay = true
-      videoContainer.value.appendChild(video)
-      pc.addEventListener('track', (e) => {
-        // 更新远程的视频
-        video.srcObject = e.streams[0]
-      })
-
-      pc.addEventListener('icecandidate', (e) => {
-        if (e.candidate) {
-          const message = {
-            code: 'candidate',
-            data: {
-              targetId,
-              candidate: e.candidate,
-            },
-          }
-          socket.value?.send(JSON.stringify(message))
-        }
-      })
-      await pc.setRemoteDescription(offer)
-      const description = await pc.createAnswer()
-      await pc.setLocalDescription(description)
-      const message = {
-        code: 'answer',
-        data: {
-          targetId,
-          answer: description,
-        },
-      }
-      socket.value?.send(JSON.stringify(message))
-    }
-
-    async function getAnswer({ fromId, answer }: any) {
-      const pc = pcMap.get(fromId)
-      await pc.setRemoteDescription(answer)
-    }
-
-    // 挂断通话并通知服务器用户离开频道
-    async function hangUp() {
-      // // 发送离开频道的消息给服务器
-      const message = {
-        code: 'leave_group',
-      }
-      if (socket.value?.readyState === 1)
-        socket.value?.send(JSON.stringify(message))
-      // 关闭所有与当前用户相关的RTCPeerConnections
-      for (const [key, pc] of pcMap.entries()) {
-        pc.close()
-        pcMap.delete(key)
-        const video = document.getElementById(key)
-        videoContainer.value.removeChild(video)
-      }
-      // 停止所有本地媒体流
-      if (localStream)
-        localStream.getTracks().forEach(track => track.stop())
     }
     return {
-      hangUp,
-      handleJoin,
-      getVideoContainer,
-      setVideoContainer,
-      getLocalVideo,
-      setLocalVideo,
-      getPagesMessages,
+      socket,
+      initChatSocket,
+      isConnected,
+      sendMsg,
+      messages,
+      getMessages,
+      getMembers,
     }
   },
 )
