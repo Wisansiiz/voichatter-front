@@ -1,7 +1,7 @@
 <script lang="ts">
 import { useUserStore } from '~/store/modules/user'
 import { wssBase } from '~/api'
-import { useWebsocketStore } from '~/store/modules/websocket'
+import { useWebRTCStore } from '~/store/modules/webrtc'
 
 interface Message {
   messageId: number
@@ -25,16 +25,16 @@ export default defineComponent({
     const page = ref(1)
     const pageSize = ref(7)
     const pageCount = ref(1)
-    const websocketStore = useWebsocketStore()
+    const webRTCStore = useWebRTCStore()
     const info = ref('')
     async function getPagesMessages() {
-      messages.value = await websocketStore.getPagesMessages(page, pageCount, pageSize)
+      messages.value = await webRTCStore.getPagesMessages(page, pageCount, pageSize)
     }
     onActivated(async () => {
       await initWebsocket()
     })
     onBeforeRouteUpdate(async (to) => {
-      messages.value = await websocketStore.getPagesMessages(page, pageCount, pageSize, to)
+      messages.value = await webRTCStore.getPagesMessages(page, pageCount, pageSize, to)
       await shutdown()
     })
     onBeforeRouteLeave(async (_to, _from, next) => {
@@ -46,7 +46,7 @@ export default defineComponent({
       socket.onopen = async () => {
         window.$message.success('连接成功')
         info.value = '你加入了频道'
-        messages.value = await websocketStore.getPagesMessages(page, pageCount, pageSize)
+        messages.value = await webRTCStore.getPagesMessages(page, pageCount, pageSize)
       }
       socket.onclose = () => {
         window.$message.error('连接已关闭')
