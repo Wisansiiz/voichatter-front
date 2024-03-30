@@ -24,6 +24,7 @@ export default defineComponent({
       type: Boolean,
     },
   },
+  emits: ['update:collapsed'],
   setup(props) {
     const userStore = useUserStore()
     const message = useMessage()
@@ -177,6 +178,7 @@ export default defineComponent({
       toggleMembersList: () => {
         showSettingStore.toggleMembersList()
       },
+      avatar: computed(() => userStore.getAvatar),
     }
   },
 })
@@ -247,12 +249,13 @@ export default defineComponent({
       <div class="layout-header-trigger layout-header-trigger-min">
         <n-dropdown trigger="hover" :options="avatarOptions" @select="avatarSelect">
           <div class="avatar">
-            <n-avatar round>
+            <n-avatar v-if="!avatar" round>
               {{ username }}
               <template #icon>
                 <UserOutlined />
               </template>
             </n-avatar>
+            <n-avatar v-else round :src="avatar" />
           </div>
         </n-dropdown>
       </div>

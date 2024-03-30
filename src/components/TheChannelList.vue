@@ -100,7 +100,7 @@ export default defineComponent({
         key: 'serverSetting',
         props: {
           onClick: () => {
-            router.push(`/server-setting?serverId=${route.params.server_id}`)
+            router.push(`/server-setting/${route.params.server_id}`)
           },
         },
       },
@@ -245,7 +245,7 @@ export default defineComponent({
 
     function handleUpdateValue(key: any, { channelType }: any) {
       // 更新频道类型
-      serverListStore.setChannelType(channelType)
+      serverListStore.channelType = channelType
       storage.set('channelType', channelType)
     }
 
