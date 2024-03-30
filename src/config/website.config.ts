@@ -5,5 +5,5 @@ export const websiteConfig = Object.freeze({
   title: 'Voichatter',
   logo: logoImage,
   loginImage,
-  loginDesc: 'Naive Ui Admin中后台前端/设计解决方案',
+  loginDesc: '即时通讯语音视频聊天频道',
 })
