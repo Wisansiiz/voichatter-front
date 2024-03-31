@@ -37,4 +37,4 @@ service.interceptors.response.use(
   },
 )
 
-export { service, wssBase }
+export { service, wssBase, baseURL }

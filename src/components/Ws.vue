@@ -21,11 +21,6 @@ const { sendMsg } = websocketStore
 onBeforeRouteUpdate((to: any) => {
   sendMsg('ping', null, to.params.name)
 })
-const messageText = ref('')
-function sendMessage() {
-  sendMsg('text', messageText.value)
-  messageText.value = ''
-}
 </script>
 
 <template>
@@ -42,23 +37,11 @@ function sendMessage() {
       :avatar="msg.avatarUrl"
       :time="msg.sendDate"
       :username="msg.senderName"
+      :msg-type="msg.messageType"
     />
   </template>
-  <div style="margin-bottom: 70px" />
-  <n-layout-footer
-    bordered
-    position="absolute"
-    style="height: 64px;padding: 5px"
-  >
-    <n-flex justify="between">
-      <TheInput v-model:value="messageText" />
-      <div style="height: 54px; line-height: 54px">
-        <n-button type="primary" ghost @click="sendMessage">
-          发送
-        </n-button>
-      </div>
-    </n-flex>
-  </n-layout-footer>
+  <div style="margin-bottom: 100px" />
+  <Footer />
 </template>
 
 <style scoped>

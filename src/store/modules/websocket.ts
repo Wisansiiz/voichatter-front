@@ -9,6 +9,7 @@ interface Data {
 }
 interface IMessage {
   messageId: number
+  messageType: string
   senderUserId: number
   channelId: number
   content: string
@@ -60,6 +61,7 @@ export const useWebsocketStore = defineStore(
       }
       window.onbeforeunload = (_) => {
         socket.value?.close()
+        members[route.params.name] -= 1
       }
       if (isConnected && socket) {
         socket.value.onmessage = (e) => {
@@ -68,6 +70,11 @@ export const useWebsocketStore = defineStore(
           switch (code) {
             case 'text':
               // 处理消息
+              if (!messages[message.channelId])
+                messages[message.channelId] = []
+              messages[message.channelId].push(message)
+              break
+            case 'image':
               if (!messages[message.channelId])
                 messages[message.channelId] = []
               messages[message.channelId].push(message)
@@ -87,9 +94,9 @@ export const useWebsocketStore = defineStore(
         }
       }
     }
-    const sendMsg = (code: string, data: any, targetId = route.params.name) => {
+    const sendMsg = (code: string, data: any, targetId = route.params.name, serverId = route.params.server_id) => {
       if (isConnected) {
-        const msg = { code, data, targetId }
+        const msg = { code, data, targetId, serverId }
         socket.value?.send(JSON.stringify(msg))
       }
     }

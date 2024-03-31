@@ -21,6 +21,11 @@ export default {
       type: String,
       required: true,
     },
+    msgType: {
+      type: String,
+      required: false,
+      default: 'text', // 消息类型，可以是 'text'、'image'、'mix' 等
+    },
   },
 }
 </script>
@@ -36,7 +41,15 @@ export default {
       {{ username }}
     </div>
     <div class="chat-bubble" :class="{ sent: isSent, received: !isSent }">
-      {{ message }}
+      <div v-if="msgType === 'text'">
+        {{ message }}
+      </div>
+      <div v-else-if="msgType === 'image'">
+        <n-image
+          width="100"
+          :src="message"
+        />
+      </div>
     </div>
     <div class="chat-footer opacity-50">
       {{ time }}
