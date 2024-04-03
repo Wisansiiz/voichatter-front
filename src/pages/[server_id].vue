@@ -1,17 +1,24 @@
-<script lang="ts">
+<script setup lang="ts">
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useShowSettingStore } from '~/store/modules/showStetting'
+import { useWebsocketStore } from '~/store/modules/websocket'
 
-export default defineComponent({
-  setup() {
-    const showSettingStore = useShowSettingStore()
-    const isShow = computed(() => showSettingStore.isShowMembersList)
-    const loading = computed(() => showSettingStore.showChannelList)
+const showSettingStore = useShowSettingStore()
+const isShow = computed(() => showSettingStore.isShowMembersList)
+const loading = computed(() => showSettingStore.showChannelList)
 
-    return {
-      isShow,
-      loading,
-    }
-  },
+const isOnline = useOnline()
+const online = computed(() => isOnline.value)
+const websocketStore = useWebsocketStore()
+const route: any = useRoute()
+onMounted(() => {
+  if (online.value)
+    websocketStore.initChatSocket({ code: 'ping', data: null, targetId: route.params.server_id })
+})
+watch(() => route.params.server_id, () => {
+  if (online.value)
+    websocketStore.initChatSocket({ code: 'ping', data: null, targetId: route.params.server_id })
 })
 </script>
 
@@ -25,7 +32,7 @@ export default defineComponent({
   >
     <n-layout-content
       has-sider
-      style="max-width: 240px; border-right: 1px solid #e8e8e8"
+      style="max-width: 240px; min-width: 240px; border-right: 1px solid #e8e8e8"
       :native-scrollbar="false"
     >
       <n-spin :show="loading">
