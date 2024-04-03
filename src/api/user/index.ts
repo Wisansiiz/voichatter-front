@@ -23,9 +23,9 @@ export async function userLogin(isLoading: Ref<UnwrapRef<boolean>>, model: Ref<U
       userStore.setAvatar(data.data.avatarUrl)
       userStore.setToken(data.data.token)
       if (localStore.token || sessionStore.token) {
-        await router.push('/')
         window.$message.success('登录成功')
         storage.set('ACCESS_TOKEN', userStore.token)
+        await router.push('/')
       }
       else {
         window.$message.error(data.message)
@@ -35,19 +35,8 @@ export async function userLogin(isLoading: Ref<UnwrapRef<boolean>>, model: Ref<U
       isLoading.value = false
     })
 }
-export function userRegister(formRef: any, model: Ref<UnwrapRef<{
-  password: null
-  reenteredPassword: null
-  email: string
-  username: null
-}>>) {
-  formRef.value?.validate(async (errors: any) => {
-    if (!errors) {
-      await service.post('/register', model)
-      window.$message.success('注册成功！')
-    }
-    else { window.$message.warning('请完整填写注册表单内容！') }
-  })
+export async function userRegister(model: { username: string, password: string, email: string, reenteredPassword: string, code: string, id: string }) {
+  await service.post('/register', model)
 }
 export async function userLogout() {
   await service.post('/logout').then(() => {
@@ -55,6 +44,11 @@ export async function userLogout() {
     window.$message.success('退出成功')
   }).then(() => router.push('/login'))
 }
+
+export async function codeApi() {
+  return await service.get('/api/code')
+}
+
 export async function userList(serverId: any) {
   const res: { data: { users: any } } = await service.get(`/users/${serverId}`)
   return res.data.users
