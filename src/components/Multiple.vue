@@ -158,25 +158,24 @@ export default defineComponent({
 
     // 挂断通话并通知服务器用户离开频道
     async function hangUp() {
-      // // 发送离开频道的消息给服务器
-      const message = {
-        code: 'leave_group',
+      // 发送离开频道的消息给服务器
+      if (socket) {
+        const message = {
+          code: 'leave_group',
+        }
+        socket.send(JSON.stringify(message))
+        // 关闭所有与当前用户相关的RTCPeerConnections
+        for (const [key, pc] of pcMap.entries()) {
+          pc.close()
+          pcMap.delete(key)
+          const video = document.getElementById(key)
+          videoContainer.value.removeChild(video)
+        }
+        // 停止所有本地媒体流
+        if (localStream)
+          localStream.getTracks().forEach(track => track.stop())
       }
-      socket.send(JSON.stringify(message))
-      // 关闭所有与当前用户相关的RTCPeerConnections
-      for (const [key, pc] of pcMap.entries()) {
-        pc.close()
-        pcMap.delete(key)
-        const video = document.getElementById(key)
-        videoContainer.value.removeChild(video)
-      }
-      // 停止所有本地媒体流
-      if (localStream)
-        localStream.getTracks().forEach(track => track.stop())
     }
-    onMounted(() => {
-      socket?.close()
-    })
 
     onBeforeRouteUpdate(async (_to) => {
       await hangUp()
