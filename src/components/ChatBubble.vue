@@ -1,5 +1,8 @@
 <script>
+import { Document } from '@vicons/ionicons5'
+
 export default {
+  components: { Document },
   props: {
     message: { // 消息内容
       type: String,
@@ -50,6 +53,16 @@ export default {
           :src="message"
         />
       </div>
+      <div v-else-if="msgType === 'file'">
+        <a
+          :href="message"
+          title="点击下载文件"
+        >
+          <n-icon>
+            <Document />
+          </n-icon>
+        </a>
+      </div>
     </div>
     <div class="chat-footer opacity-50">
       {{ time }}
@@ -63,6 +76,8 @@ export default {
   padding: 10px 15px;
   border-radius: 20px;
   max-width: 60%;
+  white-space: pre-wrap;
+  word-break: break-word;
 }
 
 .sent {
@@ -118,10 +133,6 @@ export default {
 }
 .opacity-50 {
   opacity: 0.5;
-}
-.text-xs {
-  font-size: 0.75rem;
-  line-height: 1rem;
 }
 .avatar > div {
   display: block;
