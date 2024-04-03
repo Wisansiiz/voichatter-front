@@ -1,21 +1,23 @@
-<script setup>
+<script setup lang="ts">
 import { Email, Password, User } from '@vicons/carbon'
-import { userRegister } from '~/api/user'
+import { codeApi, userRegister } from '~/api/user'
 
 const router = useRouter()
-const formRef = ref(null)
-const rPasswordFormItemRef = ref(null)
+const formRef = ref()
+const rPasswordFormItemRef = ref()
 const modelRef = ref({
-  username: null,
+  username: '',
   email: '',
-  password: null,
-  reenteredPassword: null,
+  password: '',
+  reenteredPassword: '',
+  code: '',
+  id: '',
 })
 const model = modelRef
-function validatePasswordStartWith(_rule, value) {
+function validatePasswordStartWith(_rule: any, value: any) {
   return !!modelRef.value.password && modelRef.value.password.startsWith(value) && modelRef.value.password.length >= value.length
 }
-function validatePasswordSame(_rule, value) {
+function validatePasswordSame(_rule: any, value: any) {
   return value === modelRef.value.password
 }
 
@@ -23,7 +25,7 @@ const rules = {
   username: [
     {
       required: true,
-      validator(_rule, value) {
+      validator(_rule: any, value: any) {
         if (!value)
           return new Error('需要用户名')
         else if (!/^[a-zA-Z0-9_-]{4,16}$/.test(value))
@@ -37,7 +39,7 @@ const rules = {
   email: [
     {
       required: true,
-      validator(_rule, value) {
+      validator(_rule: any, value: any) {
         if (!value)
           return new Error('需要邮箱')
         else if (!/^[a-zA-Z0-9_.-]+@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z0-9]{2,6}$/.test(value))
@@ -70,6 +72,12 @@ const rules = {
       trigger: ['blur', 'password-input'],
     },
   ],
+  code: [
+    {
+      required: true,
+      message: '请输入验证码',
+    },
+  ],
 }
 function handlePasswordInput() {
   if (modelRef.value.reenteredPassword)
@@ -85,7 +93,22 @@ const autoCompleteOptions = computed(() => {
   })
 })
 function register() {
-  userRegister(formRef, model)
+  formRef.value?.validate(async (errors: any) => {
+    if (!errors) {
+      await userRegister(model.value)
+      window.$message.success('注册成功！')
+      await router.push('/login')
+    }
+    else { window.$message.warning('请完整填写注册表单内容！') }
+  })
+}
+
+const base64 = ref('')
+function getCode() {
+  codeApi().then((res: any) => {
+    base64.value = res.data.img
+    model.value.id = res.data.id
+  })
 }
 </script>
 
@@ -154,6 +177,28 @@ function register() {
             </template>
           </n-input>
         </n-form-item>
+        <n-form-item path="code" label="验证码">
+          <n-input
+            v-model:value="model.code"
+            type="text"
+            show-password-on="click"
+            maxlength="10"
+            @keydown.enter.prevent
+          >
+            <template #prefix>
+              <n-icon>
+                <Password />
+              </n-icon>
+            </template>
+          </n-input>
+          <n-button @click="getCode">
+            获取验证码
+          </n-button>
+        </n-form-item>
+        <n-image
+          :src="base64"
+          size="15"
+        />
       </n-form>
       <div style="margin-top: 20px">
         <n-button
