@@ -1,26 +1,16 @@
 import { defineStore } from 'pinia'
 import { useUserStore } from '~/store/modules/user'
-import { wssBase } from '~/api'
+import { service, wssBase } from '~/api'
+import type { MessageInfo } from '~/api/message'
 
 interface Data {
   count: number
   code: string
-  message: IMessage
+  message: MessageInfo
 }
-interface IMessage {
-  messageId: number
-  messageType: string
-  senderUserId: number
-  channelId: number
-  content: string
-  attachment: string
-  sendDate: string
-  serverId: number
-  avatarUrl: string
-  senderName: string
-}
+
 interface MessageMap {
-  [key: string]: IMessage[]
+  [key: string]: MessageInfo[]
 }
 
 export const useWebsocketStore = defineStore(
@@ -37,25 +27,37 @@ export const useWebsocketStore = defineStore(
 
     // getters
     const isConnected = computed(() => socket.value?.readyState === 1 || isActive.value)
-    const getMessages = computed(() => messages[route.params.name] || [])
+    const getMessages = computed(() => messages[route.params.name])
     const getMembers = computed(() => members[route.params.name] || 0)
 
     // actions
-    const initChatSocket = () => {
+    async function getPagesMessages(page: any, pageCount: any, pageSize: any, r: any = null) {
+      r = r === null ? route : r
+      return new Promise((resolve) => {
+        service.get(`/messages/page/${r.params.server_id}/${r.params.name}?page=${page.value}&pageSize=${pageSize.value}`)
+          .then((res) => {
+            const { messageInfo, pageTotal } = res.data.messagePages
+            pageCount.value = pageTotal
+            resolve(messageInfo)
+          })
+      })
+    }
+
+    const initChatSocket = (msg: { code: string, data: any, targetId: string }) => {
       socket.value = new WebSocket(`${wssBase}/api/wz?token=${encodeURIComponent(userStore.getToken)}`)
       socket.value.onopen = () => {
-        console.log('websocket连接成功')
-        const msg = { code: 'ping', data: null, targetId: route.params.name }
+        // console.log('websocket连接成功')
+        // const msg = { code: 'ping', data: null, targetId: route.params.name }
         socket.value?.send(JSON.stringify(msg))
         isActive.value = true
       }
       socket.value.close = (_) => {
-        console.log('websocket连接关闭')
+        // console.log('websocket连接关闭')
         isActive.value = false
         members[route.params.name] -= 1
       }
       socket.value.onerror = (_) => {
-        console.log('WebSocket:发生错误')
+        // console.log('WebSocket:发生错误')
         isActive.value = false
         members[route.params.name] -= 1
       }
@@ -79,6 +81,11 @@ export const useWebsocketStore = defineStore(
                 messages[message.channelId] = []
               messages[message.channelId].push(message)
               break
+            case 'file':
+              if (!messages[message.channelId])
+                messages[message.channelId] = []
+              messages[message.channelId].push(message)
+              break
             case 'notice':
               // 处理通知
               break
@@ -86,7 +93,13 @@ export const useWebsocketStore = defineStore(
               if (!members[message.channelId])
                 members[message.channelId] = 0
               members[message.channelId] = count
-              window.$message.success('ping')
+              if (userStore.getUserId !== message.senderUserId) {
+                window.$notification.create({
+                  title: '在线通知',
+                  content: `${message.senderName}上线了`,
+                  duration: 5000,
+                })
+              }
               break
             default:
               break
@@ -108,6 +121,7 @@ export const useWebsocketStore = defineStore(
       messages,
       getMessages,
       getMembers,
+      getPagesMessages,
     }
   },
 )
