@@ -5,9 +5,6 @@
   <!--  <n-flex justify="center"> -->
   <div class="contain">
     <RouterView />
-    <div mx-auto mt-5 text-center text-sm opacity-50>
-      [Home Layout]
-    </div>
   </div>
   <n-layout-footer>
     <div mx-auto mt-5 text-center text-sm opacity-50>
