@@ -21,6 +21,7 @@ export interface MessagePages {
 
 export interface MessageInfo {
   attachment: string
+  messageType: string
   avatarUrl: string
   channelId: number
   content: string
