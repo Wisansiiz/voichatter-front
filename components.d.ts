@@ -17,6 +17,8 @@ declare module 'vue' {
     MainView: typeof import('./src/components/MainView.vue')['default']
     Multiple: typeof import('./src/components/Multiple.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
+    NAnchor: typeof import('naive-ui')['NAnchor']
+    NAnchorLink: typeof import('naive-ui')['NAnchorLink']
     NAutoComplete: typeof import('naive-ui')['NAutoComplete']
     NAvatar: typeof import('naive-ui')['NAvatar']
     NBackTop: typeof import('naive-ui')['NBackTop']
