@@ -27,3 +27,9 @@ export async function createGroupApi(serverId: any, groupName: string): Promise<
 export async function deleteGroupApi(serverId: any, groupId: any): Promise<void> {
   await service.delete(`/group/${serverId}/${groupId}`)
 }
+
+export async function groupModifyApi(model: any): Promise<Group> {
+  const { serverId, groupId, groupName } = model
+  const res: Response = await service.put(`/group/${serverId}/${groupId}`, { groupName })
+  return res.data.group
+}
