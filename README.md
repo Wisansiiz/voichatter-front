@@ -1,18 +1,34 @@
-# Vue 3 + TypeScript + Vite
+# 一个关于使用webrtc和websocket实现视频通话和发送消息的项目的后端部分
 
-This template should help get you started developing with Vue 3 and TypeScript in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+## 1. 项目启动
+```bash
+pnpm install
+pnpm run dev
+```
 
-## Recommended IDE Setup
+## 2. 技术支持
+1. naive-ui
+2. vue3
+3. ts
+## 3. 参考项目
+4. naive-ui-admin
+5. vitesse
+6. hotgo
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## 4. 项目实现的主要功能
+- [x] 1. 用户登录注册，注册阶段进行图形验证码验证
+- [x] 2. 创建服务器，加入服务器
+- [x] 3. 在服务器内创建分组，频道，进行文字图片发送
+- [x] 4. 在服务器内进行视频通话
+- [x] 5. 发布公告，用户加入到服务器内时进行提示
+- [x] 6. 服务器内用户列表，用户信息查看
+- [x] 7. 踢出服务器内成员
+- [ ] 8. 消息的编辑和删除功能，引用和回复功能
+- [x] 9. 报名参加公共区域的活动，活动开始时会自动加入活动服务器
+- [x] 10. 权限控制：设置不同角色，每个角色有不同的权限。服务器创建者拥有该服务器的最高管理权限。
+- [x] 11. 发布“活动服务器”，在公共区域发布活动服务器，进行活动报名的用户在活动期间会自动加入到该服务器中
+- [x] 12. 聊天用户管理：管理员可以对聊天用户禁言、警告、踢出服务器（语音频道）等
+- [x] 13. 公告管理：在频道内发布和取消公告
 
-## Type Support For `.vue` Imports in TS
-
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
-
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
-
-1. Disable the built-in TypeScript Extension
-   1. Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-   2. Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+#### 最后
+后端地址: [Voichatter后端地址](https://github.com/Wisansiiz/voichatter-gf)
