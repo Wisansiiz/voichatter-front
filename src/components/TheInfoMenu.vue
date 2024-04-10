@@ -3,7 +3,7 @@ import { h, nextTick, ref } from 'vue'
 import type { DataTableColumns, DropdownOption } from 'naive-ui'
 import { NTag } from 'naive-ui'
 import { useServerListStore } from '~/store/modules/serverList'
-import { modifyUserSPermissionsApi } from '~/api/user'
+import { modifyUserSPermissionsApi, removeUserApi } from '~/api/user'
 
 const serverListStore = useServerListStore()
 const route: any = useRoute()
@@ -70,6 +70,24 @@ const options: DropdownOption[] = [
   {
     label: () => h('span', { style: { color: 'red' } }, '删除'),
     key: 'delete',
+    props: {
+      onClick: () => {
+        window.$dialog.create({
+          title: '确认删除',
+          content: '确认删除该用户吗？',
+          positiveText: '确定',
+          negativeText: '不确定',
+          onPositiveClick: async () => {
+            await removeUserApi(route.params.server_id, userInfo.value.userId)
+            await updateMemberList()
+            window.$message.success('删除成功')
+          },
+          onNegativeClick: () => {
+            window.$message.info('不确定')
+          },
+        })
+      },
+    },
   },
 ]
 const colsReactive: DataTableColumns = [
