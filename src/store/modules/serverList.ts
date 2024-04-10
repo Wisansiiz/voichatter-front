@@ -1,10 +1,9 @@
 import { defineStore } from 'pinia'
 import { RouterLink } from 'vue-router'
-import { Add } from '@vicons/ionicons5'
+import { Add, NewspaperSharp, SearchCircleSharp } from '@vicons/ionicons5'
 import { createImageVNode, renderIcon } from '~/composables'
 import { createServer, getServerList, joinServer } from '~/api/server'
 
-// import { findChannelList } from '~/api/channel'
 import { userList } from '~/api/user'
 import { findChannelList } from '~/api/channel'
 import { useShowSettingStore } from '~/store/modules/showStetting'
@@ -112,6 +111,34 @@ export const useServerListStore = defineStore(
           key: 'add',
           icon: renderIcon(Add),
         })
+        menu.push({
+          label: () =>
+            h(
+              RouterLink,
+              {
+                to: {
+                  path: `/activity`,
+                },
+              },
+              { default: () => '活动列表' },
+            ),
+          key: 'activity',
+          icon: renderIcon(NewspaperSharp),
+        })
+        menu.push({
+          label: () =>
+            h(
+              RouterLink,
+              {
+                to: {
+                  path: `/search`,
+                },
+              },
+              { default: () => '发现服务器' },
+            ),
+          key: 'search',
+          icon: renderIcon(SearchCircleSharp),
+        })
         serverMap.value = new Map<number, any>()
         getServerList().then((res: { serverList: any }) => {
           if (res.serverList) {
@@ -164,8 +191,8 @@ export const useServerListStore = defineStore(
       })
     }
 
-    async function toJoinServer(serverId: number) {
-      joinServer(serverId).then((server: serverRep) => {
+    async function toJoinServer(model: any) {
+      joinServer(model).then((server: serverRep) => {
         menuOptions.value.push({
           label: () =>
             h(
