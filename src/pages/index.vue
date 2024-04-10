@@ -1,32 +1,65 @@
-<script setup>
-defineOptions({
-  name: 'IndexPage',
-})
+<script setup lang="ts">
+import { addDays, isYesterday } from 'date-fns'
+import type { NumberAnimationInst } from 'naive-ui'
+import { serverCountApi } from '~/api/server'
 
-const messages = [
-  { username: '张三', text: '一段非常长的文本，一段非常长的文本，一段非常长的文本，一段非常长的文本，一段非常长的文本，一段非常长的文本，一段非常长的文本，一段非常长的文本，一段非常长的文本，一段非常长的文本，一段非常长的文本，一段非常长的文本，一段非常长的文本，', isSent: true, time: '2024年2月19日 13:55', avatar: 'https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100' },
-  { username: '李四', text: '一段非常长的文本，一段非常长的文本，一段非常长的文本一段非常长的文本，一段非常长的文本，一段非常长的文本', isSent: false, time: '2024年2月19日 13:56', avatar: 'https://thirdqq.qlogo.cn/g?b=qq&nk=1392634254&s=100' },
-]
+const value = ref(addDays(Date.now(), 1).valueOf())
+function handleUpdateValue(
+  _: number,
+  { year, month, date }: { year: number, month: number, date: number },
+) {
+  window.$message.success(`${year}-${month}-${date}`)
+}
+function isDateDisabled(timestamp: number) {
+  return (isYesterday(timestamp))
+}
+
+const numberAnimationInstRef = ref<NumberAnimationInst | null>(null)
+function handleClick() {
+  numberAnimationInstRef.value?.play()
+}
+
+const count = ref(0)
+serverCount()
+function serverCount() {
+  serverCountApi().then((res: any) => {
+    count.value = res.count
+  })
+}
 </script>
 
 <template>
-  <n-scrollbar style="margin-bottom: 50px">
-    <n-h1>主页</n-h1>
-    <n-button @click="logout()">
-      退出登录
-    </n-button>
-    <div class="chat-window">
-      <ChatBubble
-        v-for="(msg, index) in messages"
-        :key="index"
-        :message="msg.text"
-        :is-sent="msg.isSent"
-        :avatar="msg.avatar"
-        :time="msg.time"
-        :username="msg.username"
-      />
-    </div>
-  </n-scrollbar>
+  <n-flex justify="center" style="margin-top: 40px">
+    <n-h1>欢迎来到Voichatter</n-h1>
+  </n-flex>
+  <n-flex justify="start" :wrap-item="false" style="height: 100%">
+    <n-flex vertical justify="center">
+      <div style="width: 500px; ">
+        <n-calendar
+          v-model:value="value"
+          #="{ year, month, date }"
+          :is-date-disabled="isDateDisabled"
+          @update:value="handleUpdateValue"
+        >
+          {{ year }}-{{ month }}-{{ date }}
+        </n-calendar>
+      </div>
+    </n-flex>
+    <n-flex vertical justify="center">
+      <n-statistic label="一共有" tabular-nums>
+        <n-number-animation ref="numberAnimationInstRef" :from="0" :to="count" />
+        <template #suffix>
+          个服务器
+        </template>
+      </n-statistic>
+      <n-space vertical>
+        花时间、花精力、花心思，愿你每一份努力都不负所望
+        <n-button @click="handleClick">
+          播放
+        </n-button>
+      </n-space>
+    </n-flex>
+  </n-flex>
 </template>
 
 <style scoped>
