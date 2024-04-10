@@ -66,19 +66,24 @@ export default defineComponent({
         }
       })
     }
-    const joinModel = ref({ serverId: null })
+    const joinModel = ref({ serverId: null, link: null })
     const joinRules = {
       serverId: {
-        required: true,
+        required: false,
         trigger: ['blur', 'input'],
         message: '请输入 id',
+      },
+      link: {
+        required: false,
+        trigger: ['blur', 'input'],
+        message: '请输入 link',
       },
     }
     function handleJoinServer() {
       formRef.value?.validate((errors) => {
         if (!errors) {
-          serverListStore.toJoinServer(Number(joinModel.value.serverId)).then(() => {
-            window.$message.success('添加成功')
+          serverListStore.toJoinServer(joinModel.value).then(() => {
+            // window.$message.success('添加成功')
             showJoinServer.value = false
             serverListStore.showModal = false
             serverListStore.setServerInfo()
@@ -231,6 +236,12 @@ export default defineComponent({
         <n-input
           v-model:value="joinModel.serverId"
           placeholder="请输入服务器id"
+        />
+      </n-form-item>
+      <n-form-item label="或者是邀请链接" path="link">
+        <n-input
+          v-model:value="joinModel.link"
+          placeholder="请输入链接"
         />
       </n-form-item>
     </n-form>
