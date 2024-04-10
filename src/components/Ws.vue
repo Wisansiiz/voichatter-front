@@ -2,6 +2,7 @@
 import { Add } from '@vicons/ionicons5'
 import type { UploadFileInfo, UploadInst } from 'naive-ui'
 import { NButton } from 'naive-ui'
+import { ref } from 'vue'
 import { baseURL } from '~/api'
 import { useWebsocketStore } from '~/store/modules/websocket'
 import { useUserStore } from '~/store/modules/user'
@@ -147,19 +148,17 @@ function getFileExtension(url: string) {
       历史消息
     </NButton>
   </n-flex>
-  <template
+  <ChatBubble
     v-for="(msg, _i) in messages"
     :key="_i"
-  >
-    <ChatBubble
-      :message="msg.content"
-      :is-sent="msg.senderUserId === userId"
-      :avatar="msg.avatarUrl"
-      :time="msg.sendDate"
-      :username="msg.senderName"
-      :msg-type="msg.messageType"
-    />
-  </template>
+    :message-id="msg.messageId"
+    :message="msg.content"
+    :is-sent="msg.senderUserId === userId"
+    :avatar="msg.avatarUrl"
+    :time="msg.sendDate"
+    :username="msg.senderName"
+    :msg-type="msg.messageType"
+  />
   <div id="bottom" style="margin-bottom: 100px" />
   <n-layout-footer
     bordered
