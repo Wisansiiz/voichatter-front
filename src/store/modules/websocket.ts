@@ -48,7 +48,8 @@ export const useWebsocketStore = defineStore(
       socket.value.onopen = () => {
         // console.log('websocket连接成功')
         // const msg = { code: 'ping', data: null, targetId: route.params.name }
-        socket.value?.send(JSON.stringify(msg))
+        if (socket.value)
+          socket.value.send(JSON.stringify(msg))
         isActive.value = true
       }
       socket.value.close = (_) => {
@@ -107,9 +108,13 @@ export const useWebsocketStore = defineStore(
         }
       }
     }
-    const sendMsg = (code: string, data: any, targetId = route.params.name, serverId = route.params.server_id) => {
+    const sendMsg = (code: string, data: any, targetId = route.params.name, serverId = route.params.server_id, messageId: any = null) => {
       if (isConnected) {
-        const msg = { code, data, targetId, serverId }
+        if (targetId === null)
+          targetId = route.params.name
+        if (serverId === null)
+          serverId = route.params.server_id
+        const msg = { code, data, targetId, serverId, messageId }
         socket.value?.send(JSON.stringify(msg))
       }
     }
