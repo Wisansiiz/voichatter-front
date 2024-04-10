@@ -43,9 +43,10 @@ declare module 'vue-router/auto/routes' {
     '/[...all]': RouteRecordInfo<'/[...all]', '/:all(.*)', { all: ParamValue<true> }, { all: ParamValue<false> }>,
     '/[server_id]': RouteRecordInfo<'/[server_id]', '/:server_id', { server_id: ParamValue<true> }, { server_id: ParamValue<false> }>,
     '/[server_id]/[name]': RouteRecordInfo<'/[server_id]/[name]', '/:server_id/:name', { server_id: ParamValue<true>, name: ParamValue<true> }, { server_id: ParamValue<false>, name: ParamValue<false> }>,
-    '/hi/[name]': RouteRecordInfo<'/hi/[name]', '/hi/:name', { name: ParamValue<true> }, { name: ParamValue<false> }>,
+    '/activity': RouteRecordInfo<'/activity', '/activity', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
     '/register': RouteRecordInfo<'/register', '/register', Record<never, never>, Record<never, never>>,
+    '/search': RouteRecordInfo<'/search', '/search', Record<never, never>, Record<never, never>>,
     '/server-setting/[serverId]': RouteRecordInfo<'/server-setting/[serverId]', '/server-setting/:serverId', { serverId: ParamValue<true> }, { serverId: ParamValue<false> }>,
     '/setting/account': RouteRecordInfo<'/setting/account', '/setting/account', Record<never, never>, Record<never, never>>,
   }
