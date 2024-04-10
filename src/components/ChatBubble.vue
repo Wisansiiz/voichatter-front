@@ -1,40 +1,47 @@
-<script>
+<script setup lang="ts">
 import { Document } from '@vicons/ionicons5'
+import { useWebsocketStore } from '~/store/modules/websocket'
 
-export default {
-  components: { Document },
-  props: {
-    message: { // 消息内容
-      type: String,
-      required: true,
-    },
-    isSent: { // true 表示发送者，false 表示接收者
-      type: Boolean,
-      required: true,
-    },
-    time: { // 消息发送的时间
-      type: String,
-      required: true,
-    },
-    avatar: { // 用户头像URL
-      type: String,
-      required: true,
-    },
-    username: { // 用户名，用于头像alt文本
-      type: String,
-      required: true,
-    },
-    msgType: {
-      type: String,
-      required: false,
-      default: 'text', // 消息类型，可以是 'text'、'image'、'mix' 等
-    },
-  },
+const props = defineProps<{
+  messageId: string | number // 消息ID
+  message: string // 消息内容
+  isSent: boolean // true 表示发送者，false 表示接收者
+  time: string // 消息发送的时间
+  avatar: string // 用户头像URL
+  username: string // 用户名，用于头像alt文本
+  msgType: string // 消息类型，可以是 'text'、'image'、'mix' 等
+}>()
+const emit = defineEmits(['data'])
+const msg = ref()
+msg.value = props.message
+function handleClick() {
+  emit('data', {
+    messageId: props.messageId,
+    message: msg.value,
+    isSent: props.isSent,
+    time: props.time,
+    avatar: props.avatar,
+    username: props.username,
+    msgType: props.msgType,
+  })
+}
+function handlePositiveClick() {
+  console.log(msg.value)
+  confirm()
+}
+function handleNegativeClick() {
+  window.$message.info('取消')
+}
+const websocketStore = useWebsocketStore()
+const { sendMsg } = websocketStore
+function confirm() {
+  sendMsg('update', msg.value, null, null, props.messageId)
+  window.$message.success('修改成功')
 }
 </script>
 
 <template>
-  <div class="chat" :class="{ 'chat-start': !isSent, 'chat-end': isSent }">
+  <div :key="messageId" class="chat" :class="{ 'chat-start': !isSent, 'chat-end': isSent }">
     <div class="chat-image avatar">
       <div class="w-10 rounded-full">
         <img class="w-10 rounded-full" :src="avatar" :alt="username">
@@ -66,6 +73,16 @@ export default {
     </div>
     <div class="chat-footer opacity-50">
       {{ time }}
+      <n-popconfirm
+        v-if="isSent"
+        @positive-click="handlePositiveClick"
+        @negative-click="handleNegativeClick"
+      >
+        <template #trigger>
+          <n-button v-if="isSent" i-carbon-settings :focusable="false" @click="handleClick" />
+        </template>
+        <n-input v-model:value="msg" />
+      </n-popconfirm>
     </div>
   </div>
 </template>
