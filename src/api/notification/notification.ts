@@ -36,3 +36,12 @@ export async function getNotificationApi(serverId: string) {
   const res: GetNotificationResponse = await service.get(`/notification/${serverId}`)
   return res.data.notification
 }
+
+export async function updateNotificationApi(serverId: string, data: any) {
+  const res: Response = await service.put(`/notification/${serverId}`, data)
+  return res.data.notification
+}
+
+export async function deleteNotificationApi(serverId: string, notificationId: any) {
+  await service.delete(`/notification/${serverId}/${notificationId}`)
+}
