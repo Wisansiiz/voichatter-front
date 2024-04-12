@@ -59,6 +59,7 @@ watch(() => route.params.server_id, async () => {
 const model = ref({
   channel_name: null,
   type: null,
+  groupId: null,
 })
 const groupModel = ref({
   groupName: '',
@@ -156,7 +157,7 @@ function handleUpdateValue(key: any, { channelType }: any) {
 }
 
 const groupInfoModel = ref({
-  groupId: '',
+  groupId: null,
   serverId: route.params.server_id,
   groupName: '',
 })
@@ -216,11 +217,26 @@ const options2 = [
   {
     label: '编辑分组',
     key: 'editGroup',
-    props: {
-      onClick: () => {
-        showGroupSetting.value = true
+    children: [
+      {
+        label: '设置',
+        key: 'setting',
+        props: {
+          onClick: () => {
+            showGroupSetting.value = true
+          },
+        },
       },
-    },
+      {
+        label: '添加频道',
+        key: 'addChannel',
+        props: {
+          onClick: () => {
+            showModal.value = true
+          },
+        },
+      },
+    ],
   },
   {
     label: () => h(
@@ -305,7 +321,7 @@ const options = [
     },
   },
   {
-    label: '活动',
+    label: '活动相关',
     key: 'activity',
     props: {
       onClick: () => {
@@ -394,6 +410,15 @@ const options = [
     key: 'delete',
   },
 ]
+
+function handleInitGroupId() {
+  model.value.groupId = groupInfoModel.value.groupId
+}
+
+function handleSetNullGroupId() {
+  groupInfoModel.value.groupId = null
+  model.value.groupId = null
+}
 </script>
 
 <template>
@@ -486,12 +511,17 @@ const options = [
       content: 'soft',
       footer: 'soft',
     }"
+    :on-after-enter="handleInitGroupId"
+    :on-after-leave="handleSetNullGroupId"
   >
     <n-form
       ref="formRef"
       :model="model"
       :rules="rules"
     >
+      <n-form-item label="分组ID">
+        <n-input :value="String(groupInfoModel.groupId)" disabled />
+      </n-form-item>
       <n-form-item label="为频道取个名字" path="channel_name">
         <n-input
           v-model:value="model.channel_name"
