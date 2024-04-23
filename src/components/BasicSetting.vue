@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import type { FormItemRule } from 'naive-ui'
+
+// import type { FormItemRule } from 'naive-ui'
 import { useMessage } from 'naive-ui'
 import { useUserStore } from '~/store/modules/user'
-import { uploadAvatarApi } from '~/api/user'
+import {uploadAvatarApi, userInfoUpdateApi} from '~/api/user'
 
 const rules = {
   username: {
@@ -14,13 +15,13 @@ const rules = {
     message: '请输入邮箱',
     trigger: 'blur',
   },
-  mobile: {
-    message: '请输入联系电话',
-    trigger: 'input',
-    validator: (_rule: FormItemRule, value: string) => {
-      return /^1[3456789]\d{9}$/.test(value)
-    },
-  },
+  // mobile: {
+  //   message: '请输入联系电话',
+  //   trigger: 'input',
+  //   validator: (_rule: FormItemRule, value: string) => {
+  //     return /^1[3456789]\d{9}$/.test(value)
+  //   },
+  // },
 }
 const formRef: any = ref(null)
 const message = useMessage()
@@ -29,16 +30,20 @@ const userStore = useUserStore()
 
 const formValue = reactive({
   username: '',
-  mobile: '',
   email: '',
   avatar: userStore.getAvatar,
 })
 
 function formSubmit() {
   formRef.value.validate((errors: any) => {
-    if (!errors)
+    if (!errors) {
       message.success('验证成功')
-    else
+      userInfoUpdateApi(formValue).then((res) => {
+        const { username, email } = res
+        userStore.setUserInfo({ username, email })
+        message.success('基本信息修改成功')
+      })
+    } else
       message.error('验证失败，请填写完整信息')
   })
 }
@@ -83,9 +88,9 @@ function getResultData({ blobData, dataURL }: any) {
           <n-input v-model:value="formValue.email" placeholder="请输入邮箱" />
         </n-form-item>
 
-        <n-form-item label="联系电话" path="mobile">
-          <n-input v-model:value="formValue.mobile" placeholder="请输入联系电话" />
-        </n-form-item>
+        <!--        <n-form-item label="联系电话" path="mobile"> -->
+        <!--          <n-input v-model:value="formValue.mobile" placeholder="请输入联系电话" /> -->
+        <!--        </n-form-item> -->
 
         <n-form-item label="头像" path="avatar">
           <label>

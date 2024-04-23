@@ -119,10 +119,6 @@ export default defineComponent({
     // 图标列表
     const iconList = [
       {
-        icon: 'SearchOutlined',
-        tips: '搜索',
-      },
-      {
         icon: 'GithubOutlined',
         tips: 'github',
         eventObject: {
@@ -281,7 +277,7 @@ export default defineComponent({
               <SettingOutlined />
             </n-icon>
           </template>
-          <span>配置</span>
+          <span>服务器内用户列表</span>
         </n-tooltip>
       </div>
     </div>

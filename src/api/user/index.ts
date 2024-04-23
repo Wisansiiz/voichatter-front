@@ -125,3 +125,9 @@ export async function uploadAvatarApi(file: any) {
 export async function removeUserApi(serverId: any, userId: any) {
   await service.delete(`/user/${serverId}/${userId}`)
 }
+
+export async function userInfoUpdateApi(userInfo: any) {
+  const res: { data: any } = await service.put('/user/info', userInfo)
+  console.log(res.data.userInfo)
+  return res.data.userInfo
+}

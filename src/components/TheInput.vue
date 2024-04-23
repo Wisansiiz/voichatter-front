@@ -5,7 +5,7 @@
 <template>
   <n-input
     type="textarea"
-    placeholder="基本的 Textarea"
+    placeholder="消息框内的内容"
     style="height: 80px"
     :style="{ width: '75%' }"
     :autosize="{ minRows: 1 }"
