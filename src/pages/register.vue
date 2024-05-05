@@ -93,11 +93,16 @@ const autoCompleteOptions = computed(() => {
   })
 })
 function register() {
-  formRef.value?.validate(async (errors: any) => {
+  formRef.value?.validate((errors: any) => {
     if (!errors) {
-      await userRegister(model.value)
-      window.$message.success('注册成功！')
-      await router.push('/login')
+      userRegister(model.value).then((res: any) => {
+        if (res.code === 0) {
+          window.$message.success('注册成功！')
+          router.push('/login')
+        }
+      })
+      // window.$message.success('注册成功！')
+      // await router.push('/login')
     }
     else { window.$message.warning('请完整填写注册表单内容！') }
   })
@@ -114,7 +119,7 @@ function getCode() {
 
 <template>
   <n-flex justify="center">
-    <div style="margin-top: 50px">
+    <div style="margin-top: 30px">
       <n-form ref="formRef" :model="model" :rules="rules">
         <n-form-item path="email" label="邮箱">
           <n-auto-complete
