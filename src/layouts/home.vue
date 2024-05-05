@@ -2,21 +2,20 @@
 </script>
 
 <template>
-  <!--  <n-flex justify="center"> -->
   <div class="contain">
+    <n-flex justify="center">
+      <n-h1>在线语音聊天频道</n-h1>
+    </n-flex>
+    <n-flex justify="center">
+      <n-h1>Voichatter</n-h1>
+    </n-flex>
     <RouterView />
   </div>
-  <n-layout-footer>
-    <div mx-auto mt-5 text-center text-sm opacity-50>
-      [Home Layout]
-    </div>
-  </n-layout-footer>
-<!--  </n-flex> -->
 </template>
 
 <style scoped>
 .contain {
-  height: 80vh;
+  height: 100vh;
   background: #ffffff;
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
