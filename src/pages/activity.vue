@@ -14,7 +14,7 @@ const page = ref(1)
 const pageSize = ref(6)
 const searchValue = ref('')
 function getActivityList() {
-  console.log(page.value, pageSize.value)
+  // console.log(page.value, pageSize.value)
   loading.value = true
   activityPagesApi(page.value, pageSize.value, searchValue.value).then((res) => {
     activityList.value = res.activityPages
@@ -28,10 +28,6 @@ type InputThemeOverrides = NonNullable<InputProps['themeOverrides']>
 const inputThemeOverrides: InputThemeOverrides = {
   heightLarge: '50px',
 }
-
-// function getData(data: any) {
-//   console.log(data)
-// }
 </script>
 
 <template>
