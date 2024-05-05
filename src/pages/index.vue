@@ -1,18 +1,6 @@
 <script setup lang="ts">
-import { addDays, isYesterday } from 'date-fns'
 import type { NumberAnimationInst } from 'naive-ui'
 import { serverCountApi } from '~/api/server'
-
-const value = ref(addDays(Date.now(), 1).valueOf())
-function handleUpdateValue(
-  _: number,
-  { year, month, date }: { year: number, month: number, date: number },
-) {
-  window.$message.success(`${year}-${month}-${date}`)
-}
-function isDateDisabled(timestamp: number) {
-  return (isYesterday(timestamp))
-}
 
 const numberAnimationInstRef = ref<NumberAnimationInst | null>(null)
 function handleClick() {
@@ -29,22 +17,10 @@ function serverCount() {
 </script>
 
 <template>
-  <n-flex justify="center" style="margin-top: 40px">
+  <n-flex justify="center" style="margin-top: 240px">
     <n-h1>欢迎来到Voichatter</n-h1>
   </n-flex>
-  <n-flex justify="start" :wrap-item="false" style="height: 100%">
-    <n-flex vertical justify="center">
-      <div style="width: 500px; ">
-        <n-calendar
-          v-model:value="value"
-          #="{ year, month, date }"
-          :is-date-disabled="isDateDisabled"
-          @update:value="handleUpdateValue"
-        >
-          {{ year }}-{{ month }}-{{ date }}
-        </n-calendar>
-      </div>
-    </n-flex>
+  <n-flex justify="center" :wrap-item="false" style="height: 100%">
     <n-flex vertical justify="center">
       <n-statistic label="一共有" tabular-nums>
         <n-number-animation ref="numberAnimationInstRef" :from="0" :to="count" />
