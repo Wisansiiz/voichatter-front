@@ -39,7 +39,7 @@ function login() {
 
 <template>
   <n-flex justify="center">
-    <div style="margin-top: 50px">
+    <div style="margin-top: 30px">
       <n-form ref="formRef" :model="model" :rules="rules">
         <n-form-item path="username" label="用户名">
           <n-input v-model:value="model.username" maxlength="20" @keydown.enter.prevent>
