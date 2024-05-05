@@ -36,7 +36,7 @@ export async function userLogin(isLoading: Ref<UnwrapRef<boolean>>, model: Ref<U
     })
 }
 export async function userRegister(model: { username: string, password: string, email: string, reenteredPassword: string, code: string, id: string }) {
-  await service.post('/register', model)
+  return await service.post('/register', model)
 }
 export async function userLogout() {
   await service.post('/logout').then(() => {
@@ -128,6 +128,6 @@ export async function removeUserApi(serverId: any, userId: any) {
 
 export async function userInfoUpdateApi(userInfo: any) {
   const res: { data: any } = await service.put('/user/info', userInfo)
-  console.log(res.data.userInfo)
+  // console.log(res.data.userInfo)
   return res.data.userInfo
 }
