@@ -4,7 +4,7 @@ import { reactive, ref } from 'vue'
 // import type { FormItemRule } from 'naive-ui'
 import { useMessage } from 'naive-ui'
 import { useUserStore } from '~/store/modules/user'
-import {uploadAvatarApi, userInfoUpdateApi} from '~/api/user'
+import { uploadAvatarApi, userInfoUpdateApi } from '~/api/user'
 
 const rules = {
   username: {
@@ -15,13 +15,6 @@ const rules = {
     message: '请输入邮箱',
     trigger: 'blur',
   },
-  // mobile: {
-  //   message: '请输入联系电话',
-  //   trigger: 'input',
-  //   validator: (_rule: FormItemRule, value: string) => {
-  //     return /^1[3456789]\d{9}$/.test(value)
-  //   },
-  // },
 }
 const formRef: any = ref(null)
 const message = useMessage()
@@ -43,8 +36,8 @@ function formSubmit() {
         userStore.setUserInfo({ username, email })
         message.success('基本信息修改成功')
       })
-    } else
-      message.error('验证失败，请填写完整信息')
+    }
+    else { message.error('验证失败，请填写完整信息') }
   })
 }
 
@@ -87,10 +80,6 @@ function getResultData({ blobData, dataURL }: any) {
         <n-form-item label="邮箱" path="email">
           <n-input v-model:value="formValue.email" placeholder="请输入邮箱" />
         </n-form-item>
-
-        <!--        <n-form-item label="联系电话" path="mobile"> -->
-        <!--          <n-input v-model:value="formValue.mobile" placeholder="请输入联系电话" /> -->
-        <!--        </n-form-item> -->
 
         <n-form-item label="头像" path="avatar">
           <label>
