@@ -59,14 +59,19 @@ export default defineComponent({
         }
       }
     }
+
+    const isVideo = ref(false)
+    const isAudio = ref(true)
     async function handleJoin() {
       await initWebsocket()
+      let audioStream: boolean | { echoCancellation: true, noiseSuppression: true }
+      if (isAudio.value)
+        audioStream = { echoCancellation: true, noiseSuppression: true }
+      else
+        audioStream = false
       localStream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-        },
+        video: isVideo.value,
+        audio: audioStream,
       })
       localVideo.value.srcObject = localStream
       const message = {
@@ -185,15 +190,13 @@ export default defineComponent({
       next()
     })
 
-    const isVideo = ref(false)
-    const isAudio = ref(true)
     return {
       videoContainer,
       localVideo,
       isVideo,
       isAudio,
-      handleChange(value: boolean) {
-        window.$message.info(`Update value: ${value}`)
+      handleChange(_value: boolean) {
+        // window.$message.info(`Update value: ${value}`)
       },
       handleJoin,
       hangUp,
