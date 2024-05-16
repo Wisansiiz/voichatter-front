@@ -52,7 +52,7 @@ const inputThemeOverrides: InputThemeOverrides = {
     </n-input>
   </n-flex>
   <n-spin :show="loading" style="margin-top: 10px">
-    <n-flex justify="center" style="padding: 10px;" :wrap-item="false">
+    <n-flex justify="center" style="padding: 30px;" :wrap-item="false">
       <template
         v-if="activityList"
       >

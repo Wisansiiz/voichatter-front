@@ -56,22 +56,22 @@ const options = [
           show.value = true
         },
       },
-      { default: () => '上传图片' },
+      { default: () => '上传图片/文件' },
     ),
     value: 'uploadPic',
   },
-  {
-    label: () => h(
-      'a',
-      {
-        onClick: () => {
-          window.$message.info('点击事件')
-        },
-      },
-      { default: () => '上传文件' },
-    ),
-    value: 'uploadFile',
-  },
+  // {
+  //   label: () => h(
+  //     'a',
+  //     {
+  //       onClick: () => {
+  //         window.$message.info('点击事件')
+  //       },
+  //     },
+  //     { default: () => '上传文件' },
+  //   ),
+  //   value: 'uploadFile',
+  // },
 ]
 const previewImageUrlRef = ref('')
 const showModalRef = ref(false)
@@ -212,7 +212,7 @@ function getFileExtension(url: string) {
       </NButton>
       <n-upload
         ref="upload"
-        :action="`${baseURL}/file?token=${encodeURIComponent(token)}`"
+        :action="`${baseURL}/file?token=${encodeURIComponent(token)}&serverId=${route.params.server_id}&channelId=${route.params.name}`"
         :default-file-list="fileList"
         list-type="image-card"
         :default-upload="false"

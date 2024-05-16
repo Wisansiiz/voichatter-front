@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { computed } from 'vue'
-import { NThemeEditor, darkTheme, dateZhCN, zhCN } from 'naive-ui'
+import { darkTheme, dateZhCN, zhCN } from 'naive-ui'
 import { useDesignSettingStore } from '~/store/modules/designSetting'
 
 const designStore = useDesignSettingStore()
@@ -27,11 +27,11 @@ const getDarkTheme = computed(() => (designStore.darkTheme ? darkTheme : undefin
     :theme-overrides="getThemeOverrides"
     :date-locale="dateZhCN"
   >
-    <NThemeEditor>
-      <AppProvider>
-        <RouterView />
-      </AppProvider>
-    </NThemeEditor>
+    <!--    <NThemeEditor> -->
+    <AppProvider>
+      <RouterView />
+    </AppProvider>
+    <!--    </NThemeEditor> -->
   </NConfigProvider>
 </template>
 
