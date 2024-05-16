@@ -24,8 +24,8 @@ export async function joinServer(model: any) {
   return res.data.server
 }
 
-export async function serverSearchApi(serverName: string) {
-  const res = await service.get(`/servers/search/?serverName=${serverName}`)
+export async function serverPagesApi(page: number, pageSize: number, serverName: string) {
+  const res = await service.get(`/servers/page?serverName=${serverName}&page=${page}&pageSize=${pageSize}`)
   return res.data
 }
 export interface Data {
