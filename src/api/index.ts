@@ -1,11 +1,17 @@
+/*
+ * @Author: Wisansiiz
+ * @Date: 2024-05-17 22:14:53
+ * @LastEditors: Wisansiiz
+ * @LastEditTime: 2024-05-18 09:03:57
+ */
 import axios from 'axios'
 import { useAuthLocalStore, useAuthSessionStore } from '~/stores/token.js'
 import { router } from '~/router'
 
 const localStore = useAuthLocalStore()
 const sessionStore = useAuthSessionStore()
-const baseURL = 'https://192.168.31.198:9000'
-const wssBase = 'wss://192.168.31.198:9000'
+const baseURL = 'https://192.168.51.28:9000'
+const wssBase = 'wss://192.168.51.28:9000'
 const service = axios.create({ baseURL, timeout: 10000 })
 service.interceptors.request.use((config) => {
   if (sessionStore.token || localStore.token)

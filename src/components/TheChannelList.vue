@@ -92,8 +92,8 @@ const rules = {
 
 const showInviteLink = ref(false)
 
-function deleteServer() {
-  deleteServerByOwner(route.params.server_id)
+async function deleteServer() {
+  await deleteServerByOwner(route.params.server_id)
   serverListStore.setServerInfo()
 }
 

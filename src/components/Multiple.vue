@@ -231,7 +231,7 @@ export default defineComponent({
     <div style="margin-top: 20px">
       <n-flex justify="center">
         <n-button @click="handleJoin">
-          join
+          加入
         </n-button>
         <n-button @click="hangUp">
           挂断
